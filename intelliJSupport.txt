@@ -1,0 +1,19 @@
+1.) build.gradle drag and drop
+
+2.) Open as project (Trust)
+    ...... (reload if failed)
+
+3.) forgegradle/setupDecompWorkspace
+                runClient (failed if you have code injection, this is not a problem)
+
+4.) Restart IDE
+
+5.) forgegradle/genIntelliJRuns (if you don't have two new run option, restart ide and run again)
+
+6.) copy to end of build.gradle/processResources ==> sourceSets { main { output.resourcesDir = output.classesDir } }
+
+7.) edit "Minecraft Client": setup compiler and modul (modName.main) (if it don't recognize the selected jdk, it's not a problem)
+
+
+
+run "Minecraft Client"
