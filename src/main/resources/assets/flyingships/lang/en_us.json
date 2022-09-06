@@ -1,0 +1,20 @@
+{
+  "item.flyingships.wand": "Wand",
+  "itemGroup.flyingshipstab": "Flying Ships",
+  "block.flyingships.rudder": "Rudder",
+  "block.flyingships.boiler": "Boiler",
+  "block.flyingships.heater": "Heater",
+  "text.wand.lessInfo": "Add rectangles to the selected ship",
+  "text.wand.moreInfo1": "Right click for a rudder block to select the ship\nThen right click on a block to select the first corner and right click to select the other corner and add to the ship.",
+  "text.wand.moreInfo2": "Shift right click to delete selected corner (not from ship)",
+  "text.wand.shipName": "Connected ship name: ",
+  "text.wand.position": "Selected first position: ",
+  "message.shipNameSet": "%s ship selected",
+  "message.pos1Set": "%s position selected",
+  "message.rectangleSet": "Add %s and %s rectangle to %s ship",
+  "message.pos1Deleted": "position unselected",
+  "message.wrongRectangle": "Rectangle data can not convert to number",
+  "message.shipNameDeleted": "ship unselected",
+  "message.collisionWarning": "%s ship shouldn't jump, because it can be cause a serious damage on target and himself",
+  "message.wrongRudderContext": "%s ship does not match to the coordinates %s"
+}

@@ -1,0 +1,46 @@
+// bugs/optimization
+- block update after jump
+- sound when jump
+
+// alfa
+- gitHub upload
+
+// demo
+- save coordinates
+- floating in water
+- perturbation on gui
+
+// beta
+- markers
+- help texts on directional round
+- heat/steam system
+- ship mode
+- configuration file
+
+// demo
+- ender engine system
+- block models
+
+// release
+- tests
+- item gate
+- sub rudder
+- graphical ship borders in the world
+- swim in lava
+- better logo (rudder block)
+
+// features
+- dimension change
+- submarine mod
+- multi rudder styles
+- computercraft integration
+- turn (during jump, without jump, saved coordinates)
+- graphical debug without texture
+- more fluid
+- animated steam, water structure
+- question before delete rectangle
+- edit coordinate
+- 1D engine
+- show absolute coordinates in settings in a tooltip
+- absolute or relative rectangles in edition mode
+- timed jump

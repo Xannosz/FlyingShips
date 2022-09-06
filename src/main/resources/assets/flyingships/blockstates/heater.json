@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "lit=true": {"model": "flyingships:block/heater_on"},
+    "lit=false": {"model": "flyingships:block/heater"}
+  }
+}
