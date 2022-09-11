@@ -4,9 +4,13 @@ import hu.xannosz.flyingships.Monad;
 import hu.xannosz.flyingships.Util;
 import hu.xannosz.flyingships.block.ModBlocks;
 import hu.xannosz.flyingships.blockentity.RudderBlockEntity;
+import hu.xannosz.flyingships.networking.GetSavedCoordinatesPacket;
+import hu.xannosz.flyingships.networking.ModMessages;
 import hu.xannosz.flyingships.screen.slot.ModInputSlot;
 import hu.xannosz.flyingships.screen.widget.ButtonId;
+import hu.xannosz.flyingships.warp.SavedCoordinate;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
@@ -25,6 +29,7 @@ import java.util.Map;
 
 import static hu.xannosz.flyingships.blockentity.RudderBlockEntity.*;
 
+@Slf4j
 public class RudderMenu extends AbstractContainerMenu {
 
 	private static final int PLAYER_INVENTORY_HEIGHT = 111;
@@ -48,6 +53,7 @@ public class RudderMenu extends AbstractContainerMenu {
 
 	public RudderMenu(int containerId, Inventory inv, BlockEntity blockEntity, ContainerData data) {
 		super(ModMenuTypes.RUDDER_MENU.get(), containerId);
+		log.info("menu constructor"); //TODO
 		checkContainerSize(inv, 3);
 		this.blockEntity = ((RudderBlockEntity) blockEntity);
 		level = inv.player.level;
@@ -56,7 +62,7 @@ public class RudderMenu extends AbstractContainerMenu {
 
 		addPlayerInventory(inv);
 		addPlayerHotBar(inv);
-
+		log.info("data C" + data.getCount());
 		this.blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handler -> {
 			enderInputSlot = new ModInputSlot(handler, 0, 105, 90);
 			steamInputSlot = new ModInputSlot(handler, 1, 128, 90);
@@ -67,6 +73,7 @@ public class RudderMenu extends AbstractContainerMenu {
 		});
 
 		addDataSlots(data);
+		log.info("menu constructor end"); //TODO
 	}
 
 
@@ -91,6 +98,7 @@ public class RudderMenu extends AbstractContainerMenu {
 	@Monad
 	@Override
 	public @NotNull ItemStack quickMoveStack(@NotNull Player playerIn, int index) {
+		log.info("quickMoveStack");
 		Slot sourceSlot = slots.get(index);
 		if (!sourceSlot.hasItem()) return ItemStack.EMPTY;  //EMPTY_ITEM
 		ItemStack sourceStack = sourceSlot.getItem();
@@ -124,6 +132,7 @@ public class RudderMenu extends AbstractContainerMenu {
 
 	@Override
 	public boolean stillValid(@NotNull Player player) {
+		log.info("still valid");
 		return stillValid(ContainerLevelAccess.create(level, blockEntity.getBlockPos()),
 				player, ModBlocks.RUDDER.get());
 	}
@@ -173,6 +182,7 @@ public class RudderMenu extends AbstractContainerMenu {
 	}
 
 	public int getPowerButtonState() {
+		log.info("getPBS"); //TODO
 		return data.get(POWER_BUTTON_STATE_KEY);
 	}
 
@@ -204,16 +214,17 @@ public class RudderMenu extends AbstractContainerMenu {
 		return GuiState.fromKey(data.get(GUI_STATE_KEY));
 	}
 
-	public int getPage() {
-		return data.get(PAGE_KEY);
+	public int getBlockPosPage() {
+		return data.get(BLOCK_POS_PAGE_KEY);
 	}
 
-	public int getMaxPage() {
-		return data.get(MAX_PAGE_KEY);
+	public int getBlockPosMaxPage() {
+		return data.get(BLOCK_POS_MAX_PAGE_KEY);
 	}
 
 	public List<BlockPos> getBlockPosStruct() {
-		int onThisPage = data.get(ON_THIS_PAGE_KEY);
+		log.info("getBPS"); //TODO
+		int onThisPage = data.get(BLOCK_POS_ON_THIS_PAGE_KEY);
 		List<BlockPos> result = new ArrayList<>();
 
 		if (onThisPage > 0) {
@@ -246,5 +257,28 @@ public class RudderMenu extends AbstractContainerMenu {
 
 	public int getFloating() {
 		return data.get(FLOATING_KEY);
+	}
+
+	public int getWaterLine() {
+		return data.get(WATER_LINE_KEY);
+	}
+
+	public void updateCoordinates() {
+		log.info("update message send"); //TODO
+		//ModMessages.sendToServer(new GetSavedCoordinatesPacket(blockEntity.getBlockPos()));
+	}
+
+	public List<SavedCoordinate> getCoordinates() {
+		log.info("get saved coordinates"); //TODO
+		//return blockEntity.getCoordinates();
+		return new ArrayList<>();
+	}
+
+	public int getCoordinatesPage() {
+		return data.get(COORDINATES_PAGE_KEY);
+	}
+
+	public int getCoordinatesMaxPage() {
+		return data.get(COORDINATES_MAX_PAGE_KEY);
 	}
 }

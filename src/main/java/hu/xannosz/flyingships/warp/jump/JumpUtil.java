@@ -1,5 +1,7 @@
 package hu.xannosz.flyingships.warp.jump;
 
+import hu.xannosz.flyingships.networking.ModMessages;
+import hu.xannosz.flyingships.networking.PlaySoundPacket;
 import hu.xannosz.flyingships.warp.AbsoluteRectangleData;
 import hu.xannosz.flyingships.warp.BlockPosStruct;
 import hu.xannosz.flyingships.warp.WarpDirection;
@@ -14,8 +16,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -59,7 +59,7 @@ public class JumpUtil {
 			final Map<LevelChunk, Boolean> chunks = getChunks(rectangles, additional, level);
 
 			//sound effect
-			playSoundEffect(level, rudderBlockPosition, players);
+			playSoundEffect(rudderBlockPosition, players);
 			//effects on player
 			addEffectsToPlayers(players);
 
@@ -235,12 +235,8 @@ public class JumpUtil {
 		return chunks;
 	}
 
-	private static void playSoundEffect(ServerLevel level, BlockPos rudderBlockPosition, Map<ServerPlayer, Vec3> players) {
-		level.playLocalSound((double) rudderBlockPosition.getX() + 0.5D, (double) rudderBlockPosition.getY() + 0.5D, (double) rudderBlockPosition.getZ() + 0.5D,
-				SoundEvents.ENDERMAN_TELEPORT, SoundSource.BLOCKS, 0.5F, RandomSource.create().nextFloat() * 0.4F + 0.8F, false);
-		players.keySet().forEach(player -> {
-			player.playSound(SoundEvents.ENDERMAN_TELEPORT);
-		});
+	private static void playSoundEffect(BlockPos rudderBlockPosition, Map<ServerPlayer, Vec3> players) {
+		players.keySet().forEach(player -> ModMessages.sendToPlayer(new PlaySoundPacket(rudderBlockPosition), player));
 	}
 
 	private static void addEffectsToPlayers(Map<ServerPlayer, Vec3> players) {

@@ -50,6 +50,26 @@ public class ModMessages {
 				.encoder(GetShipNamePacket::toBytes)
 				.consumerMainThread(GetShipNamePacket::handler)
 				.add();
+		INSTANCE.messageBuilder(PlaySoundPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+				.decoder(PlaySoundPacket::new)
+				.encoder(PlaySoundPacket::toBytes)
+				.consumerMainThread(PlaySoundPacket::handler)
+				.add();
+/*		INSTANCE.messageBuilder(SendNewCoordinatePacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+				.decoder(SendNewCoordinatePacket::new)
+				.encoder(SendNewCoordinatePacket::toBytes)
+				.consumerMainThread(SendNewCoordinatePacket::handler)
+				.add();
+		INSTANCE.messageBuilder(SendSavedCoordinatesPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+				.decoder(SendSavedCoordinatesPacket::new)
+				.encoder(SendSavedCoordinatesPacket::toBytes)
+				.consumerMainThread(SendSavedCoordinatesPacket::handler)
+				.add();
+		INSTANCE.messageBuilder(GetSavedCoordinatesPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+				.decoder(GetSavedCoordinatesPacket::new)
+				.encoder(GetSavedCoordinatesPacket::toBytes)
+				.consumerMainThread(GetSavedCoordinatesPacket::handler)
+				.add();*/
 	}
 
 	public static <MSG> void sendToServer(MSG message) {

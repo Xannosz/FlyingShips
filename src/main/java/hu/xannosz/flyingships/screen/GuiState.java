@@ -8,7 +8,7 @@ import javax.annotation.Nonnull;
 
 @RequiredArgsConstructor
 public enum GuiState {
-	MAIN(0), SETTINGS(1);
+	MAIN(0), SETTINGS(1), COORDINATES(2) ;
 
 	@Getter
 	private final int key;

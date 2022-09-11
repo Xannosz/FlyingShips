@@ -2,10 +2,12 @@ package hu.xannosz.flyingships.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import hu.xannosz.flyingships.screen.subscreen.CoordinatesSubScreen;
 import hu.xannosz.flyingships.screen.subscreen.MainSubScreen;
 import hu.xannosz.flyingships.screen.subscreen.SettingsSubScreen;
 import hu.xannosz.flyingships.screen.subscreen.SubScreen;
 import hu.xannosz.flyingships.screen.widget.ButtonId;
+import lombok.extern.slf4j.Slf4j;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -19,6 +21,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
+@Slf4j
 @OnlyIn(Dist.CLIENT)
 public class RudderScreen extends AbstractContainerScreen<RudderMenu> {
 
@@ -31,13 +34,17 @@ public class RudderScreen extends AbstractContainerScreen<RudderMenu> {
 
 	private final SubScreen mainSubScreen;
 	private final SubScreen settingsSubScreen;
+	private final SubScreen coordinatesSubScreen;
 	private SubScreen actualSubScreen = null;
 
 	public RudderScreen(RudderMenu rudderMenu, Inventory inventory, Component title) {
 		super(rudderMenu, inventory, title);
+		log.info("screen construct start"); //TODO
 		imageHeight = 193;
 		mainSubScreen = new MainSubScreen(this);
 		settingsSubScreen = new SettingsSubScreen(this);
+		coordinatesSubScreen = new CoordinatesSubScreen(this);
+		log.info("screen construct end"); //TODO
 	}
 
 	@Override
@@ -49,9 +56,11 @@ public class RudderScreen extends AbstractContainerScreen<RudderMenu> {
 
 		mainSubScreen.init(x, y);
 		settingsSubScreen.init(x, y);
+		coordinatesSubScreen.init(x, y);
 
 		mainSubScreen.registerRenderables();
 		settingsSubScreen.registerRenderables();
+		coordinatesSubScreen.registerRenderables();
 	}
 
 
@@ -71,6 +80,7 @@ public class RudderScreen extends AbstractContainerScreen<RudderMenu> {
 		switch (guiState) {
 			case MAIN -> actualSubScreen = mainSubScreen;
 			case SETTINGS -> actualSubScreen = settingsSubScreen;
+			case COORDINATES -> actualSubScreen = coordinatesSubScreen;
 		}
 
 		//call built-in functions
@@ -80,6 +90,7 @@ public class RudderScreen extends AbstractContainerScreen<RudderMenu> {
 		//set visibility
 		mainSubScreen.setVisibility(guiState.equals(GuiState.MAIN));
 		settingsSubScreen.setVisibility(guiState.equals(GuiState.SETTINGS));
+		coordinatesSubScreen.setVisibility(guiState.equals(GuiState.COORDINATES));
 
 		blinking();
 

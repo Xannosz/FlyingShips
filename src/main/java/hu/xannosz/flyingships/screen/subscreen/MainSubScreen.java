@@ -13,6 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 
 import static hu.xannosz.flyingships.screen.RudderScreen.DEBUG_MODE;
 import static hu.xannosz.flyingships.screen.constant.MainScreenConstants.*;
@@ -20,7 +21,7 @@ import static net.minecraftforge.client.gui.ScreenUtils.drawTexturedModalRect;
 
 public class MainSubScreen extends SubScreen {
 
-	private static final ResourceLocation BASE_TEXTURE =
+	private static final ResourceLocation TEXTURE =
 			new ResourceLocation(FlyingShips.MOD_ID, "textures/gui/rudder_gui.png");
 	private GraphicalButton right;
 	private GraphicalButton forward;
@@ -46,6 +47,8 @@ public class MainSubScreen extends SubScreen {
 
 	private HelpMessage windMessage;
 	private HelpMessage floatingMessage;
+
+	private final Random random = new Random();
 
 	public MainSubScreen(RudderScreen rudderScreen) {
 		super(rudderScreen);
@@ -316,7 +319,7 @@ public class MainSubScreen extends SubScreen {
 
 	@Override
 	public void renderBg() {
-		RenderSystem.setShaderTexture(0, BASE_TEXTURE);
+		RenderSystem.setShaderTexture(0, TEXTURE);
 		rudderScreen.setImageWidth(MAIN_GUI_WIDTH);
 		power.setState(rudderScreen.getMenu().getPowerButtonState());
 		power.setNextState(rudderScreen.getMenu().getPowerButtonNextState());
@@ -364,8 +367,8 @@ public class MainSubScreen extends SubScreen {
 
 		drawTexturedModalRect(poseStack, x + 120, y + 75, 219, 106, 10, 10, partialTick); //TODO remove after coordinates
 
-		wind.render(poseStack, rudderScreen.getMenu().getWind(), (int) (1.2 * rudderScreen.getMenu().getWindMax()), partialTick);
-		floating.render(poseStack, rudderScreen.getMenu().getFloating(), (int) (1.2 * rudderScreen.getMenu().getFloatingMax()), partialTick);
+		wind.render(poseStack, (int) (random.nextFloat(0.9f, 1.1f) * rudderScreen.getMenu().getWind()), (int) (1.2 * rudderScreen.getMenu().getWindMax()), partialTick);
+		floating.render(poseStack, (int) (random.nextFloat(0.9f, 1.1f) * rudderScreen.getMenu().getFloating()), (int) (1.2 * rudderScreen.getMenu().getFloatingMax()), partialTick);
 	}
 
 	@Override

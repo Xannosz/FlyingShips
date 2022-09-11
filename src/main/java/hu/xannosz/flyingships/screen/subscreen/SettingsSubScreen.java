@@ -26,7 +26,7 @@ import static net.minecraftforge.client.gui.ScreenUtils.drawTexturedModalRect;
 @Slf4j
 public class SettingsSubScreen extends SubScreen {
 
-	private static final ResourceLocation SETTINGS_TEXTURE =
+	private static final ResourceLocation TEXTURE =
 			new ResourceLocation(FlyingShips.MOD_ID, "textures/gui/rudder_gui_settings.png");
 
 	private GraphicalButton editName;
@@ -83,7 +83,7 @@ public class SettingsSubScreen extends SubScreen {
 				.build(), rudderScreen);
 
 		pageUp = new GraphicalButton(ButtonConfig.builder()
-				.buttonId(ButtonId.PAGE_UP)
+				.buttonId(ButtonId.RECTANGLE_PAGE_UP)
 				.position(rudderScreen.getMenu().getBlockEntity().getBlockPos())
 				.isDefaultButtonDrawNeeded(false)
 				.debugMode(DEBUG_MODE)
@@ -99,7 +99,7 @@ public class SettingsSubScreen extends SubScreen {
 				.hoveredY(SETTINGS_BIG_BUTTON_MAIN_ROW_Y)
 				.build());
 		pageDown = new GraphicalButton(ButtonConfig.builder()
-				.buttonId(ButtonId.PAGE_DOWN)
+				.buttonId(ButtonId.RECTANGLE_PAGE_DOWN)
 				.position(rudderScreen.getMenu().getBlockEntity().getBlockPos())
 				.isDefaultButtonDrawNeeded(false)
 				.debugMode(DEBUG_MODE)
@@ -115,7 +115,7 @@ public class SettingsSubScreen extends SubScreen {
 				.hoveredY(SETTINGS_BIG_BUTTON_MAIN_ROW_Y + SETTINGS_BIG_BUTTON_MAIN_ROW_ADDITIONAL)
 				.build());
 		addNew = new LoopBackButton(ButtonConfig.builder()
-				.buttonId(ButtonId.ADD_NEW)
+				.buttonId(ButtonId.ADD_NEW_RECTANGLE)
 				.position(rudderScreen.getMenu().getBlockEntity().getBlockPos())
 				.isDefaultButtonDrawNeeded(false)
 				.debugMode(DEBUG_MODE)
@@ -394,7 +394,7 @@ public class SettingsSubScreen extends SubScreen {
 
 	@Override
 	public void renderBg() {
-		RenderSystem.setShaderTexture(0, SETTINGS_TEXTURE);
+		RenderSystem.setShaderTexture(0, TEXTURE);
 		rudderScreen.setImageWidth(SETTINGS_GUI_WIDTH);
 	}
 
@@ -425,7 +425,7 @@ public class SettingsSubScreen extends SubScreen {
 						24 + 13 + (int) (i * 14.5), Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
 			}
 		}
-		font.draw(poseStack, Component.literal("" + (rudderScreen.getMenu().getPage() + 1) + "/" + rudderScreen.getMenu().getMaxPage()), 155,
+		font.draw(poseStack, Component.literal("" + (rudderScreen.getMenu().getBlockPosPage() + 1) + "/" + rudderScreen.getMenu().getBlockPosMaxPage()), 155,
 				98, Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
 
 		if (!shipNameBox.isEditable()) {
@@ -457,7 +457,7 @@ public class SettingsSubScreen extends SubScreen {
 				}
 				ModMessages.sendToServer(new GetShipNamePacket(rudderScreen.getMenu().getBlockEntity().getBlockPos()));
 			}
-			case ADD_NEW -> {
+			case ADD_NEW_RECTANGLE -> {
 				addNewRec = true;
 				recNum = 4;
 				rec1x.setValue("");
