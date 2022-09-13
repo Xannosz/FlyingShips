@@ -4,9 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hu.xannosz.flyingships.FlyingShips;
 import hu.xannosz.flyingships.networking.AddRectanglePacket;
-import hu.xannosz.flyingships.networking.GetShipNamePacket;
 import hu.xannosz.flyingships.networking.ModMessages;
-import hu.xannosz.flyingships.networking.ShipNamePacket2S;
 import hu.xannosz.flyingships.screen.RudderScreen;
 import hu.xannosz.flyingships.screen.widget.*;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +27,6 @@ public class SettingsSubScreen extends SubScreen {
 	private static final ResourceLocation TEXTURE =
 			new ResourceLocation(FlyingShips.MOD_ID, "textures/gui/rudder_gui_settings.png");
 
-	private GraphicalButton editName;
-
 	private GraphicalButton pageUp;
 	private GraphicalButton pageDown;
 	private GraphicalButton addNew;
@@ -45,8 +41,6 @@ public class SettingsSubScreen extends SubScreen {
 
 	private GraphicalButton okEdition;
 	private GraphicalButton exitEdition;
-
-	private LoopBackEditBox shipNameBox;
 
 	private LoopBackEditBox rec1x;
 	private LoopBackEditBox rec1y;
@@ -65,23 +59,6 @@ public class SettingsSubScreen extends SubScreen {
 
 	@Override
 	public void init(int x, int y) {
-		editName = new LoopBackButton(ButtonConfig.builder()
-				.buttonId(ButtonId.EDIT_NAME)
-				.position(rudderScreen.getMenu().getBlockEntity().getBlockPos())
-				.isDefaultButtonDrawNeeded(false)
-				.debugMode(DEBUG_MODE)
-				.hitBoxX(x + 159)
-				.hitBoxY(y + 7)
-				.hitBoxW(SETTINGS_SMALL_BUTTON_W_H)
-				.hitBoxH(SETTINGS_SMALL_BUTTON_W_H)
-				.graphicalX(x + 159)
-				.graphicalY(y + 7)
-				.graphicalW(SETTINGS_SMALL_BUTTON_W_H)
-				.graphicalH(SETTINGS_SMALL_BUTTON_W_H)
-				.hoveredX(SETTINGS_SMALL_BUTTON_MAIN_ROW_X + SETTINGS_SMALL_BUTTON_MAIN_ROW_ADDITIONAL)
-				.hoveredY(SETTINGS_SMALL_BUTTON_MAIN_ROW_Y)
-				.build(), rudderScreen);
-
 		pageUp = new GraphicalButton(ButtonConfig.builder()
 				.buttonId(ButtonId.RECTANGLE_PAGE_UP)
 				.position(rudderScreen.getMenu().getBlockEntity().getBlockPos())
@@ -289,29 +266,22 @@ public class SettingsSubScreen extends SubScreen {
 				.hoveredY(SETTINGS_SMALL_BUTTON_MAIN_ROW_Y + 2 * SETTINGS_SMALL_BUTTON_MAIN_ROW_ADDITIONAL)
 				.build(), rudderScreen);
 
-		shipNameBox = new LoopBackEditBox(rudderScreen.getFont(), x + 7, y + 7, 148, EDIT_BOX_H,
-				Component.empty().withStyle(ChatFormatting.DARK_GRAY), ButtonId.EDITION_NAME_DOWN, rudderScreen);
-		shipNameBox.setValue(rudderScreen.getMenu().getBlockEntity().getShipName());
-		shipNameBox.setEditable(false);
-
 		rec1x = new LoopBackEditBox(rudderScreen.getFont(), x + SETTINGS_ADD_NEW_REC_X + ADD_NEW_EDIT_BOX_X, y + SETTINGS_ADD_NEW_REC_Y + ADD_NEW_EDIT_BOX_Y, ADD_NEW_EDIT_BOX_W, EDIT_BOX_H,
-				Component.empty().withStyle(ChatFormatting.DARK_GRAY), ButtonId.EDITION_NAME_DOWN, rudderScreen);
+				Component.empty().withStyle(ChatFormatting.DARK_GRAY), ButtonId.BLOCK_POS_EDITION_DOWN, rudderScreen);
 		rec1y = new LoopBackEditBox(rudderScreen.getFont(), x + SETTINGS_ADD_NEW_REC_X + ADD_NEW_EDIT_BOX_X + ADD_NEW_EDIT_BOX_ADDITIONAL_X, y + SETTINGS_ADD_NEW_REC_Y + ADD_NEW_EDIT_BOX_Y, ADD_NEW_EDIT_BOX_W, EDIT_BOX_H,
-				Component.empty().withStyle(ChatFormatting.DARK_GRAY), ButtonId.EDITION_NAME_DOWN, rudderScreen);
+				Component.empty().withStyle(ChatFormatting.DARK_GRAY), ButtonId.BLOCK_POS_EDITION_DOWN, rudderScreen);
 		rec1z = new LoopBackEditBox(rudderScreen.getFont(), x + SETTINGS_ADD_NEW_REC_X + ADD_NEW_EDIT_BOX_X + 2 * ADD_NEW_EDIT_BOX_ADDITIONAL_X, y + SETTINGS_ADD_NEW_REC_Y + ADD_NEW_EDIT_BOX_Y, ADD_NEW_EDIT_BOX_W, EDIT_BOX_H,
-				Component.empty().withStyle(ChatFormatting.DARK_GRAY), ButtonId.EDITION_NAME_DOWN, rudderScreen);
+				Component.empty().withStyle(ChatFormatting.DARK_GRAY), ButtonId.BLOCK_POS_EDITION_DOWN, rudderScreen);
 		rec2x = new LoopBackEditBox(rudderScreen.getFont(), x + SETTINGS_ADD_NEW_REC_X + ADD_NEW_EDIT_BOX_X, y + SETTINGS_ADD_NEW_REC_Y + ADD_NEW_EDIT_BOX_Y + ADD_NEW_EDIT_BOX_ADDITIONAL_Y, ADD_NEW_EDIT_BOX_W, EDIT_BOX_H,
-				Component.empty().withStyle(ChatFormatting.DARK_GRAY), ButtonId.EDITION_NAME_DOWN, rudderScreen);
+				Component.empty().withStyle(ChatFormatting.DARK_GRAY), ButtonId.BLOCK_POS_EDITION_DOWN, rudderScreen);
 		rec2y = new LoopBackEditBox(rudderScreen.getFont(), x + SETTINGS_ADD_NEW_REC_X + ADD_NEW_EDIT_BOX_X + ADD_NEW_EDIT_BOX_ADDITIONAL_X, y + SETTINGS_ADD_NEW_REC_Y + ADD_NEW_EDIT_BOX_Y + ADD_NEW_EDIT_BOX_ADDITIONAL_Y, ADD_NEW_EDIT_BOX_W, EDIT_BOX_H,
-				Component.empty().withStyle(ChatFormatting.DARK_GRAY), ButtonId.EDITION_NAME_DOWN, rudderScreen);
+				Component.empty().withStyle(ChatFormatting.DARK_GRAY), ButtonId.BLOCK_POS_EDITION_DOWN, rudderScreen);
 		rec2z = new LoopBackEditBox(rudderScreen.getFont(), x + SETTINGS_ADD_NEW_REC_X + ADD_NEW_EDIT_BOX_X + 2 * ADD_NEW_EDIT_BOX_ADDITIONAL_X, y + SETTINGS_ADD_NEW_REC_Y + ADD_NEW_EDIT_BOX_Y + ADD_NEW_EDIT_BOX_ADDITIONAL_Y, ADD_NEW_EDIT_BOX_W, EDIT_BOX_H,
-				Component.empty().withStyle(ChatFormatting.DARK_GRAY), ButtonId.EDITION_NAME_DOWN, rudderScreen);
+				Component.empty().withStyle(ChatFormatting.DARK_GRAY), ButtonId.BLOCK_POS_EDITION_DOWN, rudderScreen);
 	}
 
 	@Override
 	public void registerRenderables() {
-		rudderScreen.addRenderable(editName);
-
 		rudderScreen.addRenderable(pageUp);
 		rudderScreen.addRenderable(pageDown);
 		rudderScreen.addRenderable(addNew);
@@ -327,8 +297,6 @@ public class SettingsSubScreen extends SubScreen {
 		rudderScreen.addRenderable(okEdition);
 		rudderScreen.addRenderable(exitEdition);
 
-		rudderScreen.addRenderable(shipNameBox);
-
 		rudderScreen.addRenderable(rec1x);
 		rudderScreen.addRenderable(rec1y);
 		rudderScreen.addRenderable(rec1z);
@@ -339,7 +307,7 @@ public class SettingsSubScreen extends SubScreen {
 
 	@Override
 	public void setVisibility(boolean visibility) {
-		editName.setVisibility(visibility);
+		int blocksSize = rudderScreen.getMenu().getBlockPosStruct().size();
 
 		if (visibility && !addNewRec) {
 			pageUp.setVisibility(true);
@@ -347,12 +315,12 @@ public class SettingsSubScreen extends SubScreen {
 			addNew.setVisibility(true);
 			back.setVisibility(true);
 
-			editRec1.setVisibility(true);
-			deleteRec1.setVisibility(true);
-			editRec2.setVisibility(true);
-			deleteRec2.setVisibility(true);
-			editRec3.setVisibility(true);
-			deleteRec3.setVisibility(true);
+			editRec1.setVisibility(blocksSize > 0);
+			deleteRec1.setVisibility(blocksSize > 0);
+			editRec2.setVisibility(blocksSize > 2);
+			deleteRec2.setVisibility(blocksSize > 2);
+			editRec3.setVisibility(blocksSize > 4);
+			deleteRec3.setVisibility(blocksSize > 4);
 		} else {
 			pageUp.setVisibility(false);
 			pageDown.setVisibility(false);
@@ -388,8 +356,6 @@ public class SettingsSubScreen extends SubScreen {
 			okEdition.setVisibility(false);
 			exitEdition.setVisibility(false);
 		}
-
-		shipNameBox.setVisible(visibility);
 	}
 
 	@Override
@@ -410,27 +376,23 @@ public class SettingsSubScreen extends SubScreen {
 		if (!addNewRec) {
 			List<BlockPos> blocks = rudderScreen.getMenu().getBlockPosStruct();
 			for (int i = 0; i < blocks.size(); i += 2) {
-				font.draw(poseStack, Component.literal("" + blocks.get(i).getX()), 10,
-						24 + (int) (i * 14.5), Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
-				font.draw(poseStack, Component.literal("" + blocks.get(i).getY()), 54,
-						24 + (int) (i * 14.5), Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
-				font.draw(poseStack, Component.literal("" + blocks.get(i).getZ()), 98,
-						24 + (int) (i * 14.5), Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
+				font.draw(poseStack, Component.literal("" + blocks.get(i).getX()), 8,
+						16 + (int) (i * 14.5), Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
+				font.draw(poseStack, Component.literal("" + blocks.get(i).getY()), 52,
+						16 + (int) (i * 14.5), Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
+				font.draw(poseStack, Component.literal("" + blocks.get(i).getZ()), 96,
+						16 + (int) (i * 14.5), Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
 
-				font.draw(poseStack, Component.literal("" + blocks.get(i + 1).getX()), 10,
-						24 + 13 + (int) (i * 14.5), Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
-				font.draw(poseStack, Component.literal("" + blocks.get(i + 1).getY()), 54,
-						24 + 13 + (int) (i * 14.5), Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
-				font.draw(poseStack, Component.literal("" + blocks.get(i + 1).getZ()), 98,
-						24 + 13 + (int) (i * 14.5), Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
+				font.draw(poseStack, Component.literal("" + blocks.get(i + 1).getX()), 8,
+						16 + 13 + (int) (i * 14.5), Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
+				font.draw(poseStack, Component.literal("" + blocks.get(i + 1).getY()), 52,
+						16 + 13 + (int) (i * 14.5), Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
+				font.draw(poseStack, Component.literal("" + blocks.get(i + 1).getZ()), 96,
+						16 + 13 + (int) (i * 14.5), Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
 			}
 		}
-		font.draw(poseStack, Component.literal("" + (rudderScreen.getMenu().getBlockPosPage() + 1) + "/" + rudderScreen.getMenu().getBlockPosMaxPage()), 155,
-				98, Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
-
-		if (!shipNameBox.isEditable()) {
-			shipNameBox.setValue(rudderScreen.getMenu().getBlockEntity().getShipName());
-		}
+		font.draw(poseStack, Component.literal("" + rudderScreen.getMenu().getBlockPosPage() + "/" + rudderScreen.getMenu().getBlockPosMaxPage()), 154,
+				90, Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
 	}
 
 	@Override
@@ -446,17 +408,6 @@ public class SettingsSubScreen extends SubScreen {
 	@Override
 	public void clickButton(ButtonId buttonId) {
 		switch (buttonId) {
-			case EDIT_NAME -> shipNameBox.setEditable(true);
-			case EDITION_NAME_DOWN -> {
-				shipNameBox.setEditable(false);
-				ModMessages.sendToServer(new ShipNamePacket2S(shipNameBox.getValue(), rudderScreen.getMenu().getBlockEntity().getBlockPos()));
-				try {
-					Thread.sleep(300);
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
-				ModMessages.sendToServer(new GetShipNamePacket(rudderScreen.getMenu().getBlockEntity().getBlockPos()));
-			}
 			case ADD_NEW_RECTANGLE -> {
 				addNewRec = true;
 				recNum = 4;
@@ -508,8 +459,7 @@ public class SettingsSubScreen extends SubScreen {
 							new BlockPos(Integer.parseInt(rec2x.getValue()), Integer.parseInt(rec2y.getValue()), Integer.parseInt(rec2z.getValue()))));
 					rudderScreen.getPlayer().sendSystemMessage(Component.translatable("message.rectangleSet",
 							"[" + rec1x.getValue() + ", " + rec1y.getValue() + ", " + rec1z.getValue() + "]",
-							"[" + rec2x.getValue() + ", " + rec2y.getValue() + ", " + rec2z.getValue() + "]",
-							rudderScreen.getMenu().getBlockEntity().getShipName()));
+							"[" + rec2x.getValue() + ", " + rec2y.getValue() + ", " + rec2z.getValue() + "]"));
 				} catch (Exception ex) {
 					rudderScreen.getPlayer().sendSystemMessage(Component.translatable("message.wrongRectangle"));
 				}

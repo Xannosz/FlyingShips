@@ -41,16 +41,17 @@ public class JumpUtil {
 	private static final List<Block> PRE_PROCESS = Arrays.asList(Blocks.REDSTONE_WIRE);
 	private static final List<Block> POST_PROCESS = Arrays.asList(Blocks.PISTON_HEAD);
 
-	public static void jump(String shipName, WarpDirection selectedWarpDirection, int speed,
+	public static void jump(WarpDirection selectedWarpDirection, int speed,
 							LandButtonSettings landButtonSettings, TerrainScanResponseStruct terrainScanResponse,
-							ServerLevel level, BlockPos rudderBlockPosition, List<BlockPosStruct> blockPositions) {
+							ServerLevel level, BlockPos rudderBlockPosition, List<BlockPosStruct> blockPositions,
+							BlockPos coordinate) {
 		try {
 			//create absolute coordinates
-			final Vec3 additional = getAdditional(selectedWarpDirection, speed, landButtonSettings, terrainScanResponse);
+			final Vec3 additional = getAdditional(selectedWarpDirection, speed, landButtonSettings, terrainScanResponse, rudderBlockPosition, coordinate);
 			final List<AbsoluteRectangleData> rectangles = createRectangles(rudderBlockPosition, blockPositions);
 
 			//save structure
-			saveStructure(rectangles, level, shipName);
+			saveStructure(rectangles, level);
 			//save entities
 			final Map<Entity, Vec3> entities = getEntities(rectangles, additional, level);
 			//save players
@@ -67,7 +68,7 @@ public class JumpUtil {
 			forceLoadChunks(chunks, level);
 			//check collision -> send error message and return
 			if (hasCollisionOnTarget(rectangles, additional, level)) {
-				sendErrorMessage(players, shipName);
+				sendErrorMessage(players);
 				return;
 			}
 
@@ -88,11 +89,13 @@ public class JumpUtil {
 			//reset chunks force load
 			resetChunkForceLoad(chunks, level);
 		} catch (Exception ex) {
-			log.error("Exception during jump, whit ship: " + shipName, ex);
+			log.error("Exception during jump, whit ship", ex);
 		}
 	}
 
-	private static Vec3 getAdditional(WarpDirection selectedWarpDirection, int speed, LandButtonSettings landButtonSettings, TerrainScanResponseStruct terrainScanResponse) {
+	private static Vec3 getAdditional(WarpDirection selectedWarpDirection, int speed,
+									  LandButtonSettings landButtonSettings, TerrainScanResponseStruct terrainScanResponse,
+									  BlockPos rudderBlockPosition, BlockPos coordinate) {
 		switch (selectedWarpDirection) {
 			case UP -> {
 				return new Vec3(0, speed, 0);
@@ -124,7 +127,9 @@ public class JumpUtil {
 						return new Vec3(0, terrainScanResponse.getHeightOfCelling(), 0);
 					}
 				}
-
+			}
+			case COORDINATE -> {
+				return new Vec3(coordinate.getX() - rudderBlockPosition.getX(), coordinate.getY() - rudderBlockPosition.getY(), coordinate.getZ() - rudderBlockPosition.getZ());
 			}
 		}
 		return new Vec3(0, 0, 0);
@@ -149,18 +154,18 @@ public class JumpUtil {
 		return absoluteRectangleDataList;
 	}
 
-	private static void saveStructure(List<AbsoluteRectangleData> rectangles, ServerLevel level, String shipName) {
+	private static void saveStructure(List<AbsoluteRectangleData> rectangles, ServerLevel level) {
 		int i = 0;
 		final StructureTemplateManager structuretemplatemanager = level.getStructureManager();
 
 		for (AbsoluteRectangleData rectangleData : rectangles) {
-			final StructureTemplate structuretemplate = structuretemplatemanager.getOrCreate(new ResourceLocation(shipName.toLowerCase(Locale.ROOT).replace(" ", "_") + (i++)));
+			final StructureTemplate structuretemplate = structuretemplatemanager.getOrCreate(new ResourceLocation(UUID.randomUUID().toString().toLowerCase(Locale.ROOT).replace(" ", "_") + (i++)));
 			structuretemplate.fillFromWorld(level, rectangleData.getNorthWestCorner(), rectangleData.getStructureSize(), false, Blocks.STRUCTURE_VOID);
 			rectangleData.setStructuretemplate(structuretemplate);
 		}
 	}
 
-	private static Map<Entity, Vec3> getEntities(List<AbsoluteRectangleData> rectangles, Vec3 additional, ServerLevel level) {
+	public static Map<Entity, Vec3> getEntities(List<AbsoluteRectangleData> rectangles, Vec3 additional, ServerLevel level) {
 
 		final Map<Entity, Vec3> result = new HashMap<>();
 
@@ -176,7 +181,7 @@ public class JumpUtil {
 		return result;
 	}
 
-	private static Map<ServerPlayer, Vec3> getPlayers(List<AbsoluteRectangleData> rectangles, Vec3 additional, ServerLevel level) {
+	public static Map<ServerPlayer, Vec3> getPlayers(List<AbsoluteRectangleData> rectangles, Vec3 additional, ServerLevel level) {
 		final Map<ServerPlayer, Vec3> result = new HashMap<>();
 
 		level.getPlayers(
@@ -281,9 +286,9 @@ public class JumpUtil {
 		return !target.isEmpty();
 	}
 
-	private static void sendErrorMessage(Map<ServerPlayer, Vec3> players, String shipName) {
+	private static void sendErrorMessage(Map<ServerPlayer, Vec3> players) {
 		players.keySet().forEach(player ->
-				player.sendSystemMessage(Component.translatable("message.collisionWarning", shipName)));
+				player.sendSystemMessage(Component.translatable("message.collisionWarning")));
 	}
 
 	private static void deleteStructure(List<AbsoluteRectangleData> rectangles, ServerLevel level) {

@@ -35,27 +35,12 @@ public class ModMessages {
 				.encoder(AddRectanglePacket::toBytes)
 				.consumerMainThread(AddRectanglePacket::handler)
 				.add();
-		INSTANCE.messageBuilder(ShipNamePacket2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
-				.decoder(ShipNamePacket2S::new)
-				.encoder(ShipNamePacket2S::toBytes)
-				.consumerMainThread(ShipNamePacket2S::handler)
-				.add();
-		INSTANCE.messageBuilder(ShipNamePacket2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-				.decoder(ShipNamePacket2C::new)
-				.encoder(ShipNamePacket2C::toBytes)
-				.consumerMainThread(ShipNamePacket2C::handler)
-				.add();
-		INSTANCE.messageBuilder(GetShipNamePacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-				.decoder(GetShipNamePacket::new)
-				.encoder(GetShipNamePacket::toBytes)
-				.consumerMainThread(GetShipNamePacket::handler)
-				.add();
 		INSTANCE.messageBuilder(PlaySoundPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
 				.decoder(PlaySoundPacket::new)
 				.encoder(PlaySoundPacket::toBytes)
 				.consumerMainThread(PlaySoundPacket::handler)
 				.add();
-/*		INSTANCE.messageBuilder(SendNewCoordinatePacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+		INSTANCE.messageBuilder(SendNewCoordinatePacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
 				.decoder(SendNewCoordinatePacket::new)
 				.encoder(SendNewCoordinatePacket::toBytes)
 				.consumerMainThread(SendNewCoordinatePacket::handler)
@@ -69,7 +54,7 @@ public class ModMessages {
 				.decoder(GetSavedCoordinatesPacket::new)
 				.encoder(GetSavedCoordinatesPacket::toBytes)
 				.consumerMainThread(GetSavedCoordinatesPacket::handler)
-				.add();*/
+				.add();
 	}
 
 	public static <MSG> void sendToServer(MSG message) {

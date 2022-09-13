@@ -28,7 +28,6 @@ public class GetSavedCoordinatesPacket {
 		NetworkEvent.Context context = supplier.get();
 		context.enqueueWork(() -> {
 			// SERVER SITE
-			System.out.println("###"+"handle get message"); //TODO
 			BlockEntity entity = Objects.requireNonNull(context.getSender()).getLevel().getBlockEntity(position);
 			if (entity instanceof RudderBlockEntity) {
 				ModMessages.sendToPlayer(

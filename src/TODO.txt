@@ -1,12 +1,9 @@
 // bugs/optimization
 - block update after jump
 - item frames sometimes broken during jump
-- C wand get ship name
-- make sure rudder inside the ship (not necessary) calculate mob and chest density
-- remove ship name (not necessary) use uid to sure valid configuration
+- calculate chest density
 
 // demo
-- save coordinates
 - floating in water
 
 // beta

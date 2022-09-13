@@ -5,7 +5,7 @@ import net.minecraft.core.Direction;
 
 public enum WarpDirection {
 
-	UP, DOWN, NORTH, SOUTH, EAST, WEST, LAND;
+	UP, DOWN, NORTH, SOUTH, EAST, WEST, LAND, COORDINATE;
 
 	public static WarpDirection fromBlockDirection(ButtonId buttonId, Direction blockDirection) {
 		switch (buttonId) {
@@ -29,6 +29,9 @@ public enum WarpDirection {
 			}
 			case LAND -> {
 				return LAND;
+			}
+			case BEACON -> {
+				return COORDINATE;
 			}
 		}
 		return null;
@@ -111,6 +114,9 @@ public enum WarpDirection {
 			}
 			case LAND -> {
 				return ButtonId.LAND;
+			}
+			case COORDINATE -> {
+				return ButtonId.BEACON;
 			}
 		}
 		return null;

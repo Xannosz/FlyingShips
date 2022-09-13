@@ -53,7 +53,7 @@ public class RudderMenu extends AbstractContainerMenu {
 
 	public RudderMenu(int containerId, Inventory inv, BlockEntity blockEntity, ContainerData data) {
 		super(ModMenuTypes.RUDDER_MENU.get(), containerId);
-		log.info("menu constructor"); //TODO
+
 		checkContainerSize(inv, 3);
 		this.blockEntity = ((RudderBlockEntity) blockEntity);
 		level = inv.player.level;
@@ -62,7 +62,7 @@ public class RudderMenu extends AbstractContainerMenu {
 
 		addPlayerInventory(inv);
 		addPlayerHotBar(inv);
-		log.info("data C" + data.getCount());
+
 		this.blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handler -> {
 			enderInputSlot = new ModInputSlot(handler, 0, 105, 90);
 			steamInputSlot = new ModInputSlot(handler, 1, 128, 90);
@@ -73,7 +73,6 @@ public class RudderMenu extends AbstractContainerMenu {
 		});
 
 		addDataSlots(data);
-		log.info("menu constructor end"); //TODO
 	}
 
 
@@ -132,7 +131,6 @@ public class RudderMenu extends AbstractContainerMenu {
 
 	@Override
 	public boolean stillValid(@NotNull Player player) {
-		log.info("still valid");
 		return stillValid(ContainerLevelAccess.create(level, blockEntity.getBlockPos()),
 				player, ModBlocks.RUDDER.get());
 	}
@@ -160,7 +158,7 @@ public class RudderMenu extends AbstractContainerMenu {
 	}
 
 	public Map<ButtonId, Boolean> getBlinking() {
-		boolean[] bits = Util.convertIntToBitArray(data.get(RudderBlockEntity.BLINK_KEY), 8);
+		boolean[] bits = Util.convertIntToBitArray(data.get(RudderBlockEntity.BLINK_KEY), 9);
 		Map<ButtonId, Boolean> result = new HashMap<>();
 
 		result.put(ButtonId.FORWARD, bits[0]);
@@ -174,6 +172,22 @@ public class RudderMenu extends AbstractContainerMenu {
 
 		result.put(ButtonId.JUMP, bits[7]);
 
+		result.put(ButtonId.BEACON, bits[8]);
+
+		return result;
+	}
+
+	public Map<ButtonId, Boolean> getCoordinateBlinking() {
+		boolean[] bits = Util.convertIntToBitArray(data.get(COORDINATES_BLINK_KEY), 6);
+		Map<ButtonId, Boolean> result = new HashMap<>();
+
+		result.put(ButtonId.JUMP_TO_COORDINATE_1, bits[0]);
+		result.put(ButtonId.JUMP_TO_COORDINATE_2, bits[1]);
+		result.put(ButtonId.JUMP_TO_COORDINATE_3, bits[2]);
+		result.put(ButtonId.JUMP_TO_COORDINATE_4, bits[3]);
+		result.put(ButtonId.JUMP_TO_COORDINATE_5, bits[4]);
+		result.put(ButtonId.JUMP_TO_COORDINATE_6, bits[5]);
+
 		return result;
 	}
 
@@ -182,7 +196,6 @@ public class RudderMenu extends AbstractContainerMenu {
 	}
 
 	public int getPowerButtonState() {
-		log.info("getPBS"); //TODO
 		return data.get(POWER_BUTTON_STATE_KEY);
 	}
 
@@ -215,7 +228,7 @@ public class RudderMenu extends AbstractContainerMenu {
 	}
 
 	public int getBlockPosPage() {
-		return data.get(BLOCK_POS_PAGE_KEY);
+		return data.get(BLOCK_POS_PAGE_KEY) + 1;
 	}
 
 	public int getBlockPosMaxPage() {
@@ -223,7 +236,6 @@ public class RudderMenu extends AbstractContainerMenu {
 	}
 
 	public List<BlockPos> getBlockPosStruct() {
-		log.info("getBPS"); //TODO
 		int onThisPage = data.get(BLOCK_POS_ON_THIS_PAGE_KEY);
 		List<BlockPos> result = new ArrayList<>();
 
@@ -264,18 +276,15 @@ public class RudderMenu extends AbstractContainerMenu {
 	}
 
 	public void updateCoordinates() {
-		log.info("update message send"); //TODO
-		//ModMessages.sendToServer(new GetSavedCoordinatesPacket(blockEntity.getBlockPos()));
+		ModMessages.sendToServer(new GetSavedCoordinatesPacket(blockEntity.getBlockPos()));
 	}
 
 	public List<SavedCoordinate> getCoordinates() {
-		log.info("get saved coordinates"); //TODO
-		//return blockEntity.getCoordinates();
-		return new ArrayList<>();
+		return blockEntity.getCoordinates();
 	}
 
 	public int getCoordinatesPage() {
-		return data.get(COORDINATES_PAGE_KEY);
+		return data.get(COORDINATES_PAGE_KEY) + 1;
 	}
 
 	public int getCoordinatesMaxPage() {

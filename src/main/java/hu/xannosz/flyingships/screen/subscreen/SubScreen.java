@@ -30,4 +30,8 @@ public abstract class SubScreen {
 	public abstract void blink(boolean on);
 
 	public abstract void clickButton(ButtonId buttonId);
+
+	public boolean keyPressed(int p_97765_, int p_97766_, int p_97767_) {
+		return rudderScreen.byPassedKeyPressed(p_97765_, p_97766_, p_97767_);
+	}
 }

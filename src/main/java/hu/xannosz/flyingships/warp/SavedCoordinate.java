@@ -12,8 +12,8 @@ import java.util.Objects;
 @Data
 @NoArgsConstructor
 public class SavedCoordinate {
-	private String name;
-	private String marker;
+	private String name = "";
+	private String marker = "";
 	private BlockPos coordinate;
 
 	public SavedCoordinate(@NotNull CompoundTag nbt, int id) {

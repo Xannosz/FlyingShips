@@ -34,6 +34,7 @@ public class MainSubScreen extends SubScreen {
 
 	private GraphicalButton jump;
 	private GraphicalButton menuButton;
+	private GraphicalButton beaconButton;
 
 	private GraphicalButton plus;
 	private GraphicalButton minus;
@@ -191,6 +192,24 @@ public class MainSubScreen extends SubScreen {
 				.hoveredX(MENU_ROW_G_X)
 				.hoveredY(MENU_ROW_G_Y + MENU_ROW_H_W_H + 2)
 				.build());
+		beaconButton = new GraphicalButton(ButtonConfig.builder()
+				.buttonId(ButtonId.BEACON)
+				.position(rudderScreen.getMenu().getBlockEntity().getBlockPos())
+				.isDefaultButtonDrawNeeded(true)
+				.debugMode(DEBUG_MODE)
+				.hitBoxX(x + MENU_ROW_X + MENU_ROW_H_W_H + 5)
+				.hitBoxY(y + MENU_ROW_Y)
+				.hitBoxW(MENU_ROW_H_W_H + MENU_ROW_H_W_H + 5)
+				.hitBoxH(MENU_ROW_H_W_H)
+				.graphicalX(x + MENU_ROW_X + MENU_ROW_H_W_H + 5)
+				.graphicalY(y + MENU_ROW_Y)
+				.graphicalW(MENU_ROW_H_W_H)
+				.graphicalH(MENU_ROW_H_W_H)
+				.buttonX(MENU_ROW_G_X + 2 * MENU_ROW_H_W_H + 4)
+				.buttonY(MENU_ROW_G_Y)
+				.hoveredX(MENU_ROW_G_X + 2 * MENU_ROW_H_W_H + 4)
+				.hoveredY(MENU_ROW_G_Y + MENU_ROW_H_W_H + 2)
+				.build());
 
 		plus = new GraphicalButton(ButtonConfig.builder()
 				.buttonId(ButtonId.PLUS)
@@ -279,6 +298,7 @@ public class MainSubScreen extends SubScreen {
 
 		rudderScreen.addRenderable(jump);
 		rudderScreen.addRenderable(menuButton);
+		rudderScreen.addRenderable(beaconButton);
 
 		rudderScreen.addRenderable(plus);
 		rudderScreen.addRenderable(minus);
@@ -302,6 +322,7 @@ public class MainSubScreen extends SubScreen {
 		stepUp.setVisibility(visibility);
 		stepDown.setVisibility(visibility);
 		power.setVisibility(visibility);
+		beaconButton.setVisibility(visibility);
 
 		if (visibility) {
 			if (rudderScreen.getMenu().getPowerButtonState() == 0) {
@@ -365,8 +386,6 @@ public class MainSubScreen extends SubScreen {
 		drawTexturedModalRect(poseStack, x + 152, y + 16, 96 + rudderScreen.getMenu().getPositionMarkerMid() * 19, 247, 17, 3, partialTick);
 		drawTexturedModalRect(poseStack, x + 152, y + 19, 96 + rudderScreen.getMenu().getPositionMarkerBottom() * 19, 250, 17, 5, partialTick);
 
-		drawTexturedModalRect(poseStack, x + 120, y + 75, 219, 106, 10, 10, partialTick); //TODO remove after coordinates
-
 		wind.render(poseStack, (int) (random.nextFloat(0.9f, 1.1f) * rudderScreen.getMenu().getWind()), (int) (1.2 * rudderScreen.getMenu().getWindMax()), partialTick);
 		floating.render(poseStack, (int) (random.nextFloat(0.9f, 1.1f) * rudderScreen.getMenu().getFloating()), (int) (1.2 * rudderScreen.getMenu().getFloatingMax()), partialTick);
 	}
@@ -400,6 +419,8 @@ public class MainSubScreen extends SubScreen {
 			land.setBlink(blinking.get(ButtonId.LAND));
 
 			jump.setBlink(blinking.get(ButtonId.JUMP));
+
+			beaconButton.setBlink(blinking.get(ButtonId.BEACON));
 		} else {
 			forward.setBlink(false);
 			right.setBlink(false);
@@ -411,6 +432,8 @@ public class MainSubScreen extends SubScreen {
 			land.setBlink(false);
 
 			jump.setBlink(false);
+
+			beaconButton.setBlink(false);
 		}
 	}
 

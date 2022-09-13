@@ -3,8 +3,6 @@ package hu.xannosz.flyingships.blockentity;
 import hu.xannosz.flyingships.Configuration;
 import hu.xannosz.flyingships.Util;
 import hu.xannosz.flyingships.block.Rudder;
-import hu.xannosz.flyingships.networking.GetShipNamePacket;
-import hu.xannosz.flyingships.networking.ModMessages;
 import hu.xannosz.flyingships.screen.GuiState;
 import hu.xannosz.flyingships.screen.RudderMenu;
 import hu.xannosz.flyingships.screen.widget.ButtonId;
@@ -49,6 +47,7 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Slf4j
 public class RudderBlockEntity extends BlockEntity implements MenuProvider {
@@ -94,8 +93,9 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	public static final int WATER_LINE_KEY = 37;
 	public static final int COORDINATES_PAGE_KEY = 38;
 	public static final int COORDINATES_MAX_PAGE_KEY = 39;
+	public static final int COORDINATES_BLINK_KEY = 40;
 
-	public static final int DATA_SLOT_SIZE = 40;
+	public static final int DATA_SLOT_SIZE = 41;
 
 	public static final int[] STEPS = new int[]{1, 10, 100, 1000};
 	private final ItemStackHandler itemHandler = new ItemStackHandler(3) {
@@ -110,8 +110,12 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	private int speed = 50;
 	private int step = 0;
 
+	private String uuid = null;
+
 	private int blockPositionsPage = 0;
 	private int coordinatesPage = 0;
+
+	private int selectedCoordinate = -1;
 
 	private boolean enableHeatEngine = false;
 	private boolean enableSteamEngine = false;
@@ -121,8 +125,6 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	private PowerState powerButtonState = PowerState.OFF;
 
 	private WarpDirection selectedWarpDirection;
-	@Setter
-	private String shipName;
 	private GuiState guiState = GuiState.MAIN;
 
 	private List<BlockPosStruct> blockPositions = new ArrayList<>();
@@ -143,22 +145,19 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 
 	public RudderBlockEntity(BlockPos blockPos, BlockState blockState) {
 		super(ModBlockEntities.RUDDER_BLOCK_ENTITY.get(), blockPos, blockState);
-		log.info("constructor"); // TODO
 		if (level != null && !level.isClientSide()) {
-			shipName = Util.generateNewShipName();
 			updateData();
 		}
 	}
 
 	@Override
 	public @NotNull Component getDisplayName() {
-		return Component.literal(shipName);
+		return Component.literal("Rudder block");
 	}
 
 	@Nullable
 	@Override
 	public AbstractContainerMenu createMenu(int containerId, @NotNull Inventory inventory, @NotNull Player player) {
-		log.info("create menu");
 		return new RudderMenu(containerId, inventory, this, data);
 	}
 
@@ -186,11 +185,9 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 
 	@Override
 	protected void saveAdditional(@NotNull CompoundTag tag) {
-		log.info("start save"); //TODO
 		tag.put("inventory", itemHandler.serializeNBT());
 		tag.putInt("rudder.speed", speed);
 		tag.putInt("rudder.step", step);
-		//tag.putString("rudder.shipName", shipName);
 		tag.putInt("rudder.powerButtonState", powerButtonState.getKey());
 		tag.putInt("rudder.waterLine", waterLine);
 
@@ -199,23 +196,21 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 			blockPositions.get(i).saveAdditional(tag, i);
 		}
 
-/*		tag.putInt("rudder.coordinate.size", coordinates.size()); //TODO
+		tag.putInt("rudder.coordinate.size", coordinates.size());
 		for (int i = 0; i < coordinates.size(); i++) {
 			coordinates.get(i).saveAdditional(tag, i);
-		}*/
+		}
 
 		super.saveAdditional(tag);
-		log.info("end save"); //TODO
 	}
 
 	@Override
 	public void load(@NotNull CompoundTag nbt) {
 		super.load(nbt);
-		log.info("start load"); // TODO
+
 		itemHandler.deserializeNBT(nbt.getCompound("inventory"));
 		speed = nbt.getInt("rudder.speed");
 		step = nbt.getInt("rudder.step");
-		//shipName = nbt.getString("rudder.shipName");
 		powerButtonState = PowerState.fromKey(nbt.getInt("rudder.powerButtonState"));
 		waterLine = nbt.getInt("rudder.waterLine");
 
@@ -224,13 +219,13 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 		for (int i = 0; i < blockPositionsSize; i++) {
 			blockPositions.add(new BlockPosStruct(nbt, i));
 		}
-		System.out.println("load coordinates"); // TODO
-/*		int coordinatesSize = nbt.getInt("rudder.coordinate.size"); //TODO
+
+		int coordinatesSize = nbt.getInt("rudder.coordinate.size");
 		coordinates = new ArrayList<>(coordinatesSize);
 		for (int i = 0; i < coordinatesSize; i++) {
 			coordinates.add(new SavedCoordinate(nbt, i));
-		}*/
-log.info("end load"); // TODO
+		}
+
 		updateData();
 	}
 
@@ -266,17 +261,17 @@ log.info("end load"); // TODO
 	}
 
 	private void calculateJumpData() {
-		log.info("calculate jump data"); //TODO
 		LiveDataPackage terrainScanMasks = TerrainScanUtil.generateMasks(JumpUtil.createRectangles(getBlockPos(), blockPositions));
 		terrainScanResult = TerrainScanUtil.scanTerrain((ServerLevel) level, terrainScanMasks);
 		vehicleScanResult = VehicleScanUtil.scanVehicle((ServerLevel) level, JumpUtil.createRectangles(getBlockPos(), blockPositions), getBlockState().getValue(Rudder.FACING));
-		log.info("end calculate jump data"); //TODO
 	}
 
 	public void executeButtonClick(ButtonId buttonId) {
 		switch (buttonId) {
-			case UP, DOWN, RIGHT, LEFT, FORWARD, BACKWARD ->
-					selectedWarpDirection = WarpDirection.fromBlockDirection(buttonId, getBlockState().getValue(Rudder.FACING));
+			case UP, DOWN, RIGHT, LEFT, FORWARD, BACKWARD -> {
+				selectedWarpDirection = WarpDirection.fromBlockDirection(buttonId, getBlockState().getValue(Rudder.FACING));
+				selectedCoordinate = -1;
+			}
 			case LAND -> {
 				landButtonSettings = landButtonSettings.nextState(terrainScanResult);
 				if (!landButtonSettings.equals(LandButtonSettings.EMPTY)) {
@@ -286,6 +281,7 @@ log.info("end load"); // TODO
 						selectedWarpDirection = null;
 					}
 				}
+				selectedCoordinate = -1;
 			}
 			case INCREASE -> {
 				if (step < STEPS.length - 1) {
@@ -297,11 +293,21 @@ log.info("end load"); // TODO
 					step--;
 				}
 			}
-			case PLUS -> speed += STEPS[step];
+			case PLUS -> {
+				speed += STEPS[step];
+				if (selectedCoordinate >= 0) {
+					selectedCoordinate = -1;
+					selectedWarpDirection = null;
+				}
+			}
 			case MINUS -> {
 				speed -= STEPS[step];
 				if (speed < 0) {
 					speed = 0;
+				}
+				if (selectedCoordinate >= 0) {
+					selectedCoordinate = -1;
+					selectedWarpDirection = null;
 				}
 			}
 			case JUMP -> {
@@ -309,8 +315,9 @@ log.info("end load"); // TODO
 				if (selectedWarpDirection != null && speed > 0 && powerButtonState.equals(PowerState.ON) &&
 						vehicleScanResult.getFloatingQuotient() >= vehicleScanResult.getDensity() &&
 						hasEnoughPowerForMovement()) {
-					JumpUtil.jump(shipName, selectedWarpDirection, speed, landButtonSettings, terrainScanResult,
-							(ServerLevel) level, getBlockPos(), blockPositions);
+					JumpUtil.jump(selectedWarpDirection, speed, landButtonSettings, terrainScanResult,
+							(ServerLevel) level, getBlockPos(), blockPositions,
+							selectedCoordinate == -1 ? null : coordinates.get(selectedCoordinate).getCoordinate());
 					selectedWarpDirection = null;
 				}
 			}
@@ -318,10 +325,11 @@ log.info("end load"); // TODO
 				powerButtonState = powerButtonState.nextState(enableSteamEngine);
 				if (!powerButtonState.equals(PowerState.ON)) {
 					selectedWarpDirection = null;
+					selectedCoordinate = -1;
 				}
 			}
 			case MENU -> guiState = GuiState.SETTINGS;
-			case BEACON -> log.error("beacon button not implemented");
+			case BEACON -> guiState = GuiState.COORDINATES;
 			case DIMENSION -> log.error("dimension button not implemented");
 			case RECTANGLE_PAGE_UP -> {
 				blockPositionsPage--;
@@ -355,22 +363,34 @@ log.info("end load"); // TODO
 				resetCoordinatePager();
 			}
 			case JUMP_TO_COORDINATE_1 -> {
-				log.error("jump to 1, not implemented"); //TODO
+				selectedCoordinate = coordinatesPage * 6;
+				selectedWarpDirection = WarpDirection.COORDINATE;
+				speed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
 			}
 			case JUMP_TO_COORDINATE_2 -> {
-				log.error("jump to 2, not implemented");//TODO
+				selectedCoordinate = coordinatesPage * 6 + 1;
+				selectedWarpDirection = WarpDirection.COORDINATE;
+				speed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
 			}
 			case JUMP_TO_COORDINATE_3 -> {
-				log.error("jump to 3, not implemented");//TODO
+				selectedCoordinate = coordinatesPage * 6 + 2;
+				selectedWarpDirection = WarpDirection.COORDINATE;
+				speed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
 			}
 			case JUMP_TO_COORDINATE_4 -> {
-				log.error("jump to 4, not implemented");//TODO
+				selectedCoordinate = coordinatesPage * 6 + 3;
+				selectedWarpDirection = WarpDirection.COORDINATE;
+				speed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
 			}
 			case JUMP_TO_COORDINATE_5 -> {
-				log.error("jump to 5, not implemented");//TODO
+				selectedCoordinate = coordinatesPage * 6 + 4;
+				selectedWarpDirection = WarpDirection.COORDINATE;
+				speed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
 			}
 			case JUMP_TO_COORDINATE_6 -> {
-				log.error("jump to 6, not implemented");//TODO
+				selectedCoordinate = coordinatesPage * 6 + 5;
+				selectedWarpDirection = WarpDirection.COORDINATE;
+				speed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
 			}
 		}
 		updateData();
@@ -394,7 +414,6 @@ log.info("end load"); // TODO
 	}
 
 	private void updateData() {
-		log.info("update data"); // TODO
 		data.set(SPEED_KEY, speed);
 		data.set(STEP_KEY, step);
 		data.set(BLINK_KEY, Util.convertBitArrayToInt(getBlinkArray()));
@@ -413,8 +432,8 @@ log.info("end load"); // TODO
 		data.set(GUI_STATE_KEY, guiState.getKey());
 		data.set(BLOCK_POS_PAGE_KEY, blockPositionsPage);
 		data.set(BLOCK_POS_MAX_PAGE_KEY, (int) Math.ceil(blockPositions.size() / 3.0));
-/*		data.set(COORDINATES_PAGE_KEY, coordinatesPage);//TODO
-		data.set(COORDINATES_MAX_PAGE_KEY, (int) Math.ceil(coordinates.size() / 6.0));*/
+		data.set(COORDINATES_PAGE_KEY, coordinatesPage);
+		data.set(COORDINATES_MAX_PAGE_KEY, (int) Math.ceil(coordinates.size() / 6.0));
 
 		int recNum = 0;
 		if (blockPositionsPage * 3 < blockPositions.size()) {
@@ -457,8 +476,7 @@ log.info("end load"); // TODO
 		}
 
 		data.set(WATER_LINE_KEY, waterLine);
-
-		log.info("end update data"); // TODO
+		data.set(COORDINATES_BLINK_KEY, Util.convertBitArrayToInt(getCoordinateBlinkArray()));
 	}
 
 	public void addRectangle(int mode, BlockPos blockPos1, BlockPos blockPos2) {
@@ -476,7 +494,6 @@ log.info("end load"); // TODO
 	}
 
 	public void addCoordinate(int mode, SavedCoordinate savedCoordinate) {
-		log.info("add coordinate"); //TODO
 		if (mode == 0) {
 			coordinates.add(savedCoordinate);
 		}
@@ -488,38 +505,22 @@ log.info("end load"); // TODO
 	}
 
 	public void removeCoordinate(int mode) {
-		log.info("remove coordinate"); //TODO
 		coordinates.remove(6 * coordinatesPage + mode - 1);
+		selectedCoordinate = -1;
+		if (selectedWarpDirection.equals(WarpDirection.COORDINATE)) {
+			selectedWarpDirection = null;
+		}
 		updateData();
 		setChanged();
 	}
 
-	public String getShipName() {
-		log.info("get ship name"); //TODO
-		if (shipName == null) {
-			if (Objects.requireNonNull(level).isClientSide()) {
-				ModMessages.sendToServer(new GetShipNamePacket(getBlockPos()));
-			} else {
-				shipName = Util.generateNewShipName();
-			}
-			setChanged();
+	public String getUuid() {
+		if (uuid == null) {
+			uuid = UUID.randomUUID().toString();
 		}
-		return shipName;
+		return uuid;
 	}
 
-	public String getShipNameSafe() {
-		String shipName = getShipName();
-		while (shipName == null) {
-			log.info("###shipName||" + shipName); //TODO
-			try {
-				Thread.sleep(1500);
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			}
-			shipName = getShipName();
-		}
-		return shipName;
-	}
 
 	private boolean[] getBlinkArray() {
 		boolean blinkForward = WarpDirection.toButtonId(selectedWarpDirection, getBlockState().getValue(Rudder.FACING)) == ButtonId.FORWARD;
@@ -533,7 +534,20 @@ log.info("end load"); // TODO
 
 		boolean blinkJump = selectedWarpDirection != null && speed > 0;
 
-		return new boolean[]{blinkForward, blinkRight, blinkBackward, blinkLeft, blinkUp, blinkDown, blinkLand, blinkJump};
+		boolean blinkBeacon = WarpDirection.toButtonId(selectedWarpDirection, getBlockState().getValue(Rudder.FACING)) == ButtonId.BEACON;
+
+		return new boolean[]{blinkForward, blinkRight, blinkBackward, blinkLeft, blinkUp, blinkDown, blinkLand, blinkJump, blinkBeacon};
+	}
+
+	private boolean[] getCoordinateBlinkArray() {
+		boolean button1 = selectedCoordinate % 6 == 0;
+		boolean button2 = selectedCoordinate % 6 == 1;
+		boolean button3 = selectedCoordinate % 6 == 2;
+		boolean button4 = selectedCoordinate % 6 == 3;
+		boolean button5 = selectedCoordinate % 6 == 4;
+		boolean button6 = selectedCoordinate % 6 == 5;
+
+		return new boolean[]{button1, button2, button3, button4, button5, button6};
 	}
 
 	private boolean[] getFunctionArray() {
@@ -550,7 +564,6 @@ log.info("end load"); // TODO
 	}
 
 	private void resetCoordinatePager() {
-		log.info("reset coordinate pager"); //TODO
 		if (coordinatesPage * 6 >= coordinates.size()) {
 			coordinatesPage--;
 		}
@@ -560,8 +573,7 @@ log.info("end load"); // TODO
 	}
 
 	public List<SavedCoordinate> getCoordinates() {
-		log.info("get coordinates"); //TODO
-		if(Objects.requireNonNull(level).isClientSide()){
+		if (Objects.requireNonNull(level).isClientSide()) {
 			return coordinates;
 		}
 		List<SavedCoordinate> result = new ArrayList<>();

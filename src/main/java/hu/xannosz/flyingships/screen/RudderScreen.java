@@ -39,12 +39,10 @@ public class RudderScreen extends AbstractContainerScreen<RudderMenu> {
 
 	public RudderScreen(RudderMenu rudderMenu, Inventory inventory, Component title) {
 		super(rudderMenu, inventory, title);
-		log.info("screen construct start"); //TODO
 		imageHeight = 193;
 		mainSubScreen = new MainSubScreen(this);
 		settingsSubScreen = new SettingsSubScreen(this);
 		coordinatesSubScreen = new CoordinatesSubScreen(this);
-		log.info("screen construct end"); //TODO
 	}
 
 	@Override
@@ -103,6 +101,15 @@ public class RudderScreen extends AbstractContainerScreen<RudderMenu> {
 	@Override
 	protected void renderLabels(@NotNull PoseStack poseStack, int mouseX, int mouseY) {
 		actualSubScreen.renderLabels(poseStack, font);
+	}
+
+	@Override
+	public boolean keyPressed(int p_97765_, int p_97766_, int p_97767_) {
+		return actualSubScreen.keyPressed(p_97765_,p_97766_,p_97767_);
+	}
+
+	public boolean byPassedKeyPressed(int p_97765_, int p_97766_, int p_97767_) {
+		return super.keyPressed(p_97765_, p_97766_, p_97767_);
 	}
 
 	private void blinking() {

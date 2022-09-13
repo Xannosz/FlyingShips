@@ -15,12 +15,12 @@ public class SettingsScreenConstants {
 	public static final int SETTINGS_BIG_BUTTON_MAIN_ROW_X = 229;
 	public static final int SETTINGS_BIG_BUTTON_MAIN_ROW_Y = 1;
 	public static final int SETTINGS_BIG_BUTTON_MAIN_ROW_ADDITIONAL = SETTINGS_BIG_BUTTON_W_H + 2;
-	public static final int SETTINGS_BIG_BUTTON_GRAPHICAL_ROW_X = 155;
-	public static final int SETTINGS_BIG_BUTTON_GRAPHICAL_ROW_Y = 20;
+	public static final int SETTINGS_BIG_BUTTON_GRAPHICAL_ROW_X = 154;
+	public static final int SETTINGS_BIG_BUTTON_GRAPHICAL_ROW_Y = 12;
 	public static final int SETTINGS_BIG_BUTTON_GRAPHICAL_ROW_ADDITIONAL = SETTINGS_BIG_BUTTON_MAIN_ROW_ADDITIONAL + 1;
 
-	public static final int SETTINGS_REC_BUTTON_GRAPHICAL_ROW_X = 140;
-	public static final int SETTINGS_REC_BUTTON_GRAPHICAL_ROW_Y = 22;
+	public static final int SETTINGS_REC_BUTTON_GRAPHICAL_ROW_X = 138;
+	public static final int SETTINGS_REC_BUTTON_GRAPHICAL_ROW_Y = 14;
 	public static final int SETTINGS_REC_BUTTON_GRAPHICAL_ROW_BUTTON_ADDITIONAL = SETTINGS_SMALL_BUTTON_MAIN_ROW_ADDITIONAL + 2;
 	public static final int SETTINGS_REC_BUTTON_GRAPHICAL_ROW_REC_ADDITIONAL = 29;
 

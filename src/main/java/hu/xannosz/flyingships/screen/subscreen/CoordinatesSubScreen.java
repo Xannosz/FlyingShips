@@ -3,6 +3,7 @@ package hu.xannosz.flyingships.screen.subscreen;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hu.xannosz.flyingships.FlyingShips;
+import hu.xannosz.flyingships.networking.ButtonClickedPacket;
 import hu.xannosz.flyingships.networking.ModMessages;
 import hu.xannosz.flyingships.networking.SendNewCoordinatePacket;
 import hu.xannosz.flyingships.screen.RudderScreen;
@@ -15,6 +16,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static hu.xannosz.flyingships.screen.RudderScreen.DEBUG_MODE;
@@ -60,15 +62,14 @@ public class CoordinatesSubScreen extends SubScreen {
 
 	public CoordinatesSubScreen(RudderScreen rudderScreen) {
 		super(rudderScreen);
-		log.info("subscreen constructor"); //TODO
 	}
 
 	@Override
 	public void init(int x, int y) {
-		log.info("init");//TODO
+
 		rudderScreen.getMenu().updateCoordinates();
-		log.info("button init");//TODO
-		pageUp = new GraphicalButton(ButtonConfig.builder()
+
+		pageUp = new LoopBackButton(ButtonConfig.builder()
 				.buttonId(ButtonId.COORDINATE_PAGE_UP)
 				.position(rudderScreen.getMenu().getBlockEntity().getBlockPos())
 				.isDefaultButtonDrawNeeded(false)
@@ -83,8 +84,8 @@ public class CoordinatesSubScreen extends SubScreen {
 				.graphicalH(BIG_BUTTONS_W_H)
 				.hoveredX(BIG_BUTTONS_G_X)
 				.hoveredY(BIG_BUTTONS_G_Y)
-				.build());
-		pageDown = new GraphicalButton(ButtonConfig.builder()
+				.build(), rudderScreen);
+		pageDown = new LoopBackButton(ButtonConfig.builder()
 				.buttonId(ButtonId.COORDINATE_PAGE_DOWN)
 				.position(rudderScreen.getMenu().getBlockEntity().getBlockPos())
 				.isDefaultButtonDrawNeeded(false)
@@ -99,7 +100,7 @@ public class CoordinatesSubScreen extends SubScreen {
 				.graphicalH(BIG_BUTTONS_W_H)
 				.hoveredX(BIG_BUTTONS_G_X)
 				.hoveredY(BIG_BUTTONS_G_Y + BIG_BUTTONS_G_Y_ADDITIONAL)
-				.build());
+				.build(), rudderScreen);
 		addNew = new LoopBackButton(ButtonConfig.builder()
 				.buttonId(ButtonId.ADD_NEW_COORDINATE)
 				.position(rudderScreen.getMenu().getBlockEntity().getBlockPos())
@@ -385,7 +386,7 @@ public class CoordinatesSubScreen extends SubScreen {
 		delete = new LoopBackButton(ButtonConfig.builder()
 				.buttonId(ButtonId.DELETE_COORDINATE)
 				.position(rudderScreen.getMenu().getBlockEntity().getBlockPos())
-				.isDefaultButtonDrawNeeded(false)
+				.isDefaultButtonDrawNeeded(true)
 				.debugMode(DEBUG_MODE)
 				.hitBoxX(x + EDIT_PANEL_X + EDIT_PANEL_BUTTONS_X + 2 * EDIT_PANEL_BUTTONS_X_ADDITIONAL)
 				.hitBoxY(y + EDIT_PANEL_Y + EDIT_PANEL_BUTTONS_Y)
@@ -395,13 +396,15 @@ public class CoordinatesSubScreen extends SubScreen {
 				.graphicalY(y + EDIT_PANEL_Y + EDIT_PANEL_BUTTONS_Y)
 				.graphicalW(SMALL_BUTTONS_W_H)
 				.graphicalH(SMALL_BUTTONS_W_H)
+				.buttonX(SMALL_BUTTONS_G_X)
+				.buttonY(SMALL_BUTTONS_G_Y + 2 * SMALL_BUTTONS_G_ADDITIONAL_X_Y)
 				.hoveredX(SMALL_BUTTONS_G_X + SMALL_BUTTONS_G_ADDITIONAL_X_Y)
 				.hoveredY(SMALL_BUTTONS_G_Y + 2 * SMALL_BUTTONS_G_ADDITIONAL_X_Y)
 				.build(), rudderScreen);
 		markerUp = new LoopBackButton(ButtonConfig.builder()
 				.buttonId(ButtonId.MARKER_UP)
 				.position(rudderScreen.getMenu().getBlockEntity().getBlockPos())
-				.isDefaultButtonDrawNeeded(false)
+				.isDefaultButtonDrawNeeded(true)
 				.debugMode(DEBUG_MODE)
 				.hitBoxX(x + EDIT_PANEL_X + EDIT_PANEL_BUTTONS_X)
 				.hitBoxY(y + EDIT_PANEL_Y + EDIT_PANEL_BUTTONS_Y + EDIT_PANEL_BUTTONS_Y_ADDITIONAL)
@@ -411,13 +414,15 @@ public class CoordinatesSubScreen extends SubScreen {
 				.graphicalY(y + EDIT_PANEL_Y + EDIT_PANEL_BUTTONS_Y + EDIT_PANEL_BUTTONS_Y_ADDITIONAL)
 				.graphicalW(SMALL_BUTTONS_W_H)
 				.graphicalH(SMALL_BUTTONS_W_H)
+				.buttonX(SMALL_BUTTONS_G_X)
+				.buttonY(SMALL_BUTTONS_G_Y + 5 * SMALL_BUTTONS_G_ADDITIONAL_X_Y)
 				.hoveredX(SMALL_BUTTONS_G_X + SMALL_BUTTONS_G_ADDITIONAL_X_Y)
 				.hoveredY(SMALL_BUTTONS_G_Y + 5 * SMALL_BUTTONS_G_ADDITIONAL_X_Y)
 				.build(), rudderScreen);
 		markerDown = new LoopBackButton(ButtonConfig.builder()
 				.buttonId(ButtonId.MARKER_DOWN)
 				.position(rudderScreen.getMenu().getBlockEntity().getBlockPos())
-				.isDefaultButtonDrawNeeded(false)
+				.isDefaultButtonDrawNeeded(true)
 				.debugMode(DEBUG_MODE)
 				.hitBoxX(x + EDIT_PANEL_X + EDIT_PANEL_BUTTONS_X + EDIT_PANEL_BUTTONS_X_ADDITIONAL)
 				.hitBoxY(y + EDIT_PANEL_Y + EDIT_PANEL_BUTTONS_Y + EDIT_PANEL_BUTTONS_Y_ADDITIONAL)
@@ -427,13 +432,15 @@ public class CoordinatesSubScreen extends SubScreen {
 				.graphicalY(y + EDIT_PANEL_Y + EDIT_PANEL_BUTTONS_Y + EDIT_PANEL_BUTTONS_Y_ADDITIONAL)
 				.graphicalW(SMALL_BUTTONS_W_H)
 				.graphicalH(SMALL_BUTTONS_W_H)
+				.buttonX(SMALL_BUTTONS_G_X)
+				.buttonY(SMALL_BUTTONS_G_Y + 6 * SMALL_BUTTONS_G_ADDITIONAL_X_Y)
 				.hoveredX(SMALL_BUTTONS_G_X + SMALL_BUTTONS_G_ADDITIONAL_X_Y)
 				.hoveredY(SMALL_BUTTONS_G_Y + 6 * SMALL_BUTTONS_G_ADDITIONAL_X_Y)
 				.build(), rudderScreen);
 		absoluteCoordinates = new LoopBackButton(ButtonConfig.builder()
 				.buttonId(ButtonId.ABSOLUTE_COORDINATE)
 				.position(rudderScreen.getMenu().getBlockEntity().getBlockPos())
-				.isDefaultButtonDrawNeeded(false)
+				.isDefaultButtonDrawNeeded(true)
 				.debugMode(DEBUG_MODE)
 				.hitBoxX(x + EDIT_PANEL_X + EDIT_PANEL_BUTTONS_X + 2 * EDIT_PANEL_BUTTONS_X_ADDITIONAL)
 				.hitBoxY(y + EDIT_PANEL_Y + EDIT_PANEL_BUTTONS_Y + EDIT_PANEL_BUTTONS_Y_ADDITIONAL)
@@ -443,14 +450,15 @@ public class CoordinatesSubScreen extends SubScreen {
 				.graphicalY(y + EDIT_PANEL_Y + EDIT_PANEL_BUTTONS_Y + EDIT_PANEL_BUTTONS_Y_ADDITIONAL)
 				.graphicalW(SMALL_BUTTONS_W_H)
 				.graphicalH(SMALL_BUTTONS_W_H)
+				.buttonX(SMALL_BUTTONS_G_X)
+				.buttonY(SMALL_BUTTONS_G_Y + 7 * SMALL_BUTTONS_G_ADDITIONAL_X_Y)
 				.hoveredX(SMALL_BUTTONS_G_X + SMALL_BUTTONS_G_ADDITIONAL_X_Y)
 				.hoveredY(SMALL_BUTTONS_G_Y + 7 * SMALL_BUTTONS_G_ADDITIONAL_X_Y)
 				.build(), rudderScreen);
-		log.info("edit init");//TODO
+
 		name = new LoopBackEditBox(rudderScreen.getFont(), x + EDIT_PANEL_X + EDIT_PANEL_NAME_X,
 				y + EDIT_PANEL_Y + EDIT_PANEL_NAME_Y_1, EDIT_PANEL_NAME_W, EDIT_PANEL_NAME_H,
 				Component.empty().withStyle(ChatFormatting.DARK_GRAY), ButtonId.EDITION_COORDINATE_DOWN, rudderScreen);
-		log.info("end init");//TODO
 	}
 
 	@Override
@@ -485,51 +493,48 @@ public class CoordinatesSubScreen extends SubScreen {
 
 	@Override
 	public void setVisibility(boolean visibility) {
+		int coordinatesSize = rudderScreen.getMenu().getCoordinates().size();
+
+		jump1.setVisibility(visibility && coordinatesSize > 0);
+		edit1.setVisibility(visibility && coordinatesSize > 0);
+		jump2.setVisibility(visibility && coordinatesSize > 1);
+		edit2.setVisibility(visibility && coordinatesSize > 1);
+		jump6.setVisibility(visibility && coordinatesSize > 5);
+		edit6.setVisibility(visibility && coordinatesSize > 5);
+
 		if (visibility && !addNewCoordinate) {
 			pageUp.setVisibility(true);
 			pageDown.setVisibility(true);
 			addNew.setVisibility(true);
 			back.setVisibility(true);
 
-			jump1.setVisibility(true);
-			edit1.setVisibility(true);
-			jump2.setVisibility(true);
-			edit2.setVisibility(true);
-			jump3.setVisibility(true);
-			edit3.setVisibility(true);
-			jump4.setVisibility(true);
-			edit4.setVisibility(true);
-			jump5.setVisibility(true);
-			edit5.setVisibility(true);
-			jump6.setVisibility(true);
-			edit6.setVisibility(true);
+			jump3.setVisibility(coordinatesSize > 2);
+			edit3.setVisibility(coordinatesSize > 2);
+			jump4.setVisibility(coordinatesSize > 3);
+			edit4.setVisibility(coordinatesSize > 3);
+			jump5.setVisibility(coordinatesSize > 4);
+			edit5.setVisibility(coordinatesSize > 4);
 		} else {
 			pageUp.setVisibility(false);
 			pageDown.setVisibility(false);
 			addNew.setVisibility(false);
 			back.setVisibility(false);
 
-			jump1.setVisibility(false);
-			edit1.setVisibility(false);
-			jump2.setVisibility(false);
-			edit2.setVisibility(false);
 			jump3.setVisibility(false);
 			edit3.setVisibility(false);
 			jump4.setVisibility(false);
 			edit4.setVisibility(false);
 			jump5.setVisibility(false);
 			edit5.setVisibility(false);
-			jump6.setVisibility(false);
-			edit6.setVisibility(false);
 		}
 
 		if (visibility && addNewCoordinate) {
 			ok.setVisibility(true);
 			cancel.setVisibility(true);
-			delete.setVisibility(true);
-			markerUp.setVisibility(true);
-			markerDown.setVisibility(true);
-			absoluteCoordinates.setVisibility(true);
+			delete.setVisibility(coordinateNum != 0);
+			markerUp.setVisibility(coordinateNum == 0);
+			markerDown.setVisibility(coordinateNum == 0);
+			absoluteCoordinates.setVisibility(coordinateNum == 0);
 
 			name.setVisible(true);
 		} else {
@@ -560,19 +565,23 @@ public class CoordinatesSubScreen extends SubScreen {
 	@Override
 	public void renderLabels(PoseStack poseStack, Font font) {
 		List<SavedCoordinate> savedCoordinates = rudderScreen.getMenu().getCoordinates();
-		if (!addNewCoordinate) {
-			for (int i = 0; i < savedCoordinates.size(); i++) {
-				font.draw(poseStack, Component.literal(savedCoordinates.get(i).getName()), NAMES_X,
-						NAMES_Y + i * NAMES_ADDITIONAL, Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
+
+		for (int i = 0; i < savedCoordinates.size(); i++) {
+			if (addNewCoordinate && (i == 2 || i == 3 || i == 4)) {
+				continue;
 			}
-			font.draw(poseStack, Component.literal(rudderScreen.getMenu().getCoordinatesPage() + "/" + rudderScreen.getMenu().getCoordinatesMaxPage()), 154,
-					67, Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
-		} else {
+			font.draw(poseStack, Component.literal(savedCoordinates.get(i).getName()), NAMES_X,
+					NAMES_Y + i * NAMES_ADDITIONAL, Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
+		}
+		if (addNewCoordinate) {
 			if (newCoordinate != null) {
-				font.draw(poseStack, Component.literal(newCoordinate.getMarker()), EDIT_PANEL_NAME_X,
+				String marker = newCoordinate.getMarker();
+				font.draw(poseStack, Component.literal(marker == null ? "" : marker), EDIT_PANEL_NAME_X,
 						EDIT_PANEL_NAME_Y_2, Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
 			}
 		}
+		font.draw(poseStack, Component.literal(rudderScreen.getMenu().getCoordinatesPage() + "/" + rudderScreen.getMenu().getCoordinatesMaxPage()), 154,
+				92, Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
 	}
 
 	@Override
@@ -582,16 +591,35 @@ public class CoordinatesSubScreen extends SubScreen {
 
 	@Override
 	public void blink(boolean on) {
-
+		if (on) {
+			Map<ButtonId, Boolean> blinking = rudderScreen.getMenu().getCoordinateBlinking();
+			jump1.setBlink(blinking.get(ButtonId.JUMP_TO_COORDINATE_1));
+			jump2.setBlink(blinking.get(ButtonId.JUMP_TO_COORDINATE_2));
+			jump3.setBlink(blinking.get(ButtonId.JUMP_TO_COORDINATE_3));
+			jump4.setBlink(blinking.get(ButtonId.JUMP_TO_COORDINATE_4));
+			jump5.setBlink(blinking.get(ButtonId.JUMP_TO_COORDINATE_5));
+			jump6.setBlink(blinking.get(ButtonId.JUMP_TO_COORDINATE_6));
+		} else {
+			jump1.setBlink(false);
+			jump2.setBlink(false);
+			jump3.setBlink(false);
+			jump4.setBlink(false);
+			jump5.setBlink(false);
+			jump6.setBlink(false);
+		}
 	}
 
 	@Override
 	public void clickButton(ButtonId buttonId) {
 		switch (buttonId) {
+			case COORDINATE_PAGE_UP ->
+					ModMessages.sendToServer(new ButtonClickedPacket(ButtonId.COORDINATE_PAGE_UP, rudderScreen.getMenu().getBlockEntity().getBlockPos()));
+			case COORDINATE_PAGE_DOWN ->
+					ModMessages.sendToServer(new ButtonClickedPacket(ButtonId.COORDINATE_PAGE_DOWN, rudderScreen.getMenu().getBlockEntity().getBlockPos()));
 			case ADD_NEW_COORDINATE -> {
 				addNewCoordinate = true;
 				coordinateNum = 0;
-				newCoordinate = null;
+				newCoordinate = new SavedCoordinate();
 				name.setValue("");
 			}
 			case EDIT_COORDINATE_1 -> {
@@ -630,30 +658,37 @@ public class CoordinatesSubScreen extends SubScreen {
 				newCoordinate = rudderScreen.getMenu().getCoordinates().get(5);
 				name.setValue(newCoordinate.getName());
 			}
-			case ADD_COORDINATE -> ModMessages.sendToServer(
-					new SendNewCoordinatePacket(coordinateNum,
-							rudderScreen.getMenu().getBlockEntity().getBlockPos(), newCoordinate));
+			case ADD_COORDINATE -> {
+				newCoordinate.setName(name.getValue());
+				ModMessages.sendToServer(
+						new SendNewCoordinatePacket(coordinateNum,
+								rudderScreen.getMenu().getBlockEntity().getBlockPos(), newCoordinate));
+				addNewCoordinate = false;
+				newCoordinate = null;
+			}
 			case EXIT_COORDINATE_EDITION -> {
 				addNewCoordinate = false;
 				newCoordinate = null;
 			}
-			case DELETE_COORDINATE -> ModMessages.sendToServer(
-					new SendNewCoordinatePacket(coordinateNum,
-							rudderScreen.getMenu().getBlockEntity().getBlockPos(), null));
-			case MARKER_UP -> {
-				log.error("marker up not implemented");
+			case DELETE_COORDINATE -> {
+				ModMessages.sendToServer(
+						new SendNewCoordinatePacket(coordinateNum,
+								rudderScreen.getMenu().getBlockEntity().getBlockPos(), null));
+				addNewCoordinate = false;
+				newCoordinate = null;
 			}
-			case MARKER_DOWN -> {
-				log.error("marker down not implemented");
-			}
-			case ABSOLUTE_COORDINATE -> {
-				log.error("absolute coordinate not implemented");
-			}
-			case EDITION_COORDINATE_DOWN -> {
-				newCoordinate.setName(name.getValue());
-				name.setValue(newCoordinate.getName());
-			}
+			case MARKER_UP -> log.error("marker up not implemented");
+			case MARKER_DOWN -> log.error("marker down not implemented");
+			case ABSOLUTE_COORDINATE -> log.error("absolute coordinate not implemented");
 		}
 		rudderScreen.getMenu().updateCoordinates();
+	}
+
+	@Override
+	public boolean keyPressed(int p_97765_, int p_97766_, int p_97767_) {
+		if (p_97765_ == 69 && addNewCoordinate) {
+			return false;
+		}
+		return super.keyPressed(p_97765_, p_97766_, p_97767_);
 	}
 }

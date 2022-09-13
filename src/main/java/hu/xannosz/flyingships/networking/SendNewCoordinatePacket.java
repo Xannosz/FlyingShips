@@ -24,8 +24,8 @@ public class SendNewCoordinatePacket {
 			this.name = coordinate.getName();
 			this.marker = coordinate.getMarker();
 		} else {
-			this.name = null;
-			this.marker = null;
+			this.name = "";
+			this.marker = "";
 		}
 	}
 
@@ -49,7 +49,7 @@ public class SendNewCoordinatePacket {
 			// SERVER SITE
 			BlockEntity entity = Objects.requireNonNull(context.getSender()).getLevel().getBlockEntity(position);
 			if (entity instanceof RudderBlockEntity) {
-				if (name == null) {
+				if (name.equals("")) {
 					((RudderBlockEntity) entity).removeCoordinate(mode);
 				} else {
 					SavedCoordinate savedCoordinate = new SavedCoordinate();
