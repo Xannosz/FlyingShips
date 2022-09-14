@@ -6,6 +6,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
+import static hu.xannosz.flyingships.Util.HOLLOW_BLOCKS;
+
 @Getter
 public class VoxelColumn {
 	private final ColumnType columnType;
@@ -103,7 +105,7 @@ public class VoxelColumn {
 		density += block.getExplosionResistance();
 		if (isAWool(block)) {
 			wool++;
-		} else {
+		} else if (!HOLLOW_BLOCKS.contains(block)) {
 			blocked = true;
 		}
 		if (block.equals(ModBlocks.HEATER.get())) {

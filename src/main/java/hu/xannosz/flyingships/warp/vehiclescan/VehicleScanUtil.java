@@ -11,9 +11,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
+import static hu.xannosz.flyingships.Util.isFluid;
 
 @UtilityClass
 public class VehicleScanUtil {
@@ -33,6 +33,9 @@ public class VehicleScanUtil {
 		// calculate lift surface
 		responseStruct.setLiftSurface(calculateSurface(matrix.getYColumns()));
 
+		// calculate bottom Y
+		responseStruct.setBottomY(calculateBottomY(matrix.getYColumns()));
+
 		// count blocks
 		countBlocks(responseStruct, matrix.getYColumns());
 
@@ -50,6 +53,46 @@ public class VehicleScanUtil {
 		calculateQuotients(responseStruct);
 
 		return responseStruct;
+	}
+
+	public static Set<BlockPos> getFluidsRecursive(ServerLevel level, List<AbsoluteRectangleData> rectangleDataList, Set<BlockPos> shell) {
+		Set<BlockPos> fluid = new HashSet<>();
+		Deque<BlockPos> neighbours = new LinkedList<>();
+
+		for (BlockPos blockPos : shell) {
+			BlockPos[] localNeighbours = new BlockPos[]{blockPos.above(), blockPos.below(), blockPos.north(), blockPos.south(), blockPos.east(), blockPos.west()};
+			for (BlockPos localNeighbour : localNeighbours) {
+				if (inRectangles(rectangleDataList, localNeighbour) && isFluid(level.getBlockState(localNeighbour).getBlock()) && !neighbours.contains(localNeighbour)) {
+					neighbours.add(localNeighbour);
+				}
+			}
+		}
+
+		while (neighbours.size() > 0) {
+			BlockPos blockPos = neighbours.pop();
+			fluid.add(blockPos);
+			BlockPos[] localNeighbours = new BlockPos[]{blockPos.above(), blockPos.below(), blockPos.north(), blockPos.south(), blockPos.east(), blockPos.west()};
+			for (BlockPos localNeighbour : localNeighbours) {
+				if (inRectangles(rectangleDataList, localNeighbour) && isFluid(level.getBlockState(localNeighbour).getBlock()) &&
+						!neighbours.contains(localNeighbour) && !fluid.contains(localNeighbour)) {
+					neighbours.add(localNeighbour);
+				}
+			}
+		}
+
+		return fluid;
+	}
+
+	private static boolean inRectangles(List<AbsoluteRectangleData> rectangleDataList, BlockPos blockPos) {
+		for (AbsoluteRectangleData rectangleData : rectangleDataList) {
+			if (rectangleData.getNorthWestCorner().getX() <= blockPos.getX() && blockPos.getX() <= rectangleData.getSouthEastCorner().getX() &&
+					rectangleData.getNorthWestCorner().getY() <= blockPos.getY() && blockPos.getY() <= rectangleData.getSouthEastCorner().getY() &&
+					rectangleData.getNorthWestCorner().getZ() <= blockPos.getZ() && blockPos.getZ() <= rectangleData.getSouthEastCorner().getZ()
+			) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static Set<BlockPos> getBlockPosSet(List<AbsoluteRectangleData> rectangleDataList) {
@@ -76,6 +119,22 @@ public class VehicleScanUtil {
 			}
 		}
 		return surface;
+	}
+
+	private static int calculateBottomY(Set<VoxelColumn> yColumns) {
+		int bottom = 0;
+		boolean first = true;
+		for (VoxelColumn column : yColumns) {
+			if (first) {
+				bottom = column.getMin();
+				first = false;
+			} else {
+				if (bottom > column.getMin()) {
+					bottom = column.getMin();
+				}
+			}
+		}
+		return bottom;
 	}
 
 	private static void countBlocks(VehicleScanResponseStruct responseStruct, Set<VoxelColumn> columns) {

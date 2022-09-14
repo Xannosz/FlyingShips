@@ -49,6 +49,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static hu.xannosz.flyingships.Util.CLOUD_LEVEL;
+
 @Slf4j
 public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 
@@ -274,8 +276,17 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 			}
 			case LAND -> {
 				landButtonSettings = landButtonSettings.nextState(terrainScanResult);
+				if (vehicleScanResult == null) {
+					break;
+				}
 				if (!landButtonSettings.equals(LandButtonSettings.EMPTY)) {
 					selectedWarpDirection = WarpDirection.fromBlockDirection(buttonId, getBlockState().getValue(Rudder.FACING));
+					switch (landButtonSettings) {
+						case VOID -> speed = Math.abs(CLOUD_LEVEL + waterLine - vehicleScanResult.getBottomY());
+						case LAND -> speed = terrainScanResult.getHeightOfBottom();
+						case TOUCH_CELLING -> speed = terrainScanResult.getHeightOfCelling();
+						case SWIM_LAVA, SWIM_WATER -> speed = Math.abs(terrainScanResult.getHeightOfBottom() + waterLine);
+					}
 				} else {
 					if (selectedWarpDirection.equals(WarpDirection.LAND)) {
 						selectedWarpDirection = null;
@@ -299,6 +310,9 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 					selectedCoordinate = -1;
 					selectedWarpDirection = null;
 				}
+				if (selectedWarpDirection != null && selectedWarpDirection.equals(WarpDirection.LAND)) {
+					selectedWarpDirection = null;
+				}
 			}
 			case MINUS -> {
 				speed -= STEPS[step];
@@ -309,6 +323,9 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 					selectedCoordinate = -1;
 					selectedWarpDirection = null;
 				}
+				if (selectedWarpDirection != null && selectedWarpDirection.equals(WarpDirection.LAND)) {
+					selectedWarpDirection = null;
+				}
 			}
 			case JUMP -> {
 				calculateJumpData();
@@ -317,7 +334,8 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 						hasEnoughPowerForMovement()) {
 					JumpUtil.jump(selectedWarpDirection, speed, landButtonSettings, terrainScanResult,
 							(ServerLevel) level, getBlockPos(), blockPositions,
-							selectedCoordinate == -1 ? null : coordinates.get(selectedCoordinate).getCoordinate());
+							selectedCoordinate == -1 ? null : coordinates.get(selectedCoordinate).getCoordinate(),
+							waterLine, vehicleScanResult.getBottomY());
 					selectedWarpDirection = null;
 				}
 			}
@@ -326,6 +344,8 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 				if (!powerButtonState.equals(PowerState.ON)) {
 					selectedWarpDirection = null;
 					selectedCoordinate = -1;
+					landButtonSettings = LandButtonSettings.VOID;
+					vehicleScanResult = null;
 				}
 			}
 			case MENU -> guiState = GuiState.SETTINGS;
@@ -473,6 +493,11 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 			data.set(WIND_KEY, getMovementPower());
 			data.set(FLOATING_MAX_KEY, vehicleScanResult.getDensity());
 			data.set(FLOATING_KEY, vehicleScanResult.getFloatingQuotient());
+		} else {
+			data.set(WIND_MAX_KEY, 0);
+			data.set(WIND_KEY, 0);
+			data.set(FLOATING_MAX_KEY, 0);
+			data.set(FLOATING_KEY, 0);
 		}
 
 		data.set(WATER_LINE_KEY, waterLine);

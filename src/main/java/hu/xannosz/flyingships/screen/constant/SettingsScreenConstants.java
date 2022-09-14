@@ -39,4 +39,8 @@ public class SettingsScreenConstants {
 
 	public static final int ADD_NEW_EDIT_BOX_X = 10;
 	public static final int ADD_NEW_EDIT_BOX_Y = 10;
+
+	public static final int CHECK_BOX_X = 211;
+	public static final int CHECK_BOX_Y = 12;
+	public static final int CHECK_BOX_Y_ADDITIONAL = 14;
 }

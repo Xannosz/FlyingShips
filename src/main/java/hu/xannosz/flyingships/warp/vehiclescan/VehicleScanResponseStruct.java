@@ -11,4 +11,5 @@ public class VehicleScanResponseStruct {
 	private int windSurface;
 	private int density;
 	private int floatingQuotient;
+	private int bottomY;
 }

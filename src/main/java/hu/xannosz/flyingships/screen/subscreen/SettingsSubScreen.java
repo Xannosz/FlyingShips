@@ -49,6 +49,9 @@ public class SettingsSubScreen extends SubScreen {
 	private LoopBackEditBox rec2y;
 	private LoopBackEditBox rec2z;
 
+	private GraphicalButton waterLineUp;
+	private GraphicalButton waterLineDown;
+
 	private boolean addNewRec = false;
 
 	private int recNum = 0;
@@ -278,6 +281,39 @@ public class SettingsSubScreen extends SubScreen {
 				Component.empty().withStyle(ChatFormatting.DARK_GRAY), ButtonId.BLOCK_POS_EDITION_DOWN, rudderScreen);
 		rec2z = new LoopBackEditBox(rudderScreen.getFont(), x + SETTINGS_ADD_NEW_REC_X + ADD_NEW_EDIT_BOX_X + 2 * ADD_NEW_EDIT_BOX_ADDITIONAL_X, y + SETTINGS_ADD_NEW_REC_Y + ADD_NEW_EDIT_BOX_Y + ADD_NEW_EDIT_BOX_ADDITIONAL_Y, ADD_NEW_EDIT_BOX_W, EDIT_BOX_H,
 				Component.empty().withStyle(ChatFormatting.DARK_GRAY), ButtonId.BLOCK_POS_EDITION_DOWN, rudderScreen);
+
+		waterLineUp = new GraphicalButton(ButtonConfig.builder()
+				.buttonId(ButtonId.WATER_LINE_UP)
+				.position(rudderScreen.getMenu().getBlockEntity().getBlockPos())
+				.isDefaultButtonDrawNeeded(false)
+				.debugMode(DEBUG_MODE)
+				.hitBoxX(x + CHECK_BOX_X)
+				.hitBoxY(y + CHECK_BOX_Y)
+				.hitBoxW(SETTINGS_SMALL_BUTTON_W_H)
+				.hitBoxH(SETTINGS_SMALL_BUTTON_W_H)
+				.graphicalX(x + CHECK_BOX_X)
+				.graphicalY(y + CHECK_BOX_Y)
+				.graphicalW(SETTINGS_SMALL_BUTTON_W_H)
+				.graphicalH(SETTINGS_SMALL_BUTTON_W_H)
+				.hoveredX(SETTINGS_SMALL_BUTTON_MAIN_ROW_X + SETTINGS_SMALL_BUTTON_MAIN_ROW_ADDITIONAL)
+				.hoveredY(SETTINGS_SMALL_BUTTON_MAIN_ROW_Y + 5 * SETTINGS_SMALL_BUTTON_MAIN_ROW_ADDITIONAL)
+				.build());
+		waterLineDown = new GraphicalButton(ButtonConfig.builder()
+				.buttonId(ButtonId.WATER_LINE_DOWN)
+				.position(rudderScreen.getMenu().getBlockEntity().getBlockPos())
+				.isDefaultButtonDrawNeeded(false)
+				.debugMode(DEBUG_MODE)
+				.hitBoxX(x + CHECK_BOX_X - SETTINGS_SMALL_BUTTON_W_H - 4)
+				.hitBoxY(y + CHECK_BOX_Y)
+				.hitBoxW(SETTINGS_SMALL_BUTTON_W_H)
+				.hitBoxH(SETTINGS_SMALL_BUTTON_W_H)
+				.graphicalX(x + CHECK_BOX_X - SETTINGS_SMALL_BUTTON_W_H - 4)
+				.graphicalY(y + CHECK_BOX_Y)
+				.graphicalW(SETTINGS_SMALL_BUTTON_W_H)
+				.graphicalH(SETTINGS_SMALL_BUTTON_W_H)
+				.hoveredX(SETTINGS_SMALL_BUTTON_MAIN_ROW_X + SETTINGS_SMALL_BUTTON_MAIN_ROW_ADDITIONAL)
+				.hoveredY(SETTINGS_SMALL_BUTTON_MAIN_ROW_Y + 4 * SETTINGS_SMALL_BUTTON_MAIN_ROW_ADDITIONAL)
+				.build());
 	}
 
 	@Override
@@ -303,6 +339,9 @@ public class SettingsSubScreen extends SubScreen {
 		rudderScreen.addRenderable(rec2x);
 		rudderScreen.addRenderable(rec2y);
 		rudderScreen.addRenderable(rec2z);
+
+		rudderScreen.addRenderable(waterLineUp);
+		rudderScreen.addRenderable(waterLineDown);
 	}
 
 	@Override
@@ -321,6 +360,9 @@ public class SettingsSubScreen extends SubScreen {
 			deleteRec2.setVisibility(blocksSize > 2);
 			editRec3.setVisibility(blocksSize > 4);
 			deleteRec3.setVisibility(blocksSize > 4);
+
+			waterLineUp.setVisibility(true);
+			waterLineDown.setVisibility(true);
 		} else {
 			pageUp.setVisibility(false);
 			pageDown.setVisibility(false);
@@ -333,6 +375,9 @@ public class SettingsSubScreen extends SubScreen {
 			deleteRec2.setVisibility(false);
 			editRec3.setVisibility(false);
 			deleteRec3.setVisibility(false);
+
+			waterLineUp.setVisibility(false);
+			waterLineDown.setVisibility(false);
 		}
 
 		if (visibility && addNewRec) {
@@ -390,6 +435,8 @@ public class SettingsSubScreen extends SubScreen {
 				font.draw(poseStack, Component.literal("" + blocks.get(i + 1).getZ()), 96,
 						16 + 13 + (int) (i * 14.5), Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
 			}
+			font.draw(poseStack, Component.literal("" + rudderScreen.getMenu().getWaterLine()), 173,
+					13, Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
 		}
 		font.draw(poseStack, Component.literal("" + rudderScreen.getMenu().getBlockPosPage() + "/" + rudderScreen.getMenu().getBlockPosMaxPage()), 154,
 				90, Objects.requireNonNull(ChatFormatting.WHITE.getColor()));

@@ -59,9 +59,11 @@ public class TerrainScanUtil {
 				bottomMaskTouch = bottomMaskHasCollision(dataPackage.getBottomMask(), level);
 				if (bottomMaskTouch.equals(Blocks.WATER)) {
 					responseStruct.setBottomPosition(BottomPosition.FLY_OVER_WATER);
+					responseStruct.setHeightOfBottom(heightOfBottom);
 					break;
 				} else if (bottomMaskTouch.equals(Blocks.LAVA)) {
 					responseStruct.setBottomPosition(BottomPosition.FLY_OVER_LAVA);
+					responseStruct.setHeightOfBottom(heightOfBottom);
 					break;
 				} else if (!bottomMaskTouch.equals(Blocks.AIR)) {
 					responseStruct.setBottomPosition(BottomPosition.FLY_OVER_FIELD);
@@ -109,6 +111,41 @@ public class TerrainScanUtil {
 		dataPackage.setBottomMask(voxelData.getBottomMask());
 
 		return dataPackage;
+	}
+
+	public static Set<BlockPos> getShell(List<AbsoluteRectangleData> rectangleDataList) {
+		Set<BlockPos> result = new HashSet<>();
+		for (AbsoluteRectangleData rectangleData : rectangleDataList) {
+			int minX = rectangleData.getNorthWestCorner().getX() - 1;
+			int maxX = rectangleData.getSouthEastCorner().getX() + 1;
+			int minY = rectangleData.getNorthWestCorner().getY() - 1;
+			int maxY = rectangleData.getSouthEastCorner().getY() + 1;
+			int minZ = rectangleData.getNorthWestCorner().getZ() - 1;
+			int maxZ = rectangleData.getSouthEastCorner().getZ() + 1;
+
+			for (int y = rectangleData.getNorthWestCorner().getY(); y <= rectangleData.getSouthEastCorner().getY(); y++) {
+				for (int z = rectangleData.getNorthWestCorner().getZ(); z <= rectangleData.getSouthEastCorner().getZ(); z++) {
+					result.add(new BlockPos(minX, y, z));
+					result.add(new BlockPos(maxX, y, z));
+				}
+			}
+
+			for (int x = rectangleData.getNorthWestCorner().getX(); x <= rectangleData.getSouthEastCorner().getX(); x++) {
+				for (int y = rectangleData.getNorthWestCorner().getY(); y <= rectangleData.getSouthEastCorner().getY(); y++) {
+					result.add(new BlockPos(x, y, minZ));
+					result.add(new BlockPos(x, y, maxZ));
+				}
+			}
+
+			for (int x = rectangleData.getNorthWestCorner().getX(); x <= rectangleData.getSouthEastCorner().getX(); x++) {
+				for (int z = rectangleData.getNorthWestCorner().getZ(); z <= rectangleData.getSouthEastCorner().getZ(); z++) {
+					result.add(new BlockPos(x, minY, z));
+					result.add(new BlockPos(x, maxY, z));
+				}
+			}
+		}
+
+		return result;
 	}
 
 	private static void nextTopMask(LiveDataPackage dataPackage) {

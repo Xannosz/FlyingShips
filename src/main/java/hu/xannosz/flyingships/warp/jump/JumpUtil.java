@@ -7,6 +7,8 @@ import hu.xannosz.flyingships.warp.BlockPosStruct;
 import hu.xannosz.flyingships.warp.WarpDirection;
 import hu.xannosz.flyingships.warp.terrainscan.LandButtonSettings;
 import hu.xannosz.flyingships.warp.terrainscan.TerrainScanResponseStruct;
+import hu.xannosz.flyingships.warp.terrainscan.TerrainScanUtil;
+import hu.xannosz.flyingships.warp.vehiclescan.VehicleScanUtil;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -33,21 +35,22 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static hu.xannosz.flyingships.Util.*;
 
 @Slf4j
 @UtilityClass
 public class JumpUtil {
 
-	private static final List<Block> PRE_PROCESS = Arrays.asList(Blocks.REDSTONE_WIRE);
-	private static final List<Block> POST_PROCESS = Arrays.asList(Blocks.PISTON_HEAD);
-
 	public static void jump(WarpDirection selectedWarpDirection, int speed,
 							LandButtonSettings landButtonSettings, TerrainScanResponseStruct terrainScanResponse,
 							ServerLevel level, BlockPos rudderBlockPosition, List<BlockPosStruct> blockPositions,
-							BlockPos coordinate) {
+							BlockPos coordinate, int waterLine, int bottomY) {
 		try {
 			//create absolute coordinates
-			final Vec3 additional = getAdditional(selectedWarpDirection, speed, landButtonSettings, terrainScanResponse, rudderBlockPosition, coordinate);
+			final Vec3 additional = getAdditional(selectedWarpDirection, speed, landButtonSettings, terrainScanResponse,
+					rudderBlockPosition, coordinate, waterLine, bottomY);
 			final List<AbsoluteRectangleData> rectangles = createRectangles(rudderBlockPosition, blockPositions);
 
 			//save structure
@@ -58,6 +61,12 @@ public class JumpUtil {
 			final Map<ServerPlayer, Vec3> players = getPlayers(rectangles, additional, level);
 			//get chunks
 			final Map<LevelChunk, Boolean> chunks = getChunks(rectangles, additional, level);
+
+			//get shell
+			final Set<BlockPos> sourceShell = TerrainScanUtil.getShell(rectangles);
+			//target shell
+			final Set<BlockPos> targetShell = sourceShell.stream().map(
+					blockPos -> blockPos.offset(additional.x, additional.y, additional.z)).collect(Collectors.toSet());
 
 			//sound effect
 			playSoundEffect(rudderBlockPosition, players);
@@ -71,6 +80,9 @@ public class JumpUtil {
 				sendErrorMessage(players);
 				return;
 			}
+
+			//get removable fluids
+			final Set<BlockPos> removableFluids = getRemovableFluids(level, rectangles, additional, sourceShell);
 
 			//delete structure
 			deleteStructure(rectangles, level);
@@ -86,6 +98,13 @@ public class JumpUtil {
 			//update chunks (reload entities)
 			updateChunks(chunks);
 
+			//remove fluids
+			removableFluids.forEach(fluid -> deleteBlock(level, fluid));
+
+			//start block updates
+			blockUpdates(level, sourceShell);
+			blockUpdates(level, targetShell);
+
 			//reset chunks force load
 			resetChunkForceLoad(chunks, level);
 		} catch (Exception ex) {
@@ -95,7 +114,7 @@ public class JumpUtil {
 
 	private static Vec3 getAdditional(WarpDirection selectedWarpDirection, int speed,
 									  LandButtonSettings landButtonSettings, TerrainScanResponseStruct terrainScanResponse,
-									  BlockPos rudderBlockPosition, BlockPos coordinate) {
+									  BlockPos rudderBlockPosition, BlockPos coordinate, int waterLine, int bottomY) {
 		switch (selectedWarpDirection) {
 			case UP -> {
 				return new Vec3(0, speed, 0);
@@ -118,13 +137,16 @@ public class JumpUtil {
 			case LAND -> {
 				switch (landButtonSettings) {
 					case VOID -> {
-						return new Vec3(0, 100, 0);
+						return new Vec3(0, CLOUD_LEVEL + waterLine - bottomY, 0);
 					}
 					case LAND -> {
 						return new Vec3(0, -terrainScanResponse.getHeightOfBottom(), 0);
 					}
 					case TOUCH_CELLING -> {
 						return new Vec3(0, terrainScanResponse.getHeightOfCelling(), 0);
+					}
+					case SWIM_LAVA, SWIM_WATER -> {
+						return new Vec3(0, -terrainScanResponse.getHeightOfBottom() + waterLine, 0);
 					}
 				}
 			}
@@ -272,8 +294,8 @@ public class JumpUtil {
 								rectangleData.getNorthWestCorner().getX() + x + additional.x,
 								rectangleData.getNorthWestCorner().getY() + y + additional.y,
 								rectangleData.getNorthWestCorner().getZ() + z + additional.z);
-						if (!level.getBlockState(state)
-								.getBlock().equals(Blocks.AIR)) {
+						if (!level.getBlockState(state).getBlock().equals(Blocks.AIR) &&
+								!isFluid(level.getBlockState(state).getBlock())) {
 							target.add(state);
 						}
 					}
@@ -354,6 +376,25 @@ public class JumpUtil {
 		players.forEach(
 				(player, target) -> player.teleportTo(target.x, target.y, target.z)
 		);
+	}
+
+	private static Set<BlockPos> getRemovableFluids(ServerLevel level, List<AbsoluteRectangleData> rectangles, Vec3 additional, Set<BlockPos> sourceShell) {
+		final Set<BlockPos> fluids = new HashSet<>();
+
+		VehicleScanUtil.getFluidsRecursive(level, rectangles, sourceShell).stream()
+				.map(fluid -> fluid.offset(new Vec3i(additional.x, additional.y, additional.z))).forEach(fluid -> {
+					if (!isFluid(level.getBlockState(fluid).getBlock())) {
+						fluids.add(fluid);
+					}
+				});
+
+		return fluids;
+	}
+
+	private static void blockUpdates(ServerLevel level, Set<BlockPos> shell) {
+		for (BlockPos pos : shell) {
+			level.updateNeighborsAt(pos, null);
+		}
 	}
 
 	private static void resetChunkForceLoad(Map<LevelChunk, Boolean> chunks, ServerLevel level) {

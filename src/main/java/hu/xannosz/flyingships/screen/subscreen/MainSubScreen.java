@@ -195,7 +195,7 @@ public class MainSubScreen extends SubScreen {
 		beaconButton = new GraphicalButton(ButtonConfig.builder()
 				.buttonId(ButtonId.BEACON)
 				.position(rudderScreen.getMenu().getBlockEntity().getBlockPos())
-				.isDefaultButtonDrawNeeded(true)
+				.isDefaultButtonDrawNeeded(false)
 				.debugMode(DEBUG_MODE)
 				.hitBoxX(x + MENU_ROW_X + MENU_ROW_H_W_H + 5)
 				.hitBoxY(y + MENU_ROW_Y)
@@ -205,8 +205,6 @@ public class MainSubScreen extends SubScreen {
 				.graphicalY(y + MENU_ROW_Y)
 				.graphicalW(MENU_ROW_H_W_H)
 				.graphicalH(MENU_ROW_H_W_H)
-				.buttonX(MENU_ROW_G_X + 2 * MENU_ROW_H_W_H + 4)
-				.buttonY(MENU_ROW_G_Y)
 				.hoveredX(MENU_ROW_G_X + 2 * MENU_ROW_H_W_H + 4)
 				.hoveredY(MENU_ROW_G_Y + MENU_ROW_H_W_H + 2)
 				.build());
@@ -327,9 +325,27 @@ public class MainSubScreen extends SubScreen {
 		if (visibility) {
 			if (rudderScreen.getMenu().getPowerButtonState() == 0) {
 				menuButton.setVisibility(false);
+
 				jump.setVisibility(true);
+				beaconButton.setVisibility(true);
+				land.setVisibility(true);
+				forward.setVisibility(true);
+				backward.setVisibility(true);
+				left.setVisibility(true);
+				right.setVisibility(true);
+				up.setVisibility(true);
+				down.setVisibility(true);
 			} else {
 				jump.setVisibility(false);
+				beaconButton.setVisibility(false);
+				land.setVisibility(false);
+				forward.setVisibility(false);
+				backward.setVisibility(false);
+				left.setVisibility(false);
+				right.setVisibility(false);
+				up.setVisibility(false);
+				down.setVisibility(false);
+
 				menuButton.setVisibility(true);
 			}
 		} else {
