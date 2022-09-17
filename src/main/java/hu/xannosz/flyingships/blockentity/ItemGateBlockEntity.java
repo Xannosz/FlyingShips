@@ -49,6 +49,10 @@ public class ItemGateBlockEntity extends BlockEntity {
 	public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
 		if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
 
+			if (level == null) {
+				return super.getCapability(cap, side);
+			}
+
 			BlockEntity entity = level.getBlockEntity(getBlockPos().offset(rudderPosition));
 			if (entity instanceof RudderBlockEntity) {
 				final LazyOptional<IItemHandler> lazyItemHandler = ((RudderBlockEntity) entity).getLazyItemHandler().cast();
@@ -58,13 +62,13 @@ public class ItemGateBlockEntity extends BlockEntity {
 						Map.of(Direction.DOWN, LazyOptional.of(() -> new WrappedHandler(itemHandler, (index, stack) ->
 										(index == 1 || index == 2) && stack.getItem() == Items.BUCKET, (i, s) -> false)),
 								Direction.UP, LazyOptional.of(() -> new WrappedHandler(itemHandler, (i, s) -> false,
-										(index, stack) -> index == 1 && itemHandler.isItemValid(1, stack))),
+										(index, stack) -> index == 1 && itemHandler.isItemValid(1, stack) && ((RudderBlockEntity) entity).isEnableSteamEngine())),
 								Direction.NORTH, LazyOptional.of(() -> new WrappedHandler(itemHandler, (i, s) -> false, (i, s) -> false)),
 								Direction.SOUTH, LazyOptional.of(() -> new WrappedHandler(itemHandler, (i, s) -> false, (i, s) -> false)),
 								Direction.EAST, LazyOptional.of(() -> new WrappedHandler(itemHandler, (i, s) -> false,
-										(index, stack) -> index == 2 && itemHandler.isItemValid(2, stack))),
+										(index, stack) -> index == 2 && itemHandler.isItemValid(2, stack) && ((RudderBlockEntity) entity).isEnableHeatEngine())),
 								Direction.WEST, LazyOptional.of(() -> new WrappedHandler(itemHandler, (i, s) -> false,
-										(index, stack) -> index == 0 && itemHandler.isItemValid(0, stack))));
+										(index, stack) -> index == 0 && itemHandler.isItemValid(0, stack) && ((RudderBlockEntity) entity).isEnableEnderEngine())));
 
 				if (side == null) {
 					return lazyItemHandler.cast();

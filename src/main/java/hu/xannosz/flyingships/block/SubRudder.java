@@ -57,10 +57,12 @@ public class SubRudder extends BaseEntityBlock {
 
 	}
 
+	@SuppressWarnings("deprecation")
 	public @NotNull BlockState rotate(BlockState blockState, Rotation rotation) {
 		return blockState.setValue(FACING, rotation.rotate(blockState.getValue(FACING)));
 	}
 
+	@SuppressWarnings("deprecation")
 	public @NotNull BlockState mirror(BlockState blockState, Mirror mirror) {
 		return blockState.rotate(mirror.getRotation(blockState.getValue(FACING)));
 	}
@@ -70,6 +72,7 @@ public class SubRudder extends BaseEntityBlock {
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public @NotNull InteractionResult use(@NotNull BlockState blockState, Level level, @NotNull BlockPos pos,
 										  @NotNull Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hitResult) {
 		if (!level.isClientSide()) {

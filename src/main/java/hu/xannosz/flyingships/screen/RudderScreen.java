@@ -7,6 +7,7 @@ import hu.xannosz.flyingships.screen.subscreen.MainSubScreen;
 import hu.xannosz.flyingships.screen.subscreen.SettingsSubScreen;
 import hu.xannosz.flyingships.screen.subscreen.SubScreen;
 import hu.xannosz.flyingships.screen.widget.ButtonId;
+import hu.xannosz.flyingships.screen.widget.ScreenWithButton;
 import lombok.extern.slf4j.Slf4j;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Widget;
@@ -23,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Slf4j
 @OnlyIn(Dist.CLIENT)
-public class RudderScreen extends AbstractContainerScreen<RudderMenu> {
+public class RudderScreen extends AbstractContainerScreen<RudderMenu> implements ScreenWithButton {
 
 	public static final boolean DEBUG_MODE = false;
 	private static final int BLINKING_RATE = 25;
@@ -105,7 +106,7 @@ public class RudderScreen extends AbstractContainerScreen<RudderMenu> {
 
 	@Override
 	public boolean keyPressed(int p_97765_, int p_97766_, int p_97767_) {
-		return actualSubScreen.keyPressed(p_97765_,p_97766_,p_97767_);
+		return actualSubScreen.keyPressed(p_97765_, p_97766_, p_97767_);
 	}
 
 	public boolean byPassedKeyPressed(int p_97765_, int p_97766_, int p_97767_) {
@@ -125,6 +126,7 @@ public class RudderScreen extends AbstractContainerScreen<RudderMenu> {
 		}
 	}
 
+	@Override
 	public void clickButton(ButtonId buttonId) {
 		actualSubScreen.clickButton(buttonId);
 	}

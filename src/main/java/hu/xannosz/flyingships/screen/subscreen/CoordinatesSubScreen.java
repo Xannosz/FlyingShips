@@ -458,7 +458,7 @@ public class CoordinatesSubScreen extends SubScreen {
 
 		name = new LoopBackEditBox(rudderScreen.getFont(), x + EDIT_PANEL_X + EDIT_PANEL_NAME_X,
 				y + EDIT_PANEL_Y + EDIT_PANEL_NAME_Y_1, EDIT_PANEL_NAME_W, EDIT_PANEL_NAME_H,
-				Component.empty().withStyle(ChatFormatting.DARK_GRAY), ButtonId.EDITION_COORDINATE_DOWN, rudderScreen);
+				Component.empty().withStyle(ChatFormatting.DARK_GRAY), ButtonId.EDITION_COORDINATE_DONE, rudderScreen);
 	}
 
 	@Override

@@ -60,6 +60,21 @@ public class ModMessages {
 				.encoder(ConnectToRudder::toBytes)
 				.consumerMainThread(ConnectToRudder::handler)
 				.add();
+		INSTANCE.messageBuilder(SendNewMarkerNamePacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+				.decoder(SendNewMarkerNamePacket::new)
+				.encoder(SendNewMarkerNamePacket::toBytes)
+				.consumerMainThread(SendNewMarkerNamePacket::handler)
+				.add();
+		INSTANCE.messageBuilder(SendSavedMarkerNamePacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+				.decoder(SendSavedMarkerNamePacket::new)
+				.encoder(SendSavedMarkerNamePacket::toBytes)
+				.consumerMainThread(SendSavedMarkerNamePacket::handler)
+				.add();
+		INSTANCE.messageBuilder(GetMarkerNamePacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+				.decoder(GetMarkerNamePacket::new)
+				.encoder(GetMarkerNamePacket::toBytes)
+				.consumerMainThread(GetMarkerNamePacket::handler)
+				.add();
 	}
 
 	public static <MSG> void sendToServer(MSG message) {

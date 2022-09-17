@@ -16,6 +16,8 @@ public class ModMenuTypes {
 
 	public static final RegistryObject<MenuType<RudderMenu>> RUDDER_MENU =
 			registerMenuType(RudderMenu::new, "rudder_menu");
+	public static final RegistryObject<MenuType<MarkerMenu>> MARKER_MENU =
+			registerMenuType(MarkerMenu::new, "marker_menu");
 
 
 	private static <T extends AbstractContainerMenu> RegistryObject<MenuType<T>> registerMenuType(IContainerFactory<T> factory,

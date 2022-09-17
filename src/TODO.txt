@@ -13,43 +13,34 @@
 - water still inside the ship?????
 - disable positive waterline
 - kelp destroy
-
-- item gate disable side, when not exist feature
-
-// gui
-- help texts on directional round
+- item gate give back disabled features things
 
 // engine
 - ender engine system
 - heat/steam system
 
 // mechanic
-- ship mode
 - cool down
 - collusion check on y
 - coordinate relative to marker
-
-// extended features
-- markers
-
-// misc
-- block models
-- align voxel shape to model
-- configuration file
 
 // release
 - tests
 - graphical ship borders in the world
 - better logo (rudder block)
 - wiki
-- description in tml file
+- description in toml file
+- hu lang
+- license
 
 
 
 // features
+- show helper text after some time
 - write out coordinates as tooltip message
 - dimension change
 - submarine mod
+- ship mode
 - item gate fluid
 - calculate chest density
 - multi rudder styles
@@ -61,6 +52,7 @@
 - question before delete rectangle/coordinate
 - edit coordinate
 - 1D engine
+- enable/disable marker
 - show absolute coordinates in settings in a tooltip
 - absolute or relative rectangles in edition mode
 - timed jump (computercraft?)

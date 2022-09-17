@@ -96,7 +96,6 @@ public class RudderMenu extends AbstractContainerMenu {
 	@Monad
 	@Override
 	public @NotNull ItemStack quickMoveStack(@NotNull Player playerIn, int index) {
-		log.info("quickMoveStack");
 		Slot sourceSlot = slots.get(index);
 		if (!sourceSlot.hasItem()) return ItemStack.EMPTY;  //EMPTY_ITEM
 		ItemStack sourceStack = sourceSlot.getItem();
@@ -115,7 +114,6 @@ public class RudderMenu extends AbstractContainerMenu {
 				return ItemStack.EMPTY;
 			}
 		} else {
-			System.out.println("Invalid slotIndex:" + index);
 			return ItemStack.EMPTY;
 		}
 		// If stack size == 0 (the entire stack was moved) set slot contents to null

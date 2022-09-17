@@ -1,6 +1,6 @@
 package hu.xannosz.flyingships.warp.vehiclescan;
 
-import hu.xannosz.flyingships.Configuration;
+import hu.xannosz.flyingships.config.FlyingShipsConfiguration;
 import hu.xannosz.flyingships.warp.AbsoluteRectangleData;
 import hu.xannosz.flyingships.warp.jump.JumpUtil;
 import lombok.experimental.UtilityClass;
@@ -168,9 +168,7 @@ public class VehicleScanUtil {
 	}
 
 	private static void calculateQuotients(VehicleScanResponseStruct responseStruct) {  //TODO remove after steam engine
-		Configuration configuration = Configuration.getConfiguration();
-
-		responseStruct.setFloatingQuotient(responseStruct.getLiftSurface() * configuration.getLiftMultiplier() +
-				responseStruct.getWool() * configuration.getBalloonMultiplier());
+		responseStruct.setFloatingQuotient(responseStruct.getLiftSurface() * FlyingShipsConfiguration.LIFT_MULTIPLIER.get() +
+				responseStruct.getWool() * FlyingShipsConfiguration.BALLOON_MULTIPLIER.get());
 	}
 }

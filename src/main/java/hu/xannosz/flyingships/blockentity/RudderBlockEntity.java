@@ -1,8 +1,8 @@
 package hu.xannosz.flyingships.blockentity;
 
-import hu.xannosz.flyingships.Configuration;
 import hu.xannosz.flyingships.Util;
 import hu.xannosz.flyingships.block.Rudder;
+import hu.xannosz.flyingships.config.FlyingShipsConfiguration;
 import hu.xannosz.flyingships.screen.GuiState;
 import hu.xannosz.flyingships.screen.RudderMenu;
 import hu.xannosz.flyingships.screen.widget.ButtonId;
@@ -133,8 +133,11 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 
 	private int selectedCoordinate = -1;
 
+	@Getter
 	private boolean enableHeatEngine = false;
+	@Getter
 	private boolean enableSteamEngine = false;
+	@Getter
 	private boolean enableEnderEngine = false;
 	private boolean enableHyperDrive = false;
 
@@ -150,7 +153,6 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	private TerrainScanResponseStruct terrainScanResult;
 	private VehicleScanResponseStruct vehicleScanResult;
 	private LandButtonSettings landButtonSettings = LandButtonSettings.VOID;
-	private final Configuration configuration = Configuration.getConfiguration();
 
 	private int clock = 0;
 
@@ -423,7 +425,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	}
 
 	private boolean hasEnoughPowerForMovement() {
-		if (configuration.isEnableSliding() && speed <= 5) {
+		if (FlyingShipsConfiguration.ENABLE_SLIDING.get() && speed <= 5) {
 			return true;
 		}
 
@@ -431,11 +433,11 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	}
 
 	private double getNecessaryMovementPower() {
-		return vehicleScanResult.getDensity() * Math.pow(1 + speed / configuration.getSpeedConsolidator(), 3);
+		return vehicleScanResult.getDensity() * Math.pow(1 + speed / FlyingShipsConfiguration.SPEED_CONSOLIDATOR.get(), 3);
 	}
 
 	private int getMovementPower() {
-		return vehicleScanResult.getWindSurface() * configuration.getWindMultiplier();
+		return vehicleScanResult.getWindSurface() * FlyingShipsConfiguration.WIND_MULTIPLIER.get();
 	}
 
 	private void updateData() {

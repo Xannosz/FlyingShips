@@ -3,11 +3,13 @@ package hu.xannosz.flyingships.screen.subscreen;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hu.xannosz.flyingships.FlyingShips;
+import hu.xannosz.flyingships.block.Rudder;
 import hu.xannosz.flyingships.blockentity.RudderBlockEntity;
 import hu.xannosz.flyingships.screen.RudderScreen;
 import hu.xannosz.flyingships.screen.widget.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -46,8 +48,15 @@ public class MainSubScreen extends SubScreen {
 	private Gauge wind;
 	private Gauge floating;
 
+	private HelpMessage speedStepMessage;
 	private HelpMessage windMessage;
 	private HelpMessage floatingMessage;
+	private HelpMessage forwardMessage;
+	private HelpMessage backMessage;
+	private HelpMessage leftMessage;
+	private HelpMessage rightMessage;
+	private HelpMessage upMessage;
+	private HelpMessage downMessage;
 
 	private final Random random = new Random();
 
@@ -279,8 +288,16 @@ public class MainSubScreen extends SubScreen {
 		wind = new Gauge(x + 65, y + 7, 177, 1, 15, 87);
 		floating = new Gauge(x + 46, y + 7, 177, 1, 15, 87);
 
+		speedStepMessage = new HelpMessage(113, 59, 44, 8, x, y, 105, 90, rudderScreen);
 		windMessage = new HelpMessage(65, 7, 15, 87, x, y, 65, 95, rudderScreen);
 		floatingMessage = new HelpMessage(46, 7, 15, 87, x, y, 46, 95, rudderScreen);
+
+		forwardMessage = new HelpMessage(MAIN_ROUND_X + 13, MAIN_ROUND_Y + 1, MAIN_ROUND_VERTICAL_H_W, MAIN_ROUND_VERTICAL_H_H, x, y, MAIN_ROUND_X + 13 - 20, MAIN_ROUND_Y + 1 + 25, rudderScreen);
+		backMessage = new HelpMessage(MAIN_ROUND_X + 13, MAIN_ROUND_Y + 36, MAIN_ROUND_VERTICAL_H_W, MAIN_ROUND_VERTICAL_H_H, x, y, MAIN_ROUND_X + 13 - 20, MAIN_ROUND_Y + 36 + 25, rudderScreen);
+		leftMessage = new HelpMessage(MAIN_ROUND_X + 1, MAIN_ROUND_Y + 13, MAIN_ROUND_HORIZONTAL_H_W, MAIN_ROUND_HORIZONTAL_H_H, x, y, MAIN_ROUND_X + 1 - 20, MAIN_ROUND_Y + 13 + 25, rudderScreen);
+		rightMessage = new HelpMessage(MAIN_ROUND_X + 36, MAIN_ROUND_Y + 13, MAIN_ROUND_HORIZONTAL_H_W, MAIN_ROUND_HORIZONTAL_H_H, x, y, MAIN_ROUND_X + 36 - 20, MAIN_ROUND_Y + 13 + 25, rudderScreen);
+		upMessage = new HelpMessage(MAIN_ROUND_X + MAIN_ROUND_UP_DOWN_X_ADDITIONAL + 3, MAIN_ROUND_Y + MAIN_ROUND_UP_DOWN_Y_ADDITIONAL, MAIN_ROUND_UP_DOWN_H_W, MAIN_ROUND_UP_DOWN_H_H, x, y, MAIN_ROUND_X + MAIN_ROUND_UP_DOWN_X_ADDITIONAL + 3 - 20, MAIN_ROUND_Y + MAIN_ROUND_UP_DOWN_Y_ADDITIONAL + 25, rudderScreen);
+		downMessage = new HelpMessage(MAIN_ROUND_X + MAIN_ROUND_UP_DOWN_X_ADDITIONAL + 3, MAIN_ROUND_Y + MAIN_ROUND_UP_DOWN_Y_ADDITIONAL + MAIN_ROUND_UP_DOWN_G_H + 1, MAIN_ROUND_UP_DOWN_H_W, MAIN_ROUND_UP_DOWN_H_H, x, y, MAIN_ROUND_X + MAIN_ROUND_UP_DOWN_X_ADDITIONAL + 3 - 20, MAIN_ROUND_Y + MAIN_ROUND_UP_DOWN_Y_ADDITIONAL + MAIN_ROUND_UP_DOWN_G_H + 1 + 25, rudderScreen);
 	}
 
 	@Override
@@ -414,11 +431,20 @@ public class MainSubScreen extends SubScreen {
 
 	@Override
 	public void renderToolTips(PoseStack poseStack, int mouseX, int mouseY, int x, int y) {
-		if (113 <= mouseX && mouseX <= 157 && 59 <= mouseY && mouseY <= 67) {
-			rudderScreen.renderTooltip(poseStack, Component.literal("+/- " + RudderBlockEntity.STEPS[rudderScreen.getMenu().getStep()]), x + 105, y + 90);
-		}
+		speedStepMessage.render(poseStack, mouseX, mouseY, Component.literal("+/- " + RudderBlockEntity.STEPS[rudderScreen.getMenu().getStep()]));
 		windMessage.render(poseStack, mouseX, mouseY, Component.literal(rudderScreen.getMenu().getWind() + "/" + rudderScreen.getMenu().getWindMax()));
 		floatingMessage.render(poseStack, mouseX, mouseY, Component.literal(rudderScreen.getMenu().getFloating() + "/" + rudderScreen.getMenu().getFloatingMax()));
+
+		Direction rudderDirection = rudderScreen.getMenu().getBlockEntity().getBlockState().getValue(Rudder.FACING);
+
+		if (rudderScreen.getMenu().getPowerButtonState() == 0) {
+			forwardMessage.render(poseStack, mouseX, mouseY, Component.translatable("gui.text." + rudderDirection.getOpposite()));
+			backMessage.render(poseStack, mouseX, mouseY, Component.translatable("gui.text." + rudderDirection));
+			leftMessage.render(poseStack, mouseX, mouseY, Component.translatable("gui.text." + rudderDirection.getClockWise()));
+			rightMessage.render(poseStack, mouseX, mouseY, Component.translatable("gui.text." + rudderDirection.getCounterClockWise()));
+			upMessage.render(poseStack, mouseX, mouseY, Component.translatable("gui.text.up"));
+			downMessage.render(poseStack, mouseX, mouseY, Component.translatable("gui.text.down"));
+		}
 	}
 
 	@Override

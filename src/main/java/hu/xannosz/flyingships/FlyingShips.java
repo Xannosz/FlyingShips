@@ -2,15 +2,19 @@ package hu.xannosz.flyingships;
 
 import hu.xannosz.flyingships.block.ModBlocks;
 import hu.xannosz.flyingships.blockentity.ModBlockEntities;
+import hu.xannosz.flyingships.config.FlyingShipsConfiguration;
 import hu.xannosz.flyingships.item.ModItems;
 import hu.xannosz.flyingships.networking.ModMessages;
+import hu.xannosz.flyingships.screen.MarkerScreen;
 import hu.xannosz.flyingships.screen.ModMenuTypes;
 import hu.xannosz.flyingships.screen.RudderScreen;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -29,7 +33,8 @@ public class FlyingShips {
 		ModMenuTypes.register(modEventBus);
 
 		modEventBus.addListener(this::commonSetup);
-		//modEventBus.addListener(this::clientSetup);
+
+		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, FlyingShipsConfiguration.SPEC, MOD_ID + ".toml");
 
 		MinecraftForge.EVENT_BUS.register(this);
 	}
@@ -43,6 +48,7 @@ public class FlyingShips {
 		@SubscribeEvent
 		public static void onClientSetup(FMLClientSetupEvent event) {
 			MenuScreens.register(ModMenuTypes.RUDDER_MENU.get(), RudderScreen::new);
+			MenuScreens.register(ModMenuTypes.MARKER_MENU.get(), MarkerScreen::new);
 		}
 	}
 }

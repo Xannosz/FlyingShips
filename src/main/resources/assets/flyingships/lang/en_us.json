@@ -29,5 +29,11 @@
   "message.firstPositionNotSelected": "First position not selected",
   "message.subRudderNotConnected": "Sub rudder not connected",
   "message.connectedToRudder": "Connected to rudder %s",
-  "message.notConnectedToRudder": "Sub rudder not connected to rudder %s"
+  "message.notConnectedToRudder": "Sub rudder not connected to rudder %s",
+  "gui.text.north": "NORTH / z-",
+  "gui.text.south": "SOUTH / z+",
+  "gui.text.east": "EAST / x+",
+  "gui.text.west": "WEST / x-",
+  "gui.text.up": "ZENITH / y+",
+  "gui.text.down": "NADIR / y-"
 }

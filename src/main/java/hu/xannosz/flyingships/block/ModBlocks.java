@@ -41,7 +41,7 @@ public class ModBlocks {
 	);
 
 	public static final RegistryObject<Block> ENDER_OSCILLATOR = registerBlock("ender_oscillator",
-			() -> new Block(BlockBehaviour.Properties.of(Material.GLASS).lightLevel(state -> 12).noOcclusion())
+			() -> new EnderOscillator(BlockBehaviour.Properties.of(Material.GLASS).lightLevel(state -> 12).noOcclusion())
 	);
 
 	public static final RegistryObject<Block> MARKER = registerBlock("marker",
