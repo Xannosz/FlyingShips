@@ -1,35 +1,57 @@
-// bugs/optimization
+// known bugs
 - item frames sometimes broken during jump
-- calculate chest density
 
+// bugs/optimization
 - more flexible system for detect the hollow blocks
 - get additional outside JumpUtil
 - remove code duplication from rudderBlockEntity
 - terrain scan detect swim and cloud reachability
-- destroy tables, torches after jump
+- destroy tables, torches after jump (inner shell)
 
-// beta
-- markers
+- normalize sounds
+- play sounds for all player
+- water still inside the ship?????
+- disable positive waterline
+- kelp destroy
+
+- item gate disable side, when not exist feature
+
+// gui
 - help texts on directional round
-- heat/steam system
-- ship mode
-- configuration file
 
-// demo
+// engine
 - ender engine system
+- heat/steam system
+
+// mechanic
+- ship mode
+- cool down
+- collusion check on y
+- coordinate relative to marker
+
+// extended features
+- markers
+
+// misc
 - block models
+- align voxel shape to model
+- configuration file
 
 // release
 - tests
-- item gate
-- sub rudder
 - graphical ship borders in the world
 - better logo (rudder block)
+- wiki
+- description in tml file
+
+
 
 // features
 - write out coordinates as tooltip message
 - dimension change
 - submarine mod
+- item gate fluid
+- calculate chest density
 - multi rudder styles
 - computercraft integration
 - turn (during jump, without jump, saved coordinates)
@@ -42,3 +64,6 @@
 - show absolute coordinates in settings in a tooltip
 - absolute or relative rectangles in edition mode
 - timed jump (computercraft?)
+- selectable inner round
+- artificial floater (like wool, just better) (crystal of levitation [no fall damage, when in hand])
+- different floating, sailing on different biomes and height

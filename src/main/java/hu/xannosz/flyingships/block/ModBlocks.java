@@ -21,13 +21,35 @@ public class ModBlocks {
 	public static final RegistryObject<Block> RUDDER = registerBlock("rudder",
 			() -> new Rudder(BlockBehaviour.Properties.of(Material.WOOD))
 	);
-	public static final RegistryObject<Block> BOILER = registerBlock("boiler",
+
+	public static final RegistryObject<Block> SUB_RUDDER = registerBlock("sub_rudder",
+			() -> new SubRudder(BlockBehaviour.Properties.of(Material.WOOD))
+	);
+
+	public static final RegistryObject<Block> TANK = registerBlock("tank",
 			() -> new Block(BlockBehaviour.Properties.of(Material.METAL))
 	);
+
 	public static final RegistryObject<Block> HEATER = registerBlock("heater",
 			() -> new Heater(BlockBehaviour.Properties.of(Material.HEAVY_METAL).lightLevel(
 					state -> state.getValue(Heater.LIT) ? 10 : 0
 			))
+	);
+
+	public static final RegistryObject<Block> HYPER_DRIVE_CORE = registerBlock("hyper_drive_core",
+			() -> new Block(BlockBehaviour.Properties.of(Material.METAL).lightLevel(state -> 12).noOcclusion())
+	);
+
+	public static final RegistryObject<Block> ENDER_OSCILLATOR = registerBlock("ender_oscillator",
+			() -> new Block(BlockBehaviour.Properties.of(Material.GLASS).lightLevel(state -> 12).noOcclusion())
+	);
+
+	public static final RegistryObject<Block> MARKER = registerBlock("marker",
+			() -> new Marker(BlockBehaviour.Properties.of(Material.WOOD).lightLevel(state -> 12).noOcclusion())
+	);
+
+	public static final RegistryObject<Block> ITEM_GATE = registerBlock("item_gate",
+			() -> new ItemGate(BlockBehaviour.Properties.of(Material.METAL))
 	);
 
 	private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> blockCreator) {

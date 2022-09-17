@@ -27,6 +27,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.structure.templatesystem.BlockRotProcessor;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
@@ -82,11 +83,15 @@ public class JumpUtil {
 			}
 
 			//get removable fluids
-			final Set<BlockPos> removableFluids = getRemovableFluids(level, rectangles, additional, sourceShell);
+			final Set<BlockPos> removableFluids = new HashSet<>();
+			final Set<BlockPos> waterTagged = new HashSet<>();
+			getRemovableFluids(level, rectangles, additional, sourceShell, removableFluids, waterTagged);
 
 			//delete structure
 			deleteStructure(rectangles, level);
 
+			//clean place
+			cleanPlace(rectangles, additional, level);
 			//create structure
 			createStructure(rectangles, additional, level);
 			//update chunks (reload structure)
@@ -100,6 +105,7 @@ public class JumpUtil {
 
 			//remove fluids
 			removableFluids.forEach(fluid -> deleteBlock(level, fluid));
+			waterTagged.forEach(waterTag -> level.setBlock(waterTag, level.getBlockState(waterTag).setValue(BlockStateProperties.WATERLOGGED, false), 2, 0));
 
 			//start block updates
 			blockUpdates(level, sourceShell);
@@ -295,7 +301,8 @@ public class JumpUtil {
 								rectangleData.getNorthWestCorner().getY() + y + additional.y,
 								rectangleData.getNorthWestCorner().getZ() + z + additional.z);
 						if (!level.getBlockState(state).getBlock().equals(Blocks.AIR) &&
-								!isFluid(level.getBlockState(state).getBlock())) {
+								!isFluid(level.getBlockState(state).getBlock()) &&
+								level.getBlockState(state).getBlock().equals(Blocks.KELP_PLANT)) { //TODO check
 							target.add(state);
 						}
 					}
@@ -350,6 +357,22 @@ public class JumpUtil {
 		level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 2, 0);
 	}
 
+	private static void cleanPlace(List<AbsoluteRectangleData> rectangles, Vec3 additional, ServerLevel level) {
+		for (AbsoluteRectangleData rectangleData : rectangles) {
+			for (int x = 0; x < rectangleData.getStructureSize().getX(); x++) {
+				for (int y = 0; y < rectangleData.getStructureSize().getY(); y++) {
+					for (int z = 0; z < rectangleData.getStructureSize().getZ(); z++) {
+						BlockPos blockPos = new BlockPos(
+								rectangleData.getNorthWestCorner().getX() + x + additional.x,
+								rectangleData.getNorthWestCorner().getY() + y + additional.y,
+								rectangleData.getNorthWestCorner().getZ() + z + additional.z);
+						deleteBlock(level, blockPos);
+					}
+				}
+			}
+		}
+	}
+
 	private static void createStructure(List<AbsoluteRectangleData> rectangles, Vec3 additional, ServerLevel level) {
 		for (AbsoluteRectangleData rectangleData : rectangles) {
 			final StructurePlaceSettings structureplacesettings = (new StructurePlaceSettings()).setMirror(Mirror.NONE).setRotation(Rotation.NONE).setIgnoreEntities(true);
@@ -378,17 +401,17 @@ public class JumpUtil {
 		);
 	}
 
-	private static Set<BlockPos> getRemovableFluids(ServerLevel level, List<AbsoluteRectangleData> rectangles, Vec3 additional, Set<BlockPos> sourceShell) {
-		final Set<BlockPos> fluids = new HashSet<>();
-
-		VehicleScanUtil.getFluidsRecursive(level, rectangles, sourceShell).stream()
-				.map(fluid -> fluid.offset(new Vec3i(additional.x, additional.y, additional.z))).forEach(fluid -> {
-					if (!isFluid(level.getBlockState(fluid).getBlock())) {
-						fluids.add(fluid);
-					}
-				});
-
-		return fluids;
+	private static void getRemovableFluids(ServerLevel level, List<AbsoluteRectangleData> rectangles, Vec3 additional,
+										   Set<BlockPos> sourceShell, Set<BlockPos> removableFluids, Set<BlockPos> waterTagged) {
+		for (BlockPos blockPos : VehicleScanUtil.getFluidsRecursive(level, rectangles, sourceShell)) {
+			if (isFluid(level.getBlockState(blockPos).getBlock()) &&
+					!isFluid(level.getBlockState(blockPos.offset(new Vec3i(additional.x, additional.y, additional.z))).getBlock())) {
+				removableFluids.add(blockPos.offset(new Vec3i(additional.x, additional.y, additional.z)));
+			}
+			if (isFluidTagged(level.getBlockState(blockPos))) {
+				waterTagged.add(blockPos.offset(new Vec3i(additional.x, additional.y, additional.z)));
+			}
+		}
 	}
 
 	private static void blockUpdates(ServerLevel level, Set<BlockPos> shell) {

@@ -1,6 +1,12 @@
 {
-  "parent": "block/cube_all",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "all": "flyingships:block/heater"
+    "down": "flyingships:block/heater_bottom",
+    "east": "flyingships:block/heater",
+    "north": "flyingships:block/heater",
+    "particle": "flyingships:block/heater_top",
+    "south": "flyingships:block/heater",
+    "up": "flyingships:block/heater_top",
+    "west": "flyingships:block/heater"
   }
 }

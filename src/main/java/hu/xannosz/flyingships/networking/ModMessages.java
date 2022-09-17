@@ -55,6 +55,11 @@ public class ModMessages {
 				.encoder(GetSavedCoordinatesPacket::toBytes)
 				.consumerMainThread(GetSavedCoordinatesPacket::handler)
 				.add();
+		INSTANCE.messageBuilder(ConnectToRudder.class, id(), NetworkDirection.PLAY_TO_SERVER)
+				.decoder(ConnectToRudder::new)
+				.encoder(ConnectToRudder::toBytes)
+				.consumerMainThread(ConnectToRudder::handler)
+				.add();
 	}
 
 	public static <MSG> void sendToServer(MSG message) {

@@ -13,7 +13,7 @@ public class Configuration {
 		return configuration;
 	}
 
-	private int windMultiplier = 1000; // /10
+	private int windMultiplier = 2000; // /10
 	private int liftMultiplier = 500; // /10
 	private int balloonMultiplier = 60;
 	private int liftOfInWater = 200;

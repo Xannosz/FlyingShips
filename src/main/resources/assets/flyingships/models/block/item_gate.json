@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "flyingships:block/item_gate_bottom",
+    "east": "flyingships:block/item_gate_east",
+    "north": "flyingships:block/item_gate_north",
+    "particle": "flyingships:block/item_gate_top",
+    "south": "flyingships:block/item_gate_south",
+    "up": "flyingships:block/item_gate_top",
+    "west": "flyingships:block/item_gate_west"
+  }
+}

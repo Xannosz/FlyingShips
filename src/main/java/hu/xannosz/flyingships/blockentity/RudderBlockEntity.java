@@ -17,10 +17,10 @@ import hu.xannosz.flyingships.warp.terrainscan.TerrainScanResponseStruct;
 import hu.xannosz.flyingships.warp.terrainscan.TerrainScanUtil;
 import hu.xannosz.flyingships.warp.vehiclescan.VehicleScanResponseStruct;
 import hu.xannosz.flyingships.warp.vehiclescan.VehicleScanUtil;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -32,24 +32,25 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 import static hu.xannosz.flyingships.Util.CLOUD_LEVEL;
+import static net.minecraft.world.item.crafting.RecipeType.SMELTING;
+import static net.minecraftforge.common.ForgeHooks.getBurnTime;
 
 @Slf4j
 public class RudderBlockEntity extends BlockEntity implements MenuProvider {
@@ -100,13 +101,26 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	public static final int DATA_SLOT_SIZE = 41;
 
 	public static final int[] STEPS = new int[]{1, 10, 100, 1000};
+
+	@Getter
 	private final ItemStackHandler itemHandler = new ItemStackHandler(3) {
 		@Override
 		protected void onContentsChanged(int slot) {
 			setChanged();
 		}
+
+		@Override
+		public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+			return switch (slot) {
+				case 0 -> stack.getItem() == Items.ENDER_PEARL || stack.getItem() == Items.ENDER_EYE;
+				case 1 -> stack.getItem() == Items.WATER_BUCKET;
+				case 2 -> getBurnTime(stack, SMELTING) > 0;
+				default -> super.isItemValid(slot, stack);
+			};
+		}
 	};
 
+	@Getter
 	private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
 
 	private int speed = 50;
@@ -161,16 +175,6 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	@Override
 	public AbstractContainerMenu createMenu(int containerId, @NotNull Inventory inventory, @NotNull Player player) {
 		return new RudderMenu(containerId, inventory, this, data);
-	}
-
-	@Nonnull
-	@Override
-	public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @javax.annotation.Nullable Direction side) {
-		if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-			return lazyItemHandler.cast();
-		}
-
-		return super.getCapability(cap, side);
 	}
 
 	@Override
@@ -285,7 +289,8 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 						case VOID -> speed = Math.abs(CLOUD_LEVEL + waterLine - vehicleScanResult.getBottomY());
 						case LAND -> speed = terrainScanResult.getHeightOfBottom();
 						case TOUCH_CELLING -> speed = terrainScanResult.getHeightOfCelling();
-						case SWIM_LAVA, SWIM_WATER -> speed = Math.abs(terrainScanResult.getHeightOfBottom() + waterLine);
+						case SWIM_LAVA, SWIM_WATER ->
+								speed = Math.abs(terrainScanResult.getHeightOfBottom() + waterLine);
 					}
 				} else {
 					if (selectedWarpDirection.equals(WarpDirection.LAND)) {

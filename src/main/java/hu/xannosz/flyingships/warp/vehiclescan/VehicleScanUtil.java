@@ -14,6 +14,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.*;
 
 import static hu.xannosz.flyingships.Util.isFluid;
+import static hu.xannosz.flyingships.Util.isFluidTagged;
 
 @UtilityClass
 public class VehicleScanUtil {
@@ -73,7 +74,8 @@ public class VehicleScanUtil {
 			fluid.add(blockPos);
 			BlockPos[] localNeighbours = new BlockPos[]{blockPos.above(), blockPos.below(), blockPos.north(), blockPos.south(), blockPos.east(), blockPos.west()};
 			for (BlockPos localNeighbour : localNeighbours) {
-				if (inRectangles(rectangleDataList, localNeighbour) && isFluid(level.getBlockState(localNeighbour).getBlock()) &&
+				if (inRectangles(rectangleDataList, localNeighbour) &&
+						(isFluid(level.getBlockState(localNeighbour).getBlock()) || isFluidTagged(level.getBlockState(localNeighbour))) &&
 						!neighbours.contains(localNeighbour) && !fluid.contains(localNeighbour)) {
 					neighbours.add(localNeighbour);
 				}
@@ -140,17 +142,17 @@ public class VehicleScanUtil {
 	private static void countBlocks(VehicleScanResponseStruct responseStruct, Set<VoxelColumn> columns) {
 		int wool = 0;
 		int heater = 0;
-		int boiler = 0;
+		int tank = 0;
 		int density = 0;
 		for (VoxelColumn voxelColumn : columns) {
 			wool += voxelColumn.getWool();
 			heater += voxelColumn.getHeater();
-			boiler += voxelColumn.getBoiler();
+			tank += voxelColumn.getTank();
 			density += voxelColumn.getDensity();
 		}
 		responseStruct.setWool(wool);
 		responseStruct.setHeater(heater);
-		responseStruct.setBoiler(boiler);
+		responseStruct.setTank(tank);
 		responseStruct.setDensity(density);
 	}
 

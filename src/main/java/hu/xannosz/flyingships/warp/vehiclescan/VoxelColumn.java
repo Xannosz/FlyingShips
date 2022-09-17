@@ -18,7 +18,7 @@ public class VoxelColumn {
 
 	private int wool = 0;
 	private int heater = 0;
-	private int boiler = 0;
+	private int tank = 0;
 
 	private int density = 0;
 	private boolean blocked = false;
@@ -111,8 +111,8 @@ public class VoxelColumn {
 		if (block.equals(ModBlocks.HEATER.get())) {
 			heater++;
 		}
-		if (block.equals(ModBlocks.BOILER.get())) {
-			boiler++;
+		if (block.equals(ModBlocks.TANK.get())) {
+			tank++;
 		}
 	}
 

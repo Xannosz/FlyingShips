@@ -3,6 +3,8 @@ package hu.xannosz.flyingships;
 import lombok.experimental.UtilityClass;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,6 +21,7 @@ public class Util {
 			Blocks.STONE_SLAB);
 
 	public static final int CLOUD_LEVEL = 196;
+	public static final int RUDDER_TYPES = 5;
 
 	public static int convertBitArrayToInt(boolean[] booleans) {
 		int value = 0;
@@ -38,5 +41,9 @@ public class Util {
 
 	public static boolean isFluid(Block block) {
 		return block.equals(Blocks.WATER) || block.equals(Blocks.LAVA);
+	}
+
+	public static boolean isFluidTagged(BlockState block) {
+		return block.hasProperty(BlockStateProperties.WATERLOGGED) && block.getValue(BlockStateProperties.WATERLOGGED);
 	}
 }

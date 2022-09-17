@@ -2,8 +2,13 @@
   "item.flyingships.wand": "Wand",
   "itemGroup.flyingshipstab": "Flying Ships",
   "block.flyingships.rudder": "Rudder",
-  "block.flyingships.boiler": "Boiler",
+  "block.flyingships.tank": "Tank",
   "block.flyingships.heater": "Heater",
+  "block.flyingships.ender_oscillator": "Ender Oscillator",
+  "block.flyingships.hyper_drive_core": "Hyper Drive Core",
+  "block.flyingships.item_gate": "Item Gate",
+  "block.flyingships.marker": "Marker",
+  "block.flyingships.sub_rudder": "Sub Rudder",
   "text.wand.lessInfo": "Add rectangles to the selected ship",
   "text.wand.moreInfo1": "Right click for a rudder block to select the ship\nThen right click on a block to select the first corner and right click to select the other corner and add to the ship.",
   "text.wand.moreInfo2": "Shift right click to delete selected corner (not from ship)",
@@ -21,5 +26,8 @@
   "message.rudderNotSelected": "Rudder not selected",
   "message.wrongBlockEntity": "Not a rudder",
   "message.wrongRudderContext": "ship does not match to the coordinates %s",
-  "message.firstPositionNotSelected": "First position not selected"
+  "message.firstPositionNotSelected": "First position not selected",
+  "message.subRudderNotConnected": "Sub rudder not connected",
+  "message.connectedToRudder": "Connected to rudder %s",
+  "message.notConnectedToRudder": "Sub rudder not connected to rudder %s"
 }

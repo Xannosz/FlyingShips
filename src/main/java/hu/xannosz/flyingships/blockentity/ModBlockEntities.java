@@ -17,6 +17,21 @@ public class ModBlockEntities {
 					BlockEntityType.Builder.of(
 							RudderBlockEntity::new,
 							ModBlocks.RUDDER.get()).build(null));
+	public static final RegistryObject<BlockEntityType<ItemGateBlockEntity>> ITEM_GATE_BLOCK_ENTITY =
+			BLOCK_ENTITIES.register("item_gate_block_entity", () ->
+					BlockEntityType.Builder.of(
+							ItemGateBlockEntity::new,
+							ModBlocks.ITEM_GATE.get()).build(null));
+	public static final RegistryObject<BlockEntityType<SubRudderBlockEntity>> SUB_RUDDER_BLOCK_ENTITY =
+			BLOCK_ENTITIES.register("sub_rudder_block_entity", () ->
+					BlockEntityType.Builder.of(
+							SubRudderBlockEntity::new,
+							ModBlocks.SUB_RUDDER.get()).build(null));
+	public static final RegistryObject<BlockEntityType<MarkerBlockEntity>> MARKER_BLOCK_ENTITY =
+			BLOCK_ENTITIES.register("marker_block_entity", () ->
+					BlockEntityType.Builder.of(
+							MarkerBlockEntity::new,
+							ModBlocks.MARKER.get()).build(null));
 
 
 	public static void register(IEventBus eventBus) {

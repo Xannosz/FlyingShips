@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "flyingships:block/item_gate",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "flyingships:block/item_gate"
+    },
+    "facing=south": {
+      "model": "flyingships:block/item_gate",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "flyingships:block/item_gate",
+      "y": 270
+    }
+  }
+}

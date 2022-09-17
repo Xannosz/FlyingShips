@@ -1,6 +1,6 @@
 {
   "parent": "block/cube_all",
   "textures": {
-    "all": "flyingships:block/boiler"
+    "all": "flyingships:block/tank"
   }
 }

@@ -19,7 +19,7 @@ import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -41,11 +41,11 @@ public class RudderMenu extends AbstractContainerMenu {
 	private final ContainerData data;
 
 	@Getter
-	private ModInputSlot enderInputSlot;
+	private final ModInputSlot enderInputSlot;
 	@Getter
-	private ModInputSlot steamInputSlot;
+	private final ModInputSlot steamInputSlot;
 	@Getter
-	private ModInputSlot heatInputSlot;
+	private final ModInputSlot heatInputSlot;
 
 	public RudderMenu(int containerId, Inventory inv, FriendlyByteBuf extraData) {
 		this(containerId, inv, inv.player.level.getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(DATA_SLOT_SIZE));
@@ -63,14 +63,13 @@ public class RudderMenu extends AbstractContainerMenu {
 		addPlayerInventory(inv);
 		addPlayerHotBar(inv);
 
-		this.blockEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handler -> {
-			enderInputSlot = new ModInputSlot(handler, 0, 105, 90);
-			steamInputSlot = new ModInputSlot(handler, 1, 128, 90);
-			heatInputSlot = new ModInputSlot(handler, 2, 151, 90);
-			this.addSlot(enderInputSlot);
-			this.addSlot(steamInputSlot);
-			this.addSlot(heatInputSlot);
-		});
+		ItemStackHandler handler = this.blockEntity.getItemHandler();
+		enderInputSlot = new ModInputSlot(handler, 0, 105, 90);
+		steamInputSlot = new ModInputSlot(handler, 1, 128, 90);
+		heatInputSlot = new ModInputSlot(handler, 2, 151, 90);
+		this.addSlot(enderInputSlot);
+		this.addSlot(steamInputSlot);
+		this.addSlot(heatInputSlot);
 
 		addDataSlots(data);
 	}
