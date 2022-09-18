@@ -1,12 +1,11 @@
 package hu.xannosz.flyingships.warp.vehiclescan;
 
+import hu.xannosz.flyingships.Util;
 import hu.xannosz.flyingships.block.ModBlocks;
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-
-import static hu.xannosz.flyingships.Util.HOLLOW_BLOCKS;
 
 @Getter
 public class VoxelColumn {
@@ -101,11 +100,12 @@ public class VoxelColumn {
 		return false;
 	}
 
+	@SuppressWarnings("deprecation")
 	private void calculateInterestBlock(Block block) {
 		density += block.getExplosionResistance();
 		if (isAWool(block)) {
 			wool++;
-		} else if (!HOLLOW_BLOCKS.contains(block)) {
+		} else if (!Util.isHollow(block)) {
 			blocked = true;
 		}
 		if (block.equals(ModBlocks.HEATER.get())) {

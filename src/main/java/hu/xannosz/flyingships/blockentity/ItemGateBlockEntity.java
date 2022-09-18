@@ -60,7 +60,11 @@ public class ItemGateBlockEntity extends BlockEntity {
 
 				final Map<Direction, LazyOptional<WrappedHandler>> directionWrappedHandlerMap =
 						Map.of(Direction.DOWN, LazyOptional.of(() -> new WrappedHandler(itemHandler, (index, stack) ->
-										(index == 1 || index == 2) && stack.getItem() == Items.BUCKET, (i, s) -> false)),
+										((index == 1 || index == 2) && stack.getItem() == Items.BUCKET) ||
+												(index == 0 && !((RudderBlockEntity) entity).isEnableEnderEngine()) ||
+												(index == 1 && !((RudderBlockEntity) entity).isEnableSteamEngine()) ||
+												(index == 2 && !((RudderBlockEntity) entity).isEnableHeatEngine())
+										, (i, s) -> false)),
 								Direction.UP, LazyOptional.of(() -> new WrappedHandler(itemHandler, (i, s) -> false,
 										(index, stack) -> index == 1 && itemHandler.isItemValid(1, stack) && ((RudderBlockEntity) entity).isEnableSteamEngine())),
 								Direction.NORTH, LazyOptional.of(() -> new WrappedHandler(itemHandler, (i, s) -> false, (i, s) -> false)),

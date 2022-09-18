@@ -13,28 +13,35 @@ import java.util.function.Supplier;
 public class PlaySoundPacket {
 
 	private final BlockPos position;
+	private final boolean inTheShip;
 
-	public PlaySoundPacket(BlockPos position) {
+	public PlaySoundPacket(BlockPos position, boolean inTheShip) {
 		this.position = position;
+		this.inTheShip = inTheShip;
 	}
 
 	public PlaySoundPacket(FriendlyByteBuf buf) {
 		position = buf.readBlockPos();
+		inTheShip = buf.readBoolean();
 	}
 
 	public void toBytes(FriendlyByteBuf buf) {
 		buf.writeBlockPos(position);
+		buf.writeBoolean(inTheShip);
 	}
 
 	public void handler(Supplier<NetworkEvent.Context> supplier) {
 		NetworkEvent.Context context = supplier.get();
 		context.enqueueWork(() -> {
 			// CLIENT SITE
-			Objects.requireNonNull(Minecraft.getInstance().level).playLocalSound(
-					(double) position.getX() + 0.5D, (double) position.getY() + 0.5D, (double) position.getZ() + 0.5D,
-					SoundEvents.PORTAL_TRAVEL, SoundSource.BLOCKS, 3F, 2F, false);
-			Objects.requireNonNull(Minecraft.getInstance().level).playSound(Minecraft.getInstance().player
-					, position, SoundEvents.ENDERMAN_TELEPORT, SoundSource.BLOCKS, 2f, 2f);
+			if (inTheShip) {
+				Objects.requireNonNull(Minecraft.getInstance().level).playSound(Minecraft.getInstance().player
+						, position, SoundEvents.PORTAL_TRAVEL, SoundSource.BLOCKS, 0.5f, 2f);
+			} else {
+				Objects.requireNonNull(Minecraft.getInstance().level).playLocalSound(
+						(double) position.getX() + 0.5D, (double) position.getY() + 0.5D, (double) position.getZ() + 0.5D,
+						SoundEvents.ENDERMAN_TELEPORT, SoundSource.BLOCKS, 2F, 2F, false);
+			}
 		});
 	}
 }

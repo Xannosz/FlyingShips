@@ -2,60 +2,58 @@
 - item frames sometimes broken during jump
 
 // bugs/optimization
-- more flexible system for detect the hollow blocks
-- get additional outside JumpUtil
-- remove code duplication from rudderBlockEntity
 - terrain scan detect swim and cloud reachability
-- destroy tables, torches after jump (inner shell)
 
-- normalize sounds
-- play sounds for all player
-- water still inside the ship?????
-- disable positive waterline
-- kelp destroy
-- item gate give back disabled features things
-
-// engine
+// beta
 - ender engine system
 - heat/steam system
-
-// mechanic
 - cool down
 - collusion check on y
+
+// pre-release
+- artificial floater (like wool, just better) (crystal of levitation [no fall damage, when in hand])
 - coordinate relative to marker
 
 // release
 - tests
-- graphical ship borders in the world
 - better logo (rudder block)
 - wiki
+- license
+- correct description in configuration file
 - description in toml file
 - hu lang
-- license
 
-
-
-// features
+//better ui
 - show helper text after some time
 - write out coordinates as tooltip message
-- dimension change
-- submarine mod
-- ship mode
-- item gate fluid
-- calculate chest density
-- multi rudder styles
-- computercraft integration
-- turn (during jump, without jump, saved coordinates)
 - graphical debug without texture
-- more fluid
 - animated steam, water structure
 - question before delete rectangle/coordinate
-- edit coordinate
-- 1D engine
-- enable/disable marker
 - show absolute coordinates in settings in a tooltip
-- absolute or relative rectangles in edition mode
-- timed jump (computercraft?)
+- graphical cool down
+- land button blink with target and target hover, not with position and target hover
+- tool tip on water line
+
+//better ux
+- multi rudder styles
+- correct voxel shapes
 - selectable inner round
-- artificial floater (like wool, just better) (crystal of levitation [no fall damage, when in hand])
+- verbose error messages in jump context validation
+- graphical ship borders in the world
+
+//integrity
+- item gate fluid
+- computercraft integration
+- more fluid
+
+//functions
+- turn (during jump, without jump, saved coordinates)
+- dimension change
+- 1D engine (elevator)
+- enable/disable marker
 - different floating, sailing on different biomes and height
+
+//modification
+- calculate chest density
+- submarine mod
+- ship mode

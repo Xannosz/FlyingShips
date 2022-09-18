@@ -14,7 +14,7 @@ public class Util {
 
 	public static final List<Block> PRE_PROCESS = Arrays.asList(Blocks.REDSTONE_WIRE);
 	public static final List<Block> POST_PROCESS = Arrays.asList(Blocks.PISTON_HEAD);
-	public static final List<Block> HOLLOW_BLOCKS = Arrays.asList(Blocks.LADDER, Blocks.TORCH, Blocks.WALL_TORCH,
+	private static final List<Block> HOLLOW_BLOCKS = Arrays.asList(Blocks.LADDER, Blocks.TORCH, Blocks.WALL_TORCH,
 			Blocks.REDSTONE_TORCH, Blocks.REDSTONE_WALL_TORCH, Blocks.SOUL_TORCH, Blocks.SOUL_WALL_TORCH,
 			Blocks.ACACIA_FENCE, Blocks.BIRCH_FENCE,
 			Blocks.SPRUCE_TRAPDOOR,
@@ -45,5 +45,9 @@ public class Util {
 
 	public static boolean isFluidTagged(BlockState block) {
 		return block.hasProperty(BlockStateProperties.WATERLOGGED) && block.getValue(BlockStateProperties.WATERLOGGED);
+	}
+
+	public static boolean isHollow(Block block) {
+		return HOLLOW_BLOCKS.contains(block);
 	}
 }

@@ -113,15 +113,15 @@ public class TerrainScanUtil {
 		return dataPackage;
 	}
 
-	public static Set<BlockPos> getShell(List<AbsoluteRectangleData> rectangleDataList) {
+	public static Set<BlockPos> getShell(List<AbsoluteRectangleData> rectangleDataList, boolean outer) { //TODO exclude inside blocks
 		Set<BlockPos> result = new HashSet<>();
 		for (AbsoluteRectangleData rectangleData : rectangleDataList) {
-			int minX = rectangleData.getNorthWestCorner().getX() - 1;
-			int maxX = rectangleData.getSouthEastCorner().getX() + 1;
-			int minY = rectangleData.getNorthWestCorner().getY() - 1;
-			int maxY = rectangleData.getSouthEastCorner().getY() + 1;
-			int minZ = rectangleData.getNorthWestCorner().getZ() - 1;
-			int maxZ = rectangleData.getSouthEastCorner().getZ() + 1;
+			int minX = rectangleData.getNorthWestCorner().getX() - (outer ? 1 : 0);
+			int maxX = rectangleData.getSouthEastCorner().getX() + (outer ? 1 : 0);
+			int minY = rectangleData.getNorthWestCorner().getY() - (outer ? 1 : 0);
+			int maxY = rectangleData.getSouthEastCorner().getY() + (outer ? 1 : 0);
+			int minZ = rectangleData.getNorthWestCorner().getZ() - (outer ? 1 : 0);
+			int maxZ = rectangleData.getSouthEastCorner().getZ() + (outer ? 1 : 0);
 
 			for (int y = rectangleData.getNorthWestCorner().getY(); y <= rectangleData.getSouthEastCorner().getY(); y++) {
 				for (int z = rectangleData.getNorthWestCorner().getZ(); z <= rectangleData.getSouthEastCorner().getZ(); z++) {

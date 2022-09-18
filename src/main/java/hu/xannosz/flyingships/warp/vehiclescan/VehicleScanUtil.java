@@ -85,7 +85,7 @@ public class VehicleScanUtil {
 		return fluid;
 	}
 
-	private static boolean inRectangles(List<AbsoluteRectangleData> rectangleDataList, BlockPos blockPos) {
+	public static boolean inRectangles(List<AbsoluteRectangleData> rectangleDataList, BlockPos blockPos) {
 		for (AbsoluteRectangleData rectangleData : rectangleDataList) {
 			if (rectangleData.getNorthWestCorner().getX() <= blockPos.getX() && blockPos.getX() <= rectangleData.getSouthEastCorner().getX() &&
 					rectangleData.getNorthWestCorner().getY() <= blockPos.getY() && blockPos.getY() <= rectangleData.getSouthEastCorner().getY() &&

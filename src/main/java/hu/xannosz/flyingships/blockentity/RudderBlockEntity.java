@@ -37,16 +37,14 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 import static hu.xannosz.flyingships.Util.CLOUD_LEVEL;
 import static net.minecraft.world.item.crafting.RecipeType.SMELTING;
@@ -157,6 +155,8 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	private int clock = 0;
 
 	private int waterLine = 0;
+
+	private int necessarySpeed = 0;
 
 	private final ContainerData data = new SimpleContainerData(DATA_SLOT_SIZE);
 
@@ -278,7 +278,6 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 		switch (buttonId) {
 			case UP, DOWN, RIGHT, LEFT, FORWARD, BACKWARD -> {
 				selectedWarpDirection = WarpDirection.fromBlockDirection(buttonId, getBlockState().getValue(Rudder.FACING));
-				selectedCoordinate = -1;
 			}
 			case LAND -> {
 				landButtonSettings = landButtonSettings.nextState(terrainScanResult);
@@ -288,18 +287,18 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 				if (!landButtonSettings.equals(LandButtonSettings.EMPTY)) {
 					selectedWarpDirection = WarpDirection.fromBlockDirection(buttonId, getBlockState().getValue(Rudder.FACING));
 					switch (landButtonSettings) {
-						case VOID -> speed = Math.abs(CLOUD_LEVEL + waterLine - vehicleScanResult.getBottomY());
-						case LAND -> speed = terrainScanResult.getHeightOfBottom();
-						case TOUCH_CELLING -> speed = terrainScanResult.getHeightOfCelling();
+						case VOID ->
+								necessarySpeed = Math.abs(CLOUD_LEVEL + waterLine - vehicleScanResult.getBottomY());
+						case LAND -> necessarySpeed = terrainScanResult.getHeightOfBottom();
+						case TOUCH_CELLING -> necessarySpeed = terrainScanResult.getHeightOfCelling();
 						case SWIM_LAVA, SWIM_WATER ->
-								speed = Math.abs(terrainScanResult.getHeightOfBottom() + waterLine);
+								necessarySpeed = Math.abs(terrainScanResult.getHeightOfBottom() + waterLine);
 					}
 				} else {
 					if (selectedWarpDirection.equals(WarpDirection.LAND)) {
 						selectedWarpDirection = null;
 					}
 				}
-				selectedCoordinate = -1;
 			}
 			case INCREASE -> {
 				if (step < STEPS.length - 1) {
@@ -313,36 +312,17 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 			}
 			case PLUS -> {
 				speed += STEPS[step];
-				if (selectedCoordinate >= 0) {
-					selectedCoordinate = -1;
-					selectedWarpDirection = null;
-				}
-				if (selectedWarpDirection != null && selectedWarpDirection.equals(WarpDirection.LAND)) {
-					selectedWarpDirection = null;
-				}
 			}
 			case MINUS -> {
 				speed -= STEPS[step];
 				if (speed < 0) {
 					speed = 0;
 				}
-				if (selectedCoordinate >= 0) {
-					selectedCoordinate = -1;
-					selectedWarpDirection = null;
-				}
-				if (selectedWarpDirection != null && selectedWarpDirection.equals(WarpDirection.LAND)) {
-					selectedWarpDirection = null;
-				}
 			}
 			case JUMP -> {
 				calculateJumpData();
-				if (selectedWarpDirection != null && speed > 0 && powerButtonState.equals(PowerState.ON) &&
-						vehicleScanResult.getFloatingQuotient() >= vehicleScanResult.getDensity() &&
-						hasEnoughPowerForMovement()) {
-					JumpUtil.jump(selectedWarpDirection, speed, landButtonSettings, terrainScanResult,
-							(ServerLevel) level, getBlockPos(), blockPositions,
-							selectedCoordinate == -1 ? null : coordinates.get(selectedCoordinate).getCoordinate(),
-							waterLine, vehicleScanResult.getBottomY());
+				if (isValidJumpContext()) {
+					JumpUtil.jump((ServerLevel) level, getBlockPos(), blockPositions, getAdditional());
 					selectedWarpDirection = null;
 				}
 			}
@@ -379,7 +359,12 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 				blockPositions.remove(blockPositionsPage * 3 + 2);
 				resetBlockPositionPager();
 			}
-			case WATER_LINE_UP -> waterLine++;
+			case WATER_LINE_UP -> {
+				waterLine++;
+				if (waterLine > 0) {
+					waterLine = 0;
+				}
+			}
 			case WATER_LINE_DOWN -> waterLine--;
 			case COORDINATE_PAGE_UP -> {
 				coordinatesPage--;
@@ -392,40 +377,97 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 			case JUMP_TO_COORDINATE_1 -> {
 				selectedCoordinate = coordinatesPage * 6;
 				selectedWarpDirection = WarpDirection.COORDINATE;
-				speed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
+				necessarySpeed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
 			}
 			case JUMP_TO_COORDINATE_2 -> {
 				selectedCoordinate = coordinatesPage * 6 + 1;
 				selectedWarpDirection = WarpDirection.COORDINATE;
-				speed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
+				necessarySpeed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
 			}
 			case JUMP_TO_COORDINATE_3 -> {
 				selectedCoordinate = coordinatesPage * 6 + 2;
 				selectedWarpDirection = WarpDirection.COORDINATE;
-				speed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
+				necessarySpeed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
 			}
 			case JUMP_TO_COORDINATE_4 -> {
 				selectedCoordinate = coordinatesPage * 6 + 3;
 				selectedWarpDirection = WarpDirection.COORDINATE;
-				speed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
+				necessarySpeed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
 			}
 			case JUMP_TO_COORDINATE_5 -> {
 				selectedCoordinate = coordinatesPage * 6 + 4;
 				selectedWarpDirection = WarpDirection.COORDINATE;
-				speed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
+				necessarySpeed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
 			}
 			case JUMP_TO_COORDINATE_6 -> {
 				selectedCoordinate = coordinatesPage * 6 + 5;
 				selectedWarpDirection = WarpDirection.COORDINATE;
-				speed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
+				necessarySpeed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
 			}
 		}
+		updateSpeed();
 		updateData();
 		setChanged();
 	}
 
+	private void updateSpeed() {
+		if (Arrays.asList(WarpDirection.UP, WarpDirection.DOWN, WarpDirection.NORTH, WarpDirection.SOUTH, WarpDirection.EAST, WarpDirection.WEST).contains(selectedWarpDirection)) {
+			necessarySpeed = speed;
+		}
+	}
+
+	private boolean isValidJumpContext() {
+		return selectedWarpDirection != null && necessarySpeed > 0 && powerButtonState.equals(PowerState.ON) &&
+				vehicleScanResult.getFloatingQuotient() >= vehicleScanResult.getDensity() &&
+				hasEnoughPowerForMovement();
+	}
+
+	private Vec3 getAdditional() {
+		switch (selectedWarpDirection) {
+			case UP -> {
+				return new Vec3(0, necessarySpeed, 0);
+			}
+			case DOWN -> {
+				return new Vec3(0, -necessarySpeed, 0);
+			}
+			case NORTH -> {
+				return new Vec3(0, 0, -necessarySpeed);
+			}
+			case SOUTH -> {
+				return new Vec3(0, 0, necessarySpeed);
+			}
+			case EAST -> {
+				return new Vec3(necessarySpeed, 0, 0);
+			}
+			case WEST -> {
+				return new Vec3(-necessarySpeed, 0, 0);
+			}
+			case LAND -> {
+				switch (landButtonSettings) {
+					case VOID -> {
+						return new Vec3(0, CLOUD_LEVEL + waterLine - vehicleScanResult.getBottomY(), 0);
+					}
+					case LAND -> {
+						return new Vec3(0, -terrainScanResult.getHeightOfBottom(), 0);
+					}
+					case TOUCH_CELLING -> {
+						return new Vec3(0, terrainScanResult.getHeightOfCelling(), 0);
+					}
+					case SWIM_LAVA, SWIM_WATER -> {
+						return new Vec3(0, -terrainScanResult.getHeightOfBottom() + waterLine, 0);
+					}
+				}
+			}
+			case COORDINATE -> {
+				BlockPos coordinate = coordinates.get(selectedCoordinate).getCoordinate();
+				return new Vec3(coordinate.getX() - getBlockPos().getX(), coordinate.getY() - getBlockPos().getY(), coordinate.getZ() - getBlockPos().getZ());
+			}
+		}
+		return new Vec3(0, 0, 0);
+	}
+
 	private boolean hasEnoughPowerForMovement() {
-		if (FlyingShipsConfiguration.ENABLE_SLIDING.get() && speed <= 5) {
+		if (FlyingShipsConfiguration.ENABLE_SLIDING.get() && necessarySpeed <= 5) {
 			return true;
 		}
 
@@ -433,7 +475,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	}
 
 	private double getNecessaryMovementPower() {
-		return vehicleScanResult.getDensity() * Math.pow(1 + speed / FlyingShipsConfiguration.SPEED_CONSOLIDATOR.get(), 3);
+		return vehicleScanResult.getDensity() * Math.pow(1 + necessarySpeed / FlyingShipsConfiguration.SPEED_CONSOLIDATOR.get(), 3);
 	}
 
 	private int getMovementPower() {
@@ -572,12 +614,12 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	}
 
 	private boolean[] getCoordinateBlinkArray() {
-		boolean button1 = selectedCoordinate % 6 == 0;
-		boolean button2 = selectedCoordinate % 6 == 1;
-		boolean button3 = selectedCoordinate % 6 == 2;
-		boolean button4 = selectedCoordinate % 6 == 3;
-		boolean button5 = selectedCoordinate % 6 == 4;
-		boolean button6 = selectedCoordinate % 6 == 5;
+		boolean button1 = selectedCoordinate % 6 == 0 && WarpDirection.COORDINATE.equals(selectedWarpDirection);
+		boolean button2 = selectedCoordinate % 6 == 1 && WarpDirection.COORDINATE.equals(selectedWarpDirection);
+		boolean button3 = selectedCoordinate % 6 == 2 && WarpDirection.COORDINATE.equals(selectedWarpDirection);
+		boolean button4 = selectedCoordinate % 6 == 3 && WarpDirection.COORDINATE.equals(selectedWarpDirection);
+		boolean button5 = selectedCoordinate % 6 == 4 && WarpDirection.COORDINATE.equals(selectedWarpDirection);
+		boolean button6 = selectedCoordinate % 6 == 5 && WarpDirection.COORDINATE.equals(selectedWarpDirection);
 
 		return new boolean[]{button1, button2, button3, button4, button5, button6};
 	}

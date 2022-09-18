@@ -4,9 +4,6 @@ import hu.xannosz.flyingships.networking.ModMessages;
 import hu.xannosz.flyingships.networking.PlaySoundPacket;
 import hu.xannosz.flyingships.warp.AbsoluteRectangleData;
 import hu.xannosz.flyingships.warp.BlockPosStruct;
-import hu.xannosz.flyingships.warp.WarpDirection;
-import hu.xannosz.flyingships.warp.terrainscan.LandButtonSettings;
-import hu.xannosz.flyingships.warp.terrainscan.TerrainScanResponseStruct;
 import hu.xannosz.flyingships.warp.terrainscan.TerrainScanUtil;
 import hu.xannosz.flyingships.warp.vehiclescan.VehicleScanUtil;
 import it.unimi.dsi.fastutil.longs.LongSet;
@@ -44,15 +41,10 @@ import static hu.xannosz.flyingships.Util.*;
 @UtilityClass
 public class JumpUtil {
 
-	public static void jump(WarpDirection selectedWarpDirection, int speed,
-							LandButtonSettings landButtonSettings, TerrainScanResponseStruct terrainScanResponse,
-							ServerLevel level, BlockPos rudderBlockPosition, List<BlockPosStruct> blockPositions,
-							BlockPos coordinate, int waterLine, int bottomY) {
+	public static void jump(ServerLevel level, BlockPos pivotPointPosition, List<BlockPosStruct> blockPositions, Vec3 additional) {
 		try {
 			//create absolute coordinates
-			final Vec3 additional = getAdditional(selectedWarpDirection, speed, landButtonSettings, terrainScanResponse,
-					rudderBlockPosition, coordinate, waterLine, bottomY);
-			final List<AbsoluteRectangleData> rectangles = createRectangles(rudderBlockPosition, blockPositions);
+			final List<AbsoluteRectangleData> rectangles = createRectangles(pivotPointPosition, blockPositions);
 
 			//save structure
 			saveStructure(rectangles, level);
@@ -64,13 +56,15 @@ public class JumpUtil {
 			final Map<LevelChunk, Boolean> chunks = getChunks(rectangles, additional, level);
 
 			//get shell
-			final Set<BlockPos> sourceShell = TerrainScanUtil.getShell(rectangles);
+			final Set<BlockPos> sourceShell = TerrainScanUtil.getShell(rectangles, true);
 			//target shell
 			final Set<BlockPos> targetShell = sourceShell.stream().map(
 					blockPos -> blockPos.offset(additional.x, additional.y, additional.z)).collect(Collectors.toSet());
+			//source inner shell
+			final Set<BlockPos> sourceInnerShell = TerrainScanUtil.getShell(rectangles, false);
 
 			//sound effect
-			playSoundEffect(rudderBlockPosition, players);
+			playSoundEffect(pivotPointPosition, players, level.getPlayers((serverPlayer -> true)));
 			//effects on player
 			addEffectsToPlayers(players);
 
@@ -89,9 +83,14 @@ public class JumpUtil {
 
 			//delete structure
 			deleteStructure(rectangles, level);
+			//delete inner shell with update
+			sourceInnerShell.forEach(blockPos -> {
+				level.setBlock(blockPos, Blocks.WATER.defaultBlockState().setValue(BlockStateProperties.LEVEL, 1), 5);
+				level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 5);
+			});
 
 			//clean place
-			cleanPlace(rectangles, additional, level);
+			cleanPlace(rectangles, additional, level); //TODO check when use STRUCTURE_AIR not necessary
 			//create structure
 			createStructure(rectangles, additional, level);
 			//update chunks (reload structure)
@@ -118,56 +117,11 @@ public class JumpUtil {
 		}
 	}
 
-	private static Vec3 getAdditional(WarpDirection selectedWarpDirection, int speed,
-									  LandButtonSettings landButtonSettings, TerrainScanResponseStruct terrainScanResponse,
-									  BlockPos rudderBlockPosition, BlockPos coordinate, int waterLine, int bottomY) {
-		switch (selectedWarpDirection) {
-			case UP -> {
-				return new Vec3(0, speed, 0);
-			}
-			case DOWN -> {
-				return new Vec3(0, -speed, 0);
-			}
-			case NORTH -> {
-				return new Vec3(0, 0, -speed);
-			}
-			case SOUTH -> {
-				return new Vec3(0, 0, speed);
-			}
-			case EAST -> {
-				return new Vec3(speed, 0, 0);
-			}
-			case WEST -> {
-				return new Vec3(-speed, 0, 0);
-			}
-			case LAND -> {
-				switch (landButtonSettings) {
-					case VOID -> {
-						return new Vec3(0, CLOUD_LEVEL + waterLine - bottomY, 0);
-					}
-					case LAND -> {
-						return new Vec3(0, -terrainScanResponse.getHeightOfBottom(), 0);
-					}
-					case TOUCH_CELLING -> {
-						return new Vec3(0, terrainScanResponse.getHeightOfCelling(), 0);
-					}
-					case SWIM_LAVA, SWIM_WATER -> {
-						return new Vec3(0, -terrainScanResponse.getHeightOfBottom() + waterLine, 0);
-					}
-				}
-			}
-			case COORDINATE -> {
-				return new Vec3(coordinate.getX() - rudderBlockPosition.getX(), coordinate.getY() - rudderBlockPosition.getY(), coordinate.getZ() - rudderBlockPosition.getZ());
-			}
-		}
-		return new Vec3(0, 0, 0);
-	}
-
-	public static List<AbsoluteRectangleData> createRectangles(BlockPos rudderBlockPosition, List<BlockPosStruct> blockPositions) {
+	public static List<AbsoluteRectangleData> createRectangles(BlockPos pivotPointPosition, List<BlockPosStruct> blockPositions) {
 		List<AbsoluteRectangleData> absoluteRectangleDataList = new ArrayList<>();
 		for (BlockPosStruct struct : blockPositions) {
-			final BlockPos northWestCorner = new BlockPos(rudderBlockPosition.getX() + struct.getPosition1().getX(), rudderBlockPosition.getY() + struct.getPosition1().getY(), rudderBlockPosition.getZ() + struct.getPosition1().getZ());
-			final BlockPos southEastCorner = new BlockPos(rudderBlockPosition.getX() + struct.getPosition2().getX(), rudderBlockPosition.getY() + struct.getPosition2().getY(), rudderBlockPosition.getZ() + struct.getPosition2().getZ());
+			final BlockPos northWestCorner = new BlockPos(pivotPointPosition.getX() + struct.getPosition1().getX(), pivotPointPosition.getY() + struct.getPosition1().getY(), pivotPointPosition.getZ() + struct.getPosition1().getZ());
+			final BlockPos southEastCorner = new BlockPos(pivotPointPosition.getX() + struct.getPosition2().getX(), pivotPointPosition.getY() + struct.getPosition2().getY(), pivotPointPosition.getZ() + struct.getPosition2().getZ());
 			final Vec3i structureSize = new Vec3i(struct.getPosition2().getX() - struct.getPosition1().getX() + 1, struct.getPosition2().getY() - struct.getPosition1().getY() + 1, struct.getPosition2().getZ() - struct.getPosition1().getZ() + 1);
 
 			AbsoluteRectangleData absoluteRectangleData = new AbsoluteRectangleData();
@@ -268,8 +222,10 @@ public class JumpUtil {
 		return chunks;
 	}
 
-	private static void playSoundEffect(BlockPos rudderBlockPosition, Map<ServerPlayer, Vec3> players) {
-		players.keySet().forEach(player -> ModMessages.sendToPlayer(new PlaySoundPacket(rudderBlockPosition), player));
+	private static void playSoundEffect(BlockPos pivotPointPosition, Map<ServerPlayer, Vec3> players, List<ServerPlayer> serverPlayers) {
+		for (ServerPlayer player : serverPlayers) {
+			ModMessages.sendToPlayer(new PlaySoundPacket(pivotPointPosition, players.containsKey(player)), player);
+		}
 	}
 
 	private static void addEffectsToPlayers(Map<ServerPlayer, Vec3> players) {
@@ -301,8 +257,7 @@ public class JumpUtil {
 								rectangleData.getNorthWestCorner().getY() + y + additional.y,
 								rectangleData.getNorthWestCorner().getZ() + z + additional.z);
 						if (!level.getBlockState(state).getBlock().equals(Blocks.AIR) &&
-								!isFluid(level.getBlockState(state).getBlock()) &&
-								level.getBlockState(state).getBlock().equals(Blocks.KELP_PLANT)) { //TODO check
+								!isFluid(level.getBlockState(state).getBlock())) {
 							target.add(state);
 						}
 					}
