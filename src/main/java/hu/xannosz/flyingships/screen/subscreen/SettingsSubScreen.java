@@ -52,6 +52,10 @@ public class SettingsSubScreen extends SubScreen {
 	private GraphicalButton waterLineUp;
 	private GraphicalButton waterLineDown;
 
+	private GraphicalButton enableHeatEngine;
+	private GraphicalButton enableSteamEngine;
+	private GraphicalButton enableEnderEngine;
+
 	private boolean addNewRec = false;
 
 	private int recNum = 0;
@@ -314,6 +318,55 @@ public class SettingsSubScreen extends SubScreen {
 				.hoveredX(SETTINGS_SMALL_BUTTON_MAIN_ROW_X + SETTINGS_SMALL_BUTTON_MAIN_ROW_ADDITIONAL)
 				.hoveredY(SETTINGS_SMALL_BUTTON_MAIN_ROW_Y + 4 * SETTINGS_SMALL_BUTTON_MAIN_ROW_ADDITIONAL)
 				.build());
+
+		enableHeatEngine = new GraphicalButton(ButtonConfig.builder()
+				.buttonId(ButtonId.HEAT_ENGINE)
+				.position(rudderScreen.getMenu().getBlockEntity().getBlockPos())
+				.isDefaultButtonDrawNeeded(false)
+				.debugMode(DEBUG_MODE)
+				.hitBoxX(x + CHECK_BOX_X)
+				.hitBoxY(y + CHECK_BOX_Y + SETTINGS_REC_BUTTON_GRAPHICAL_ROW_BUTTON_ADDITIONAL)
+				.hitBoxW(SETTINGS_SMALL_BUTTON_W_H)
+				.hitBoxH(SETTINGS_SMALL_BUTTON_W_H)
+				.graphicalX(x + CHECK_BOX_X)
+				.graphicalY(y + CHECK_BOX_Y + SETTINGS_REC_BUTTON_GRAPHICAL_ROW_BUTTON_ADDITIONAL)
+				.graphicalW(SETTINGS_SMALL_BUTTON_W_H)
+				.graphicalH(SETTINGS_SMALL_BUTTON_W_H)
+				.hoveredX(SETTINGS_SMALL_BUTTON_MAIN_ROW_X + SETTINGS_SMALL_BUTTON_MAIN_ROW_ADDITIONAL)
+				.hoveredY(SETTINGS_SMALL_BUTTON_MAIN_ROW_Y + 2 * SETTINGS_SMALL_BUTTON_MAIN_ROW_ADDITIONAL)
+				.build());
+		enableSteamEngine = new GraphicalButton(ButtonConfig.builder()
+				.buttonId(ButtonId.STEAM_ENGINE)
+				.position(rudderScreen.getMenu().getBlockEntity().getBlockPos())
+				.isDefaultButtonDrawNeeded(false)
+				.debugMode(DEBUG_MODE)
+				.hitBoxX(x + CHECK_BOX_X)
+				.hitBoxY(y + CHECK_BOX_Y + 2 * SETTINGS_REC_BUTTON_GRAPHICAL_ROW_BUTTON_ADDITIONAL)
+				.hitBoxW(SETTINGS_SMALL_BUTTON_W_H)
+				.hitBoxH(SETTINGS_SMALL_BUTTON_W_H)
+				.graphicalX(x + CHECK_BOX_X)
+				.graphicalY(y + CHECK_BOX_Y + 2 * SETTINGS_REC_BUTTON_GRAPHICAL_ROW_BUTTON_ADDITIONAL)
+				.graphicalW(SETTINGS_SMALL_BUTTON_W_H)
+				.graphicalH(SETTINGS_SMALL_BUTTON_W_H)
+				.hoveredX(SETTINGS_SMALL_BUTTON_MAIN_ROW_X + SETTINGS_SMALL_BUTTON_MAIN_ROW_ADDITIONAL)
+				.hoveredY(SETTINGS_SMALL_BUTTON_MAIN_ROW_Y + 2 * SETTINGS_SMALL_BUTTON_MAIN_ROW_ADDITIONAL)
+				.build());
+		enableEnderEngine = new GraphicalButton(ButtonConfig.builder()
+				.buttonId(ButtonId.ENDER_ENGINE)
+				.position(rudderScreen.getMenu().getBlockEntity().getBlockPos())
+				.isDefaultButtonDrawNeeded(false)
+				.debugMode(DEBUG_MODE)
+				.hitBoxX(x + CHECK_BOX_X)
+				.hitBoxY(y + CHECK_BOX_Y + 3 * SETTINGS_REC_BUTTON_GRAPHICAL_ROW_BUTTON_ADDITIONAL)
+				.hitBoxW(SETTINGS_SMALL_BUTTON_W_H)
+				.hitBoxH(SETTINGS_SMALL_BUTTON_W_H)
+				.graphicalX(x + CHECK_BOX_X)
+				.graphicalY(y + CHECK_BOX_Y + 3 * SETTINGS_REC_BUTTON_GRAPHICAL_ROW_BUTTON_ADDITIONAL)
+				.graphicalW(SETTINGS_SMALL_BUTTON_W_H)
+				.graphicalH(SETTINGS_SMALL_BUTTON_W_H)
+				.hoveredX(SETTINGS_SMALL_BUTTON_MAIN_ROW_X + SETTINGS_SMALL_BUTTON_MAIN_ROW_ADDITIONAL)
+				.hoveredY(SETTINGS_SMALL_BUTTON_MAIN_ROW_Y + 2 * SETTINGS_SMALL_BUTTON_MAIN_ROW_ADDITIONAL)
+				.build());
 	}
 
 	@Override
@@ -342,6 +395,10 @@ public class SettingsSubScreen extends SubScreen {
 
 		rudderScreen.addRenderable(waterLineUp);
 		rudderScreen.addRenderable(waterLineDown);
+
+		rudderScreen.addRenderable(enableHeatEngine);
+		rudderScreen.addRenderable(enableSteamEngine);
+		rudderScreen.addRenderable(enableEnderEngine);
 	}
 
 	@Override
@@ -363,6 +420,9 @@ public class SettingsSubScreen extends SubScreen {
 
 			waterLineUp.setVisibility(true);
 			waterLineDown.setVisibility(true);
+			enableHeatEngine.setVisibility(true);
+			enableSteamEngine.setVisibility(true);
+			enableEnderEngine.setVisibility(true);
 		} else {
 			pageUp.setVisibility(false);
 			pageDown.setVisibility(false);
@@ -378,6 +438,9 @@ public class SettingsSubScreen extends SubScreen {
 
 			waterLineUp.setVisibility(false);
 			waterLineDown.setVisibility(false);
+			enableHeatEngine.setVisibility(false);
+			enableSteamEngine.setVisibility(false);
+			enableEnderEngine.setVisibility(false);
 		}
 
 		if (visibility && addNewRec) {
@@ -413,6 +476,20 @@ public class SettingsSubScreen extends SubScreen {
 	public void renderDynamicImages(PoseStack poseStack, int x, int y, float partialTick) {
 		if (addNewRec) {
 			drawTexturedModalRect(poseStack, x + SETTINGS_ADD_NEW_REC_X, y + SETTINGS_ADD_NEW_REC_Y, 1, 194, SETTINGS_ADD_NEW_REC_W, SETTINGS_ADD_NEW_REC_H, partialTick);
+		} else {
+			boolean[] functions = rudderScreen.getMenu().getEnabledFunctions();
+			if (functions[0]) {
+				drawTexturedModalRect(poseStack, x + CHECK_BOX_X, y + CHECK_BOX_Y + SETTINGS_REC_BUTTON_GRAPHICAL_ROW_BUTTON_ADDITIONAL,
+						SETTINGS_SMALL_BUTTON_MAIN_ROW_X, SETTINGS_SMALL_BUTTON_MAIN_ROW_Y + 2 * SETTINGS_SMALL_BUTTON_MAIN_ROW_ADDITIONAL, SETTINGS_SMALL_BUTTON_W_H, SETTINGS_SMALL_BUTTON_W_H, partialTick);
+			}
+			if (functions[1]) {
+				drawTexturedModalRect(poseStack, x + CHECK_BOX_X, y + CHECK_BOX_Y + 2 * SETTINGS_REC_BUTTON_GRAPHICAL_ROW_BUTTON_ADDITIONAL,
+						SETTINGS_SMALL_BUTTON_MAIN_ROW_X, SETTINGS_SMALL_BUTTON_MAIN_ROW_Y + 2 * SETTINGS_SMALL_BUTTON_MAIN_ROW_ADDITIONAL, SETTINGS_SMALL_BUTTON_W_H, SETTINGS_SMALL_BUTTON_W_H, partialTick);
+			}
+			if (functions[2]) {
+				drawTexturedModalRect(poseStack, x + CHECK_BOX_X, y + CHECK_BOX_Y + 3 * SETTINGS_REC_BUTTON_GRAPHICAL_ROW_BUTTON_ADDITIONAL,
+						SETTINGS_SMALL_BUTTON_MAIN_ROW_X, SETTINGS_SMALL_BUTTON_MAIN_ROW_Y + 2 * SETTINGS_SMALL_BUTTON_MAIN_ROW_ADDITIONAL, SETTINGS_SMALL_BUTTON_W_H, SETTINGS_SMALL_BUTTON_W_H, partialTick);
+			}
 		}
 	}
 
@@ -437,6 +514,13 @@ public class SettingsSubScreen extends SubScreen {
 			}
 			font.draw(poseStack, Component.literal("" + rudderScreen.getMenu().getWaterLine()), 173,
 					13, Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
+
+			font.draw(poseStack, Component.literal("heat"), 173,
+					13 + SETTINGS_REC_BUTTON_GRAPHICAL_ROW_BUTTON_ADDITIONAL, Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
+			font.draw(poseStack, Component.literal("steam"), 173,
+					13 + 2 * SETTINGS_REC_BUTTON_GRAPHICAL_ROW_BUTTON_ADDITIONAL, Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
+			font.draw(poseStack, Component.literal("ender"), 173,
+					13 + 3 * SETTINGS_REC_BUTTON_GRAPHICAL_ROW_BUTTON_ADDITIONAL, Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
 		}
 		font.draw(poseStack, Component.literal("" + rudderScreen.getMenu().getBlockPosPage() + "/" + rudderScreen.getMenu().getBlockPosMaxPage()), 154,
 				90, Objects.requireNonNull(ChatFormatting.WHITE.getColor()));

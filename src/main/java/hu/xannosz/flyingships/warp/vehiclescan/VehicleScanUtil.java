@@ -1,6 +1,5 @@
 package hu.xannosz.flyingships.warp.vehiclescan;
 
-import hu.xannosz.flyingships.config.FlyingShipsConfiguration;
 import hu.xannosz.flyingships.warp.AbsoluteRectangleData;
 import hu.xannosz.flyingships.warp.jump.JumpUtil;
 import lombok.experimental.UtilityClass;
@@ -49,9 +48,6 @@ public class VehicleScanUtil {
 		} else {
 			responseStruct.setWindSurface(calculateSurface(matrix.getXColumns()));
 		}
-
-		// calculate quotients
-		calculateQuotients(responseStruct);
 
 		return responseStruct;
 	}
@@ -142,6 +138,7 @@ public class VehicleScanUtil {
 	private static void countBlocks(VehicleScanResponseStruct responseStruct, Set<VoxelColumn> columns) {
 		int wool = 0;
 		int heater = 0;
+		int enderOscillator = 0;
 		int tank = 0;
 		int density = 0;
 		for (VoxelColumn voxelColumn : columns) {
@@ -149,9 +146,11 @@ public class VehicleScanUtil {
 			heater += voxelColumn.getHeater();
 			tank += voxelColumn.getTank();
 			density += voxelColumn.getDensity();
+			enderOscillator += voxelColumn.getEnderOscillator();
 		}
 		responseStruct.setWool(wool);
 		responseStruct.setHeater(heater);
+		responseStruct.setEnderOscillator(enderOscillator);
 		responseStruct.setTank(tank);
 		responseStruct.setDensity(density);
 	}
@@ -165,10 +164,5 @@ public class VehicleScanUtil {
 			density += serverPlayer.getType().getDimensions().height * serverPlayer.getType().getDimensions().width * 10;
 		}
 		responseStruct.setDensity(density);
-	}
-
-	private static void calculateQuotients(VehicleScanResponseStruct responseStruct) {  //TODO remove after steam engine
-		responseStruct.setFloatingQuotient(responseStruct.getLiftSurface() * FlyingShipsConfiguration.LIFT_MULTIPLIER.get() +
-				responseStruct.getWool() * FlyingShipsConfiguration.BALLOON_MULTIPLIER.get());
 	}
 }

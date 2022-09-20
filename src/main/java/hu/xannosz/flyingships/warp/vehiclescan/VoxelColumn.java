@@ -17,6 +17,7 @@ public class VoxelColumn {
 
 	private int wool = 0;
 	private int heater = 0;
+	private int enderOscillator = 0;
 	private int tank = 0;
 
 	private int density = 0;
@@ -113,6 +114,9 @@ public class VoxelColumn {
 		}
 		if (block.equals(ModBlocks.TANK.get())) {
 			tank++;
+		}
+		if (block.equals(ModBlocks.ENDER_OSCILLATOR.get())) {
+			enderOscillator++;
 		}
 	}
 

@@ -287,4 +287,48 @@ public class RudderMenu extends AbstractContainerMenu {
 	public int getCoordinatesMaxPage() {
 		return data.get(COORDINATES_MAX_PAGE_KEY);
 	}
+
+	public int getWater() {
+		return data.get(WATER_KEY);
+	}
+
+	public int getWaterMax() {
+		return data.get(WATER_MAX_KEY);
+	}
+
+	public int getSteam() {
+		return data.get(STEAM_KEY);
+	}
+
+	public int getSteamMax() {
+		return data.get(STEAM_MAX_KEY);
+	}
+
+	public int getHeat() {
+		return data.get(HEAT_KEY);
+	}
+
+	public int getHeatMax() {
+		return data.get(HEAT_MAX_KEY);
+	}
+
+	public int getEnder() {
+		return data.get(ENDER_KEY);
+	}
+
+	public int getEnderMax() {
+		return data.get(ENDER_MAX_KEY);
+	}
+
+	public int getFurnace() {
+		return data.get(FURNACE_KEY);
+	}
+
+	public int getBurnTime() {
+		return data.get(BURN_TIME_KEY);
+	}
+
+	public int getBurnTimeMax() {
+		return data.get(BURN_TIME_MAX_KEY);
+	}
 }

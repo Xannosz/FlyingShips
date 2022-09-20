@@ -4,15 +4,12 @@
 // bugs/optimization
 - terrain scan detect swim and cloud reachability
 
-// beta
-- ender engine system
-- heat/steam system
-- cool down
-- collusion check on y
-
 // pre-release
 - artificial floater (like wool, just better) (crystal of levitation [no fall damage, when in hand])
 - coordinate relative to marker
+- yellow remove
+- todo remove
+- graphical cool down
 
 // release
 - tests
@@ -23,37 +20,33 @@
 - description in toml file
 - hu lang
 
-//better ui
+// post-release
+- graphical debug without texture
+- land button blink with target and target hover, not with position and target hover
+- tool tip on water line
+- verbose error messages in jump context validation
+
+// update
 - show helper text after some time
 - write out coordinates as tooltip message
-- graphical debug without texture
 - animated steam, water structure
 - question before delete rectangle/coordinate
 - show absolute coordinates in settings in a tooltip
-- graphical cool down
-- land button blink with target and target hover, not with position and target hover
-- tool tip on water line
-
-//better ux
 - multi rudder styles
 - correct voxel shapes
-- selectable inner round
-- verbose error messages in jump context validation
-- graphical ship borders in the world
-
-//integrity
 - item gate fluid
 - computercraft integration
-- more fluid
-
-//functions
-- turn (during jump, without jump, saved coordinates)
 - dimension change
-- 1D engine (elevator)
 - enable/disable marker
-- different floating, sailing on different biomes and height
+- use rudder clock on gui blinking
 
-//modification
+// not in this life
+- selectable inner round
+- graphical ship borders in the world
+- more fluid
 - calculate chest density
 - submarine mod
 - ship mode
+- 1D engine (elevator)
+- turn (during jump, without jump, saved coordinates)
+- different floating, sailing on different biomes and height
