@@ -1,5 +1,6 @@
 package hu.xannosz.flyingships.warp.vehiclescan;
 
+import hu.xannosz.flyingships.block.ModBlocks;
 import hu.xannosz.flyingships.warp.AbsoluteRectangleData;
 import hu.xannosz.flyingships.warp.jump.JumpUtil;
 import lombok.experimental.UtilityClass;
@@ -29,6 +30,11 @@ public class VehicleScanUtil {
 
 		// get players
 		Set<ServerPlayer> players = JumpUtil.getPlayers(rectangleDataList, new Vec3(0, 0, 0), level).keySet();
+		responseStruct.setPlayers(players);
+
+		// detect hyper drive
+		Set<BlockPos> hyperDriveCores = getHyperDriveCores(level, blocks);
+		responseStruct.setHyperDriveEngineFound(isHyperDriveEngineFound(level, hyperDriveCores));
 
 		// calculate lift surface
 		responseStruct.setLiftSurface(calculateSurface(matrix.getYColumns()));
@@ -107,6 +113,44 @@ public class VehicleScanUtil {
 		return blocks;
 	}
 
+	private static Set<BlockPos> getHyperDriveCores(ServerLevel level, Set<BlockPos> blocks) {
+		Set<BlockPos> result = new HashSet<>();
+		for (BlockPos block : blocks) {
+			if (level.getBlockState(block).getBlock().equals(ModBlocks.HYPER_DRIVE_CORE.get())) {
+				result.add(block);
+			}
+		}
+		return result;
+	}
+
+	private static boolean isHyperDriveEngineFound(ServerLevel level, Set<BlockPos> hyperDriveCores) {
+		for (BlockPos hyperDriveCore : hyperDriveCores) {
+			if (isEnderOscillator(level, hyperDriveCore, 2, 0, 2) &&
+					isEnderOscillator(level, hyperDriveCore, -2, 0, -2) &&
+					isEnderOscillator(level, hyperDriveCore, -2, 0, 2) &&
+					isEnderOscillator(level, hyperDriveCore, 2, 0, -2)) {
+				return true;
+			}
+			if (isEnderOscillator(level, hyperDriveCore, 2, 2, 0) &&
+					isEnderOscillator(level, hyperDriveCore, -2, -2, 0) &&
+					isEnderOscillator(level, hyperDriveCore, -2, 2, 0) &&
+					isEnderOscillator(level, hyperDriveCore, 2, -2, 0)) {
+				return true;
+			}
+			if (isEnderOscillator(level, hyperDriveCore, 0, 2, 2) &&
+					isEnderOscillator(level, hyperDriveCore, 0, -2, -2) &&
+					isEnderOscillator(level, hyperDriveCore, 0, -2, 2) &&
+					isEnderOscillator(level, hyperDriveCore, 0, 2, -2)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static boolean isEnderOscillator(ServerLevel level, BlockPos hyperDriveCore, int x, int y, int z) {
+		return level.getBlockState(hyperDriveCore.offset(x, y, z)).getBlock().equals(ModBlocks.ENDER_OSCILLATOR.get());
+	}
+
 	private static int calculateSurface(Set<VoxelColumn> columns) {
 		int surface = 0;
 		for (VoxelColumn voxelColumn : columns) {
@@ -141,18 +185,21 @@ public class VehicleScanUtil {
 		int enderOscillator = 0;
 		int tank = 0;
 		int density = 0;
+		int artificialFloater = 0;
 		for (VoxelColumn voxelColumn : columns) {
 			wool += voxelColumn.getWool();
 			heater += voxelColumn.getHeater();
 			tank += voxelColumn.getTank();
 			density += voxelColumn.getDensity();
 			enderOscillator += voxelColumn.getEnderOscillator();
+			artificialFloater += voxelColumn.getArtificialFloater();
 		}
 		responseStruct.setWool(wool);
 		responseStruct.setHeater(heater);
 		responseStruct.setEnderOscillator(enderOscillator);
 		responseStruct.setTank(tank);
 		responseStruct.setDensity(density);
+		responseStruct.setArtificialFloater(artificialFloater);
 	}
 
 	private static void calculateMobDensity(VehicleScanResponseStruct responseStruct, Set<Entity> entities, Set<ServerPlayer> players) {

@@ -35,6 +35,8 @@ public class LandButton extends AbstractButton {
 	private int nextState = 0;
 	@Setter
 	private boolean isBlink = false;
+	@Setter
+	private boolean selected = false;
 
 	public LandButton(int guiX, int guiY, BlockPos position, boolean debugMode) {
 		super(guiX + 153, guiY + 13, 15, 9, Component.empty());
@@ -53,7 +55,10 @@ public class LandButton extends AbstractButton {
 			} else if (isBlink && state >= 0) {
 				drawTexturedModalRect(poseStack, guiX + GRAPHICAL_X, guiY + GRAPHICAL_Y,
 						HOVER_X + state * ADDITIONAL_W, HOVER_Y, GRAPHICAL_W, GRAPHICAL_H, partialTicks);
-			} else if (debugMode) {
+			} else if (!isBlink && state >= 0 && selected) {
+				drawTexturedModalRect(poseStack, guiX + GRAPHICAL_X, guiY + GRAPHICAL_Y,
+						HOVER_X + state * ADDITIONAL_W, HOVER_Y-GRAPHICAL_H-2, GRAPHICAL_W, GRAPHICAL_H, partialTicks);
+			}else if (debugMode) {
 				drawTexturedModalRect(poseStack, x, y, 215, 215, width, height, partialTicks);
 			}
 		}

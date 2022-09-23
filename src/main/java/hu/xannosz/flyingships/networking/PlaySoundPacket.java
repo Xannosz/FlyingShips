@@ -36,7 +36,7 @@ public class PlaySoundPacket {
 			// CLIENT SITE
 			if (inTheShip) {
 				Objects.requireNonNull(Minecraft.getInstance().level).playSound(Minecraft.getInstance().player
-						, position, SoundEvents.PORTAL_TRAVEL, SoundSource.BLOCKS, 0.5f, 2f);
+						, position, SoundEvents.BEACON_DEACTIVATE, SoundSource.BLOCKS, 0.5f, 2f);
 			} else {
 				Objects.requireNonNull(Minecraft.getInstance().level).playLocalSound(
 						(double) position.getX() + 0.5D, (double) position.getY() + 0.5D, (double) position.getZ() + 0.5D,

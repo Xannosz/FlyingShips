@@ -107,9 +107,10 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	public static final int FURNACE_KEY = 49;
 	public static final int BURN_TIME_KEY = 50;
 	public static final int BURN_TIME_MAX_KEY = 51;
-	public static final int DATA_SLOT_SIZE = 52;
+	public static final int COOL_DOWN_KEY = 52;
+	public static final int DATA_SLOT_SIZE = 53;
 
-	public static final int[] STEPS = new int[]{1, 10, 100, 1000};
+	public static final int[] STEPS = new int[]{1, 10, 100, 1000, 10000, 100000};
 
 	// inside data
 	@Getter
@@ -281,19 +282,20 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 
 	@SuppressWarnings("unused")
 	public static void tick(Level level, BlockPos pos, BlockState state, RudderBlockEntity blockEntity) {
-		if (!level.isClientSide()) {
-			blockEntity.tick();
-		}
+		blockEntity.tick();
 	}
 
 	private void tick() {
-		coolDown--;
-		if (coolDown < 0) {
-			coolDown = 0;
-		}
 		clock++;
 		if (clock > 100) {
 			clock = 0;
+		}
+		if (level == null || level.isClientSide()) {
+			return;
+		}
+		coolDown--;
+		if (coolDown < 0) {
+			coolDown = 0;
 		}
 
 		if (clock % 5 == 0) {
@@ -436,6 +438,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	private void calculateJumpData() {
 		LiveDataPackage terrainScanMasks = TerrainScanUtil.generateMasks(JumpUtil.createRectangles(getBlockPos(), blockPositions));
 		terrainScanResult = TerrainScanUtil.scanTerrain((ServerLevel) level, terrainScanMasks);
+		vehicleScanResult = VehicleScanUtil.scanVehicle((ServerLevel) level, JumpUtil.createRectangles(getBlockPos(), blockPositions), getBlockState().getValue(Rudder.FACING));
 	}
 
 	public void executeButtonClick(ButtonId buttonId) {
@@ -647,10 +650,48 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	}
 
 	private boolean isValidJumpContext() {
-		return selectedWarpDirection != null && necessarySpeed > 0 && powerButtonState.equals(PowerState.ON) &&
-				getFloatingPower() >= vehicleScanResult.getDensity() &&
-				hasEnoughPowerForMovement() && (!collusionOnY() || isHyperDriveEnabled()) && coolDown < 1 &&
-				(isNormalDirection() || !isHyperDriveEnabled());
+		if (selectedWarpDirection == null) {
+			vehicleScanResult.getPlayers().forEach(player ->
+					player.sendSystemMessage(Component.translatable("message.noWarpDirection")));
+			return false;
+		}
+		if (necessarySpeed <= 0) {
+			vehicleScanResult.getPlayers().forEach(player ->
+					player.sendSystemMessage(Component.translatable("message.zeroSpeed")));
+			return false;
+		}
+		if (!powerButtonState.equals(PowerState.ON)) {
+			vehicleScanResult.getPlayers().forEach(player ->
+					player.sendSystemMessage(Component.translatable("message.engineOffline")));
+			return false;
+		}
+		if (getFloatingPower() < vehicleScanResult.getDensity()) {
+			vehicleScanResult.getPlayers().forEach(player ->
+					player.sendSystemMessage(Component.translatable("message.notEnoughFloatingPower")));
+			return false;
+		}
+		if (!hasEnoughPowerForMovement()) {
+			vehicleScanResult.getPlayers().forEach(player ->
+					player.sendSystemMessage(Component.translatable("message.notEnoughMovementPower")));
+			return false;
+		}
+		if (collusionOnY() && !isHyperDriveEnabled() && FlyingShipsConfiguration.ENABLE_COLLUSION_DETECTION_ON_Y.get()) {
+			vehicleScanResult.getPlayers().forEach(player ->
+					player.sendSystemMessage(Component.translatable("message.collisionOnY")));
+			return false;
+		}
+		if (coolDown > 0) {
+			vehicleScanResult.getPlayers().forEach(player ->
+					player.sendSystemMessage(Component.translatable("message.coolDownInProgress")));
+			return false;
+		}
+		if (!isNormalDirection() && isHyperDriveEnabled()) {
+			vehicleScanResult.getPlayers().forEach(player ->
+					player.sendSystemMessage(Component.translatable("message.useHyperDriveWithNormalDirection")));
+			return false;
+		}
+
+		return true;
 	}
 
 	private boolean collusionOnY() {
@@ -724,6 +765,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 
 	private int getMovementPower() {
 		return vehicleScanResult.getWindSurface() * FlyingShipsConfiguration.WIND_MULTIPLIER.get() +
+				vehicleScanResult.getArtificialFloater() * FlyingShipsConfiguration.ARTIFICIAL_FLOATER_MOVEMENT_MULTIPLIER.get() +
 				steamEnergy + getLeftoverEnderEnergy();
 	}
 
@@ -738,7 +780,8 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 
 	private int getStructuralFloatingPower() {
 		return vehicleScanResult.getLiftSurface() * FlyingShipsConfiguration.LIFT_MULTIPLIER.get() +
-				vehicleScanResult.getWool() * FlyingShipsConfiguration.BALLOON_MULTIPLIER.get();
+				vehicleScanResult.getWool() * FlyingShipsConfiguration.BALLOON_MULTIPLIER.get() +
+				vehicleScanResult.getArtificialFloater() * FlyingShipsConfiguration.ARTIFICIAL_FLOATER_LIFT_MULTIPLIER.get();
 	}
 
 	private int getHeatSteamFloatingPower() {
@@ -835,6 +878,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 			data.set(BURN_TIME_MAX_KEY, maxBurnTime);
 		}
 
+		data.set(COOL_DOWN_KEY, coolDown);
 		data.set(WATER_LINE_KEY, waterLine);
 		data.set(COORDINATES_BLINK_KEY, Util.convertBitArrayToInt(getCoordinateBlinkArray()));
 	}

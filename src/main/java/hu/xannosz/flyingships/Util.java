@@ -48,6 +48,6 @@ public class Util {
 	}
 
 	public static boolean isHollow(Block block) {
-		return HOLLOW_BLOCKS.contains(block);
+		return block.defaultBlockState().hasProperty(BlockStateProperties.WATERLOGGED) || HOLLOW_BLOCKS.contains(block);
 	}
 }

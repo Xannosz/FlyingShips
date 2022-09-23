@@ -19,6 +19,7 @@ public class VoxelColumn {
 	private int heater = 0;
 	private int enderOscillator = 0;
 	private int tank = 0;
+	private int artificialFloater = 0;
 
 	private int density = 0;
 	private boolean blocked = false;
@@ -117,6 +118,9 @@ public class VoxelColumn {
 		}
 		if (block.equals(ModBlocks.ENDER_OSCILLATOR.get())) {
 			enderOscillator++;
+		}
+		if (block.equals(ModBlocks.ARTIFICIAL_FLOATER.get())) {
+			artificialFloater++;
 		}
 	}
 

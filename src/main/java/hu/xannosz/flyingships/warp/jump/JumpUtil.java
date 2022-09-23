@@ -90,7 +90,7 @@ public class JumpUtil {
 			});
 
 			//clean place
-			cleanPlace(rectangles, additional, level); //TODO check when use STRUCTURE_AIR not necessary
+			cleanPlace(rectangles, additional, level);
 			//create structure
 			createStructure(rectangles, additional, level);
 			//update chunks (reload structure)

@@ -11,6 +11,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
+import static net.minecraftforge.client.gui.ScreenUtils.drawGradientRect;
 import static net.minecraftforge.client.gui.ScreenUtils.drawTexturedModalRect;
 
 @OnlyIn(Dist.CLIENT)
@@ -34,7 +35,7 @@ public class GraphicalButton extends AbstractButton {
 						config.getHoveredX(), config.getHoveredY(),
 						config.getGraphicalW(), config.getGraphicalH(), partialTicks);
 			} else if (config.isDebugMode()) {
-				drawTexturedModalRect(poseStack, x, y, 215, 215, width, height, partialTicks);
+				drawGradientRect(poseStack.last().pose(), 1, x, y, x + width, y + height, 0x7f1895ff, 0x7f1895ff);
 			} else if (config.isDefaultButtonDrawNeeded()) {
 				drawTexturedModalRect(poseStack, config.getGraphicalX(), config.getGraphicalY(),
 						config.getButtonX(), config.getButtonY(),

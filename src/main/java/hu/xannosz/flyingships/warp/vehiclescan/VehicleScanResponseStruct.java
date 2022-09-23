@@ -1,6 +1,9 @@
 package hu.xannosz.flyingships.warp.vehiclescan;
 
 import lombok.Data;
+import net.minecraft.server.level.ServerPlayer;
+
+import java.util.Set;
 
 @Data
 public class VehicleScanResponseStruct {
@@ -11,6 +14,8 @@ public class VehicleScanResponseStruct {
 	private int liftSurface;
 	private int windSurface;
 	private int density;
+	private int artificialFloater;
 	private int bottomY;
-	private boolean hyperDriveEngineFound = false; //TODO detect
+	private boolean hyperDriveEngineFound = false;
+	private Set<ServerPlayer> players;
 }

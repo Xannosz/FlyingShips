@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hu.xannosz.flyingships.FlyingShips;
 import hu.xannosz.flyingships.block.Rudder;
 import hu.xannosz.flyingships.blockentity.RudderBlockEntity;
+import hu.xannosz.flyingships.config.FlyingShipsConfiguration;
 import hu.xannosz.flyingships.screen.RudderScreen;
 import hu.xannosz.flyingships.screen.widget.*;
 import net.minecraft.ChatFormatting;
@@ -25,6 +26,8 @@ public class MainSubScreen extends SubScreen {
 
 	private static final ResourceLocation TEXTURE =
 			new ResourceLocation(FlyingShips.MOD_ID, "textures/gui/rudder_gui.png");
+	private static final ResourceLocation INNER_ROUND_TEXTURE =
+			new ResourceLocation(FlyingShips.MOD_ID, "textures/gui/rudder_gui_inner_round.png");
 	private GraphicalButton right;
 	private GraphicalButton forward;
 	private GraphicalButton left;
@@ -52,6 +55,7 @@ public class MainSubScreen extends SubScreen {
 	private Gauge heat;
 	private Gauge ender;
 	private Gauge burn;
+	private Gauge coolDown;
 
 	private HelpMessage speedStepMessage;
 	private HelpMessage windMessage;
@@ -217,7 +221,7 @@ public class MainSubScreen extends SubScreen {
 				.debugMode(DEBUG_MODE)
 				.hitBoxX(x + MENU_ROW_X + MENU_ROW_H_W_H + 5)
 				.hitBoxY(y + MENU_ROW_Y)
-				.hitBoxW(MENU_ROW_H_W_H + MENU_ROW_H_W_H + 5)
+				.hitBoxW(MENU_ROW_H_W_H)
 				.hitBoxH(MENU_ROW_H_W_H)
 				.graphicalX(x + MENU_ROW_X + MENU_ROW_H_W_H + 5)
 				.graphicalY(y + MENU_ROW_Y)
@@ -301,6 +305,7 @@ public class MainSubScreen extends SubScreen {
 		heat = new Gauge(x + 85, y + 7, 233, 1, 3, 87);
 		ender = new Gauge(x + 94, y + 7, 240, 1, 3, 87);
 		burn = new Gauge(x + 152, y + 73, 177, 90, 13, 13);
+		coolDown = new Gauge(x + 112, y + 15, 1, 33, 30, 30);
 
 		speedStepMessage = new HelpMessage(113, 59, 44, 8, x, y, 105, 90, rudderScreen);
 		windMessage = new HelpMessage(65, 7, 15, 87, x, y, 65, 95, rudderScreen);
@@ -447,6 +452,10 @@ public class MainSubScreen extends SubScreen {
 
 		wind.render(poseStack, (int) (random.nextFloat(0.9f, 1.1f) * rudderScreen.getMenu().getWind()), (int) (1.2 * rudderScreen.getMenu().getWindMax()), partialTick);
 		floating.render(poseStack, (int) (random.nextFloat(0.9f, 1.1f) * rudderScreen.getMenu().getFloating()), (int) (1.2 * rudderScreen.getMenu().getFloatingMax()), partialTick);
+
+		RenderSystem.setShaderTexture(0, INNER_ROUND_TEXTURE);
+		coolDown.render(poseStack, rudderScreen.getMenu().getCoolDown(), FlyingShipsConfiguration.COOL_DOWN_TIME.get(), partialTick);
+		RenderSystem.setShaderTexture(0, TEXTURE);
 	}
 
 	@Override
@@ -508,6 +517,7 @@ public class MainSubScreen extends SubScreen {
 
 			beaconButton.setBlink(false);
 		}
+		land.setSelected(rudderScreen.getMenu().getBlinking().get(ButtonId.LAND));
 	}
 
 	@Override

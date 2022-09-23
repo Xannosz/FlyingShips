@@ -27,11 +27,9 @@ import org.jetbrains.annotations.NotNull;
 public class RudderScreen extends AbstractContainerScreen<RudderMenu> implements ScreenWithButton {
 
 	public static final boolean DEBUG_MODE = false;
-	private static final int BLINKING_RATE = 25;
 
 	private int x;
 	private int y;
-	private int clock = 0;
 
 	private final SubScreen mainSubScreen;
 	private final SubScreen settingsSubScreen;
@@ -114,16 +112,8 @@ public class RudderScreen extends AbstractContainerScreen<RudderMenu> implements
 	}
 
 	private void blinking() {
-		clock++;
-
-		if (clock == BLINKING_RATE) {
-			actualSubScreen.blink(true);
-		}
-
-		if (clock == 2 * BLINKING_RATE) {
-			actualSubScreen.blink(false);
-			clock = 0;
-		}
+		final int clock = menu.getBlockEntity().getClock();
+		actualSubScreen.blink(clock < 16 || (33 < clock && clock < 49) || (66 < clock && clock < 82));
 	}
 
 	@Override

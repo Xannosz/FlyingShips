@@ -55,6 +55,7 @@ public class SettingsSubScreen extends SubScreen {
 	private GraphicalButton enableHeatEngine;
 	private GraphicalButton enableSteamEngine;
 	private GraphicalButton enableEnderEngine;
+	private HelpMessage waterLineMessage;
 
 	private boolean addNewRec = false;
 
@@ -367,6 +368,8 @@ public class SettingsSubScreen extends SubScreen {
 				.hoveredX(SETTINGS_SMALL_BUTTON_MAIN_ROW_X + SETTINGS_SMALL_BUTTON_MAIN_ROW_ADDITIONAL)
 				.hoveredY(SETTINGS_SMALL_BUTTON_MAIN_ROW_Y + 2 * SETTINGS_SMALL_BUTTON_MAIN_ROW_ADDITIONAL)
 				.build());
+
+		waterLineMessage = new HelpMessage(170, 11, 22, 8, x, y, 173, 13, rudderScreen);
 	}
 
 	@Override
@@ -528,7 +531,7 @@ public class SettingsSubScreen extends SubScreen {
 
 	@Override
 	public void renderToolTips(PoseStack poseStack, int mouseX, int mouseY, int x, int y) {
-
+		waterLineMessage.render(poseStack, mouseX, mouseY, Component.translatable("gui.text.waterLine"));
 	}
 
 	@Override

@@ -113,7 +113,7 @@ public class TerrainScanUtil {
 		return dataPackage;
 	}
 
-	public static Set<BlockPos> getShell(List<AbsoluteRectangleData> rectangleDataList, boolean outer) { //TODO exclude inside blocks
+	public static Set<BlockPos> getShell(List<AbsoluteRectangleData> rectangleDataList, boolean outer) {
 		Set<BlockPos> result = new HashSet<>();
 		for (AbsoluteRectangleData rectangleData : rectangleDataList) {
 			int minX = rectangleData.getNorthWestCorner().getX() - (outer ? 1 : 0);

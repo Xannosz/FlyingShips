@@ -331,4 +331,8 @@ public class RudderMenu extends AbstractContainerMenu {
 	public int getBurnTimeMax() {
 		return data.get(BURN_TIME_MAX_KEY);
 	}
+
+	public int getCoolDown() {
+		return data.get(COOL_DOWN_KEY);
+	}
 }

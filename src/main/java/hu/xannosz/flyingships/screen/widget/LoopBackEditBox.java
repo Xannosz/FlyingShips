@@ -1,6 +1,5 @@
 package hu.xannosz.flyingships.screen.widget;
 
-import hu.xannosz.flyingships.screen.RudderScreen;
 import lombok.Getter;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.EditBox;

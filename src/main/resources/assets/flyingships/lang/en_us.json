@@ -1,5 +1,6 @@
 {
   "item.flyingships.wand": "Wand",
+  "item.flyingships.crystal_of_levitation": "Crystal Of Levitation",
   "itemGroup.flyingshipstab": "Flying Ships",
   "block.flyingships.rudder": "Rudder",
   "block.flyingships.tank": "Tank",
@@ -9,6 +10,7 @@
   "block.flyingships.item_gate": "Item Gate",
   "block.flyingships.marker": "Marker",
   "block.flyingships.sub_rudder": "Sub Rudder",
+  "block.flyingships.artificial_floater": "Artificial Floater",
   "text.wand.lessInfo": "Add rectangles to the selected ship",
   "text.wand.moreInfo1": "Right click for a rudder block to select the ship\nThen right click on a block to select the first corner and right click to select the other corner and add to the ship.",
   "text.wand.moreInfo2": "Shift right click to delete selected corner (not from ship)",
@@ -30,10 +32,19 @@
   "message.subRudderNotConnected": "Sub rudder not connected",
   "message.connectedToRudder": "Connected to rudder %s",
   "message.notConnectedToRudder": "Sub rudder not connected to rudder %s",
+  "message.noWarpDirection": "No warp direction selected",
+  "message.zeroSpeed": "Too low speed",
+  "message.engineOffline": "Engine is offline",
+  "message.notEnoughFloatingPower": "Not enough floating power",
+  "message.notEnoughMovementPower": "Not enough movement power",
+  "message.collisionOnY": "Collision on vertical direction",
+  "message.coolDownInProgress": "Cool down in progress",
+  "message.useHyperDriveWithNormalDirection": "Use hyper drive with normal direction",
   "gui.text.north": "NORTH / z-",
   "gui.text.south": "SOUTH / z+",
   "gui.text.east": "EAST / x+",
   "gui.text.west": "WEST / x-",
   "gui.text.up": "ZENITH / y+",
-  "gui.text.down": "NADIR / y-"
+  "gui.text.down": "NADIR / y-",
+  "gui.text.waterLine": "ship's draft"
 }

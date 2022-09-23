@@ -2,14 +2,30 @@
 - item frames sometimes broken during jump
 
 // bugs/optimization
-- terrain scan detect swim and cloud reachability
 
 // pre-release
-- artificial floater (like wool, just better) (crystal of levitation [no fall damage, when in hand])
+- terrain scan detect swim and cloud reachability
+- submarine mod
+- ship mode
+- correct water/lava handling
+
+- crystal of levitation found in chests
 - coordinate relative to marker
-- yellow remove
-- todo remove
-- graphical cool down
+- correct power out write-ing
+
+// others
+- show helper text after some time
+- write out coordinates as tooltip message
+- animated steam, water structure
+- question before delete rectangle/coordinate
+- show absolute coordinates in settings in a tooltip
+- multi rudder styles
+- artificial floater texture
+- correct voxel shapes
+- enable/disable marker
+- selectable inner round
+- crystal of levitation no fall damage, when in hand
+- extend hollow blocks list
 
 // release
 - tests
@@ -20,33 +36,10 @@
 - description in toml file
 - hu lang
 
-// post-release
-- graphical debug without texture
-- land button blink with target and target hover, not with position and target hover
-- tool tip on water line
-- verbose error messages in jump context validation
-
-// update
-- show helper text after some time
-- write out coordinates as tooltip message
-- animated steam, water structure
-- question before delete rectangle/coordinate
-- show absolute coordinates in settings in a tooltip
-- multi rudder styles
-- correct voxel shapes
+// not in this life
+- turn (during jump, without jump, saved coordinates)
+- dimension change
 - item gate fluid
 - computercraft integration
-- dimension change
-- enable/disable marker
-- use rudder clock on gui blinking
-
-// not in this life
-- selectable inner round
 - graphical ship borders in the world
 - more fluid
-- calculate chest density
-- submarine mod
-- ship mode
-- 1D engine (elevator)
-- turn (during jump, without jump, saved coordinates)
-- different floating, sailing on different biomes and height

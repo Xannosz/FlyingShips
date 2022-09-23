@@ -3,12 +3,8 @@ package hu.xannosz.flyingships.block;
 import hu.xannosz.flyingships.blockentity.ItemGateBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -34,21 +30,12 @@ public class ItemGate extends BaseEntityBlock {
 		return RenderShape.MODEL;
 	}
 
-	@Override
-	public void setPlacedBy(@NotNull Level level, @NotNull BlockPos blockPos, @NotNull BlockState blockState, LivingEntity livingEntity, ItemStack itemStack) {
-		if (itemStack.hasCustomHoverName()) {
-			BlockEntity blockentity = level.getBlockEntity(blockPos);
-			if (blockentity instanceof AbstractFurnaceBlockEntity) {
-				((AbstractFurnaceBlockEntity) blockentity).setCustomName(itemStack.getHoverName());
-			}
-		}
-
-	}
-
+	@SuppressWarnings("deprecation")
 	public @NotNull BlockState rotate(BlockState blockState, Rotation rotation) {
 		return blockState.setValue(FACING, rotation.rotate(blockState.getValue(FACING)));
 	}
 
+	@SuppressWarnings("deprecation")
 	public @NotNull BlockState mirror(BlockState blockState, Mirror mirror) {
 		return blockState.rotate(mirror.getRotation(blockState.getValue(FACING)));
 	}
