@@ -302,8 +302,8 @@ public class MainSubScreen extends SubScreen {
 		floating = new Gauge(x + 46, y + 7, 177, 1, 15, 87);
 		steam = new Gauge(x + 8, y + 7, 195, 2, 15, 87);
 		water = new Gauge(x + 27, y + 7, 214, 2, 15, 87);
-		heat = new Gauge(x + 85, y + 7, 233, 1, 3, 87);
-		ender = new Gauge(x + 94, y + 7, 240, 1, 3, 87);
+		heat = new Gauge(x + 85, y + 7, 233, 2, 3, 87);
+		ender = new Gauge(x + 94, y + 7, 240, 2, 3, 87);
 		burn = new Gauge(x + 152, y + 73, 177, 90, 13, 13);
 		coolDown = new Gauge(x + 112, y + 15, 1, 33, 30, 30);
 
@@ -467,12 +467,23 @@ public class MainSubScreen extends SubScreen {
 	@Override
 	public void renderToolTips(PoseStack poseStack, int mouseX, int mouseY, int x, int y) {
 		speedStepMessage.render(poseStack, mouseX, mouseY, Component.literal("+/- " + RudderBlockEntity.STEPS[rudderScreen.getMenu().getStep()]));
-		windMessage.render(poseStack, mouseX, mouseY, Component.literal(rudderScreen.getMenu().getWind() + "/" + rudderScreen.getMenu().getWindMax()));
-		floatingMessage.render(poseStack, mouseX, mouseY, Component.literal(rudderScreen.getMenu().getFloating() + "/" + rudderScreen.getMenu().getFloatingMax()));
+		windMessage.render(poseStack, mouseX, mouseY,
+				Component.literal(rudderScreen.getMenu().getWind() + "/" + rudderScreen.getMenu().getWindMax()),
+				Component.literal("" + rudderScreen.getMenu().usedStructuralEnergyForMovement()).withStyle(ChatFormatting.DARK_GRAY),
+				Component.literal("" + rudderScreen.getMenu().usedSteamEnergyForMovement()).withStyle(ChatFormatting.GRAY),
+				Component.literal("" + rudderScreen.getMenu().usedEnderEnergyForMovement()).withStyle(ChatFormatting.DARK_AQUA)
+		);
+		floatingMessage.render(poseStack, mouseX, mouseY,
+				Component.literal(rudderScreen.getMenu().getFloating() + "/" + rudderScreen.getMenu().getFloatingMax()),
+				Component.literal("" + rudderScreen.getMenu().usedStructuralEnergyForFloating()).withStyle(ChatFormatting.DARK_GRAY),
+				Component.literal("" + rudderScreen.getMenu().usedHeatEnergyForFloating()).withStyle(ChatFormatting.DARK_RED),
+				Component.literal("" + rudderScreen.getMenu().usedSteamEnergyForFloating()).withStyle(ChatFormatting.GRAY),
+				Component.literal("" + rudderScreen.getMenu().usedEnderEnergyForFloating()).withStyle(ChatFormatting.DARK_AQUA)
+		);
 
 		steamMessage.render(poseStack, mouseX, mouseY, Component.literal(rudderScreen.getMenu().getSteam() + "/" + rudderScreen.getMenu().getSteamMax()));
 		waterMessage.render(poseStack, mouseX, mouseY, Component.literal(rudderScreen.getMenu().getWater() + "/" + rudderScreen.getMenu().getWaterMax()));
-		heatMessage.render(poseStack, mouseX, mouseY, Component.literal(rudderScreen.getMenu().getFurnace() + "/523 C° " + rudderScreen.getMenu().getHeat() + "/" + rudderScreen.getMenu().getHeatMax()));
+		heatMessage.render(poseStack, mouseX, mouseY, Component.literal(rudderScreen.getMenu().getFurnace() + "/523 C°"), Component.literal(rudderScreen.getMenu().getHeat() + "/" + rudderScreen.getMenu().getHeatMax()));
 		enderMessage.render(poseStack, mouseX, mouseY, Component.literal(rudderScreen.getMenu().getEnder() + "/" + rudderScreen.getMenu().getEnderMax()));
 
 		Direction rudderDirection = rudderScreen.getMenu().getBlockEntity().getBlockState().getValue(Rudder.FACING);

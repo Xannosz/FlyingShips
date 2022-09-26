@@ -2,6 +2,7 @@ package hu.xannosz.flyingships.blockentity;
 
 import hu.xannosz.flyingships.screen.MarkerMenu;
 import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -18,6 +19,9 @@ public class MarkerBlockEntity extends BlockEntity implements MenuProvider {
 
 	@Getter
 	private String markerName;
+	@Getter
+	@Setter
+	private boolean enabled = true;
 
 	public MarkerBlockEntity(BlockPos blockPos, BlockState blockState) {
 		super(ModBlockEntities.MARKER_BLOCK_ENTITY.get(), blockPos, blockState);
@@ -30,6 +34,7 @@ public class MarkerBlockEntity extends BlockEntity implements MenuProvider {
 			markerName = "";
 		}
 		tag.putString("marker.name", markerName);
+		tag.putBoolean("marker.enabled", enabled);
 
 		super.saveAdditional(tag);
 	}
@@ -38,6 +43,7 @@ public class MarkerBlockEntity extends BlockEntity implements MenuProvider {
 	public void load(@NotNull CompoundTag nbt) {
 		super.load(nbt);
 		markerName = nbt.getString("marker.name");
+		enabled = nbt.getBoolean("marker.enabled");
 	}
 
 	public void setMarkerName(String markerName) {

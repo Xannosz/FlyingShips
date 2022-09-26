@@ -335,4 +335,32 @@ public class RudderMenu extends AbstractContainerMenu {
 	public int getCoolDown() {
 		return data.get(COOL_DOWN_KEY);
 	}
+
+	public int usedStructuralEnergyForFloating() {
+		return data.get(STRUCTURAL_FLOATING_POWER_KEY);
+	}
+
+	public int usedHeatEnergyForFloating() {
+		return data.get(HEAT_FLOATING_POWER_KEY);
+	}
+
+	public int usedSteamEnergyForFloating() {
+		return data.get(STEAM_FLOATING_POWER_KEY);
+	}
+
+	public int usedEnderEnergyForFloating() {
+		return data.get(ENDER_FLOATING_POWER_KEY);
+	}
+
+	public int usedStructuralEnergyForMovement() {
+		return data.get(STRUCTURAL_MOVEMENT_POWER_KEY);
+	}
+
+	public int usedSteamEnergyForMovement() {
+		return data.get(STEAM_MOVEMENT_POWER_KEY);
+	}
+
+	public int usedEnderEnergyForMovement() {
+		return data.get(ENDER_MOVEMENT_POWER_KEY);
+	}
 }

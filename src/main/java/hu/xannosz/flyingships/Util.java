@@ -50,4 +50,9 @@ public class Util {
 	public static boolean isHollow(Block block) {
 		return block.defaultBlockState().hasProperty(BlockStateProperties.WATERLOGGED) || HOLLOW_BLOCKS.contains(block);
 	}
+
+	@SuppressWarnings("deprecation")
+	public static float getDensity(Block block) {
+		return block.getExplosionResistance();
+	}
 }

@@ -102,9 +102,8 @@ public class VoxelColumn {
 		return false;
 	}
 
-	@SuppressWarnings("deprecation")
 	private void calculateInterestBlock(Block block) {
-		density += block.getExplosionResistance();
+		density += Util.getDensity(block);
 		if (isAWool(block)) {
 			wool++;
 		} else if (!Util.isHollow(block)) {

@@ -57,16 +57,19 @@ public class Rudder extends BaseEntityBlock {
 		}
 	}
 
+	@Override
 	@SuppressWarnings("deprecation")
 	public @NotNull BlockState rotate(BlockState blockState, Rotation rotation) {
 		return blockState.setValue(FACING, rotation.rotate(blockState.getValue(FACING)));
 	}
 
+	@Override
 	@SuppressWarnings("deprecation")
 	public @NotNull BlockState mirror(BlockState blockState, Mirror mirror) {
 		return blockState.rotate(mirror.getRotation(blockState.getValue(FACING)));
 	}
 
+	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> blockStateBuilder) {
 		blockStateBuilder.add(FACING);
 	}

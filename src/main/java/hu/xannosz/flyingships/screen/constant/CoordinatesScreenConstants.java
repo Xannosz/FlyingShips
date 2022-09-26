@@ -35,7 +35,7 @@ public class CoordinatesScreenConstants {
 
 	public static final int EDIT_PANEL_NAME_X = 10;
 	public static final int EDIT_PANEL_NAME_Y_1 = 10;
-	public static final int EDIT_PANEL_NAME_Y_2 = 25;
+	public static final int EDIT_PANEL_NAME_Y_2 = 26;
 	public static final int EDIT_PANEL_NAME_W = 128;
 	public static final int EDIT_PANEL_NAME_H = 10;
 

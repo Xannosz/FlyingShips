@@ -5,6 +5,8 @@ import hu.xannosz.flyingships.screen.RudderScreen;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.network.chat.Component;
 
+import java.util.Arrays;
+
 @RequiredArgsConstructor
 public class HelpMessage {
 	private final int x;
@@ -19,9 +21,9 @@ public class HelpMessage {
 	private final int toolTipY;
 	private final RudderScreen rudderScreen;
 
-	public void render(PoseStack poseStack, int mouseX, int mouseY, Component component) {
+	public void render(PoseStack poseStack, int mouseX, int mouseY, Component... components) {
 		if (x <= mouseX && mouseX <= x + w && y <= mouseY && mouseY <= y + h) {
-			rudderScreen.renderTooltip(poseStack, component, guiX + toolTipX, guiY + toolTipY);
+			rudderScreen.renderComponentTooltip(poseStack, Arrays.asList(components), guiX + toolTipX, guiY + toolTipY);
 		}
 	}
 }

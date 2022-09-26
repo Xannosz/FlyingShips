@@ -1,8 +1,11 @@
 package hu.xannosz.flyingships.blockentity;
 
 import hu.xannosz.flyingships.Util;
+import hu.xannosz.flyingships.block.ModBlocks;
 import hu.xannosz.flyingships.block.Rudder;
 import hu.xannosz.flyingships.config.FlyingShipsConfiguration;
+import hu.xannosz.flyingships.networking.GetMarkerNamePacket;
+import hu.xannosz.flyingships.networking.ModMessages;
 import hu.xannosz.flyingships.screen.GuiState;
 import hu.xannosz.flyingships.screen.RudderMenu;
 import hu.xannosz.flyingships.screen.widget.ButtonId;
@@ -34,6 +37,7 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -108,7 +112,14 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	public static final int BURN_TIME_KEY = 50;
 	public static final int BURN_TIME_MAX_KEY = 51;
 	public static final int COOL_DOWN_KEY = 52;
-	public static final int DATA_SLOT_SIZE = 53;
+	public static final int STRUCTURAL_FLOATING_POWER_KEY = 53;
+	public static final int HEAT_FLOATING_POWER_KEY = 54;
+	public static final int STEAM_FLOATING_POWER_KEY = 55;
+	public static final int ENDER_FLOATING_POWER_KEY = 56;
+	public static final int STRUCTURAL_MOVEMENT_POWER_KEY = 57;
+	public static final int STEAM_MOVEMENT_POWER_KEY = 58;
+	public static final int ENDER_MOVEMENT_POWER_KEY = 59;
+	public static final int DATA_SLOT_SIZE = 60;
 
 	public static final int[] STEPS = new int[]{1, 10, 100, 1000, 10000, 100000};
 
@@ -553,32 +564,38 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 			case JUMP_TO_COORDINATE_1 -> {
 				selectedCoordinate = coordinatesPage * 6;
 				selectedWarpDirection = WarpDirection.COORDINATE;
-				necessarySpeed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
+				final Vec3 coordinate = getCoordinateVector();
+				necessarySpeed = (int) Math.abs(coordinate.x + coordinate.y + coordinate.z);
 			}
 			case JUMP_TO_COORDINATE_2 -> {
 				selectedCoordinate = coordinatesPage * 6 + 1;
 				selectedWarpDirection = WarpDirection.COORDINATE;
-				necessarySpeed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
+				final Vec3 coordinate = getCoordinateVector();
+				necessarySpeed = (int) Math.abs(coordinate.x + coordinate.y + coordinate.z);
 			}
 			case JUMP_TO_COORDINATE_3 -> {
 				selectedCoordinate = coordinatesPage * 6 + 2;
 				selectedWarpDirection = WarpDirection.COORDINATE;
-				necessarySpeed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
+				final Vec3 coordinate = getCoordinateVector();
+				necessarySpeed = (int) Math.abs(coordinate.x + coordinate.y + coordinate.z);
 			}
 			case JUMP_TO_COORDINATE_4 -> {
 				selectedCoordinate = coordinatesPage * 6 + 3;
 				selectedWarpDirection = WarpDirection.COORDINATE;
-				necessarySpeed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
+				final Vec3 coordinate = getCoordinateVector();
+				necessarySpeed = (int) Math.abs(coordinate.x + coordinate.y + coordinate.z);
 			}
 			case JUMP_TO_COORDINATE_5 -> {
 				selectedCoordinate = coordinatesPage * 6 + 4;
 				selectedWarpDirection = WarpDirection.COORDINATE;
-				necessarySpeed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
+				final Vec3 coordinate = getCoordinateVector();
+				necessarySpeed = (int) Math.abs(coordinate.x + coordinate.y + coordinate.z);
 			}
 			case JUMP_TO_COORDINATE_6 -> {
 				selectedCoordinate = coordinatesPage * 6 + 5;
 				selectedWarpDirection = WarpDirection.COORDINATE;
-				necessarySpeed = coordinates.get(selectedCoordinate).getCoordinate().distManhattan(getBlockPos());
+				final Vec3 coordinate = getCoordinateVector();
+				necessarySpeed = (int) Math.abs(coordinate.x + coordinate.y + coordinate.z);
 			}
 			case ENDER_ENGINE -> enableEnderEngine = !enableEnderEngine;
 			case STEAM_ENGINE -> {
@@ -600,39 +617,9 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	}
 
 	private void consumeEnergy() {
-		int necessaryFloatingEnergy = Math.max(vehicleScanResult.getDensity() - getStructuralFloatingPower(), 0);
-		int necessaryMovementEnergy = Math.max(getNecessaryMovementPower() - vehicleScanResult.getWindSurface() * FlyingShipsConfiguration.WIND_MULTIPLIER.get(), 0);
-		if (enableSteamEngine) {
-			necessaryFloatingEnergy -= steamEnergy;
-			if (necessaryMovementEnergy >= steamEnergy) {
-				necessaryMovementEnergy -= steamEnergy;
-				steamEnergy = 0;
-			} else {
-				steamEnergy -= necessaryMovementEnergy;
-				necessaryMovementEnergy = 0;
-			}
-		} else if (enableHeatEngine) {
-			if (necessaryFloatingEnergy >= heatEnergy) {
-				necessaryFloatingEnergy -= heatEnergy;
-				heatEnergy = 0;
-			} else {
-				heatEnergy -= necessaryFloatingEnergy;
-				necessaryFloatingEnergy = 0;
-			}
-		}
-
-		if (enableEnderEngine) {
-			if (necessaryFloatingEnergy >= enderEnergy) {
-				enderEnergy = 0;
-			} else {
-				enderEnergy -= necessaryFloatingEnergy;
-			}
-			if (necessaryMovementEnergy >= enderEnergy) {
-				enderEnergy = 0;
-			} else {
-				enderEnergy -= necessaryMovementEnergy;
-			}
-		}
+		steamEnergy -= usedSteamEnergyForMovement();
+		heatEnergy -= usedHeatEnergyForFloating();
+		enderEnergy -= usedEnderEnergyForFloating() + usedEnderEnergyForMovement();
 
 		if (isHyperDriveEnabled()) {
 			itemHandler.getStackInSlot(0).shrink(1);
@@ -665,7 +652,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 					player.sendSystemMessage(Component.translatable("message.engineOffline")));
 			return false;
 		}
-		if (getFloatingPower() < vehicleScanResult.getDensity()) {
+		if (!hasEnoughPowerForFloating()) {
 			vehicleScanResult.getPlayers().forEach(player ->
 					player.sendSystemMessage(Component.translatable("message.notEnoughFloatingPower")));
 			return false;
@@ -688,6 +675,13 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 		if (!isNormalDirection() && isHyperDriveEnabled()) {
 			vehicleScanResult.getPlayers().forEach(player ->
 					player.sendSystemMessage(Component.translatable("message.useHyperDriveWithNormalDirection")));
+			return false;
+		}
+		if (selectedWarpDirection.equals(WarpDirection.COORDINATE) &&
+				!coordinates.get(selectedCoordinate).getMarker().isEmpty() &&
+				getMarkersInRange().get(coordinates.get(selectedCoordinate).getMarker()) == null) {
+			vehicleScanResult.getPlayers().forEach(player ->
+					player.sendSystemMessage(Component.translatable("message.markerOutOfRange", coordinates.get(selectedCoordinate).getMarker())));
 			return false;
 		}
 
@@ -744,19 +738,36 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 				}
 			}
 			case COORDINATE -> {
-				BlockPos coordinate = coordinates.get(selectedCoordinate).getCoordinate();
-				return new Vec3(coordinate.getX() - getBlockPos().getX(), coordinate.getY() - getBlockPos().getY(), coordinate.getZ() - getBlockPos().getZ());
+				return getCoordinateVector();
 			}
 		}
 		return new Vec3(0, 0, 0);
 	}
 
+	private Vec3 getCoordinateVector() {
+		SavedCoordinate coordinate = coordinates.get(selectedCoordinate);
+		if (coordinate.getMarker().isEmpty()) {
+			return new Vec3(coordinate.getCoordinate().getX() - getBlockPos().getX(), coordinate.getCoordinate().getY() - getBlockPos().getY(), coordinate.getCoordinate().getZ() - getBlockPos().getZ());
+		} else {
+			final BlockPos markerPosition = getMarkersInRange().get(coordinate.getMarker());
+			if (markerPosition == null) {
+				vehicleScanResult.getPlayers().forEach(player ->
+						player.sendSystemMessage(Component.translatable("message.markerOutOfRange", coordinate.getMarker())));
+			} else {
+				final BlockPos target = markerPosition.offset(coordinate.getCoordinate());
+				return new Vec3(target.getX() - getBlockPos().getX(), target.getY() - getBlockPos().getY(), target.getZ() - getBlockPos().getZ());
+			}
+		}
+		return new Vec3(0, 0, 0);
+	}
+
+	// power handling
 	private boolean hasEnoughPowerForMovement() {
 		if (FlyingShipsConfiguration.ENABLE_SLIDING.get() && necessarySpeed <= 5) {
 			return true;
 		}
 
-		return getMovementPower() > getNecessaryMovementPower();
+		return getMovementPower() >= getNecessaryMovementPower();
 	}
 
 	private int getNecessaryMovementPower() {
@@ -764,30 +775,69 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	}
 
 	private int getMovementPower() {
-		return vehicleScanResult.getWindSurface() * FlyingShipsConfiguration.WIND_MULTIPLIER.get() +
-				vehicleScanResult.getArtificialFloater() * FlyingShipsConfiguration.ARTIFICIAL_FLOATER_MOVEMENT_MULTIPLIER.get() +
-				steamEnergy + getLeftoverEnderEnergy();
+		return usedStructuralEnergyForMovement() + usedSteamEnergyForMovement() + usedEnderEnergyForMovement();
 	}
 
-	private int getLeftoverEnderEnergy() {
-		final int usedEnderEnergy = Math.max(vehicleScanResult.getDensity() - getStructuralFloatingPower() - getHeatSteamFloatingPower(), 0);
-		return Math.max(enderEnergy - usedEnderEnergy, 0);
+	private int usedStructuralEnergyForMovement() {
+		return vehicleScanResult.getWindSurface() * FlyingShipsConfiguration.WIND_MULTIPLIER.get() +
+				vehicleScanResult.getArtificialFloater() * FlyingShipsConfiguration.ARTIFICIAL_FLOATER_MOVEMENT_MULTIPLIER.get();
+	}
+
+	private int usedSteamEnergyForMovement() {
+		if (!enableSteamEngine) {
+			return 0;
+		}
+		return Math.min(Math.max(getNecessaryMovementPower() - usedStructuralEnergyForMovement(), 0), steamEnergy);
+	}
+
+	private int usedEnderEnergyForMovement() {
+		if (!enableEnderEngine) {
+			return 0;
+		}
+		return Math.min(Math.max(getNecessaryMovementPower() - usedStructuralEnergyForMovement() - usedSteamEnergyForMovement(), 0), enderEnergy - usedEnderEnergyForFloating());
+	}
+
+	private boolean hasEnoughPowerForFloating() {
+		return getFloatingPower() >= getNecessaryFloatingPower();
+	}
+
+	private int getNecessaryFloatingPower() {
+		return vehicleScanResult.getDensity();
 	}
 
 	private int getFloatingPower() {
-		return getStructuralFloatingPower() + enderEnergy + getHeatSteamFloatingPower();
+		return usedStructuralEnergyForFloating() + usedHeatEnergyForFloating() + usedSteamEnergyForFloating() + usedEnderEnergyForFloating();
 	}
 
-	private int getStructuralFloatingPower() {
+	private int usedStructuralEnergyForFloating() {
 		return vehicleScanResult.getLiftSurface() * FlyingShipsConfiguration.LIFT_MULTIPLIER.get() +
 				vehicleScanResult.getWool() * FlyingShipsConfiguration.BALLOON_MULTIPLIER.get() +
 				vehicleScanResult.getArtificialFloater() * FlyingShipsConfiguration.ARTIFICIAL_FLOATER_LIFT_MULTIPLIER.get();
 	}
 
-	private int getHeatSteamFloatingPower() {
-		return (enableSteamEngine ? steamEnergy : heatEnergy);
+	private int usedHeatEnergyForFloating() {
+		if (!enableHeatEngine || enableSteamEngine) {
+			return 0;
+		}
+		return Math.min(Math.max(getNecessaryFloatingPower() - usedStructuralEnergyForFloating(), 0), heatEnergy);
 	}
 
+	private int usedSteamEnergyForFloating() {
+		if (!enableSteamEngine) {
+			return 0;
+		}
+		return Math.min(Math.max(getNecessaryFloatingPower() - usedStructuralEnergyForFloating(), 0), steamEnergy);
+	}
+
+	private int usedEnderEnergyForFloating() {
+		if (!enableEnderEngine) {
+			return 0;
+		}
+		return Math.min(Math.max(getNecessaryFloatingPower() - usedStructuralEnergyForFloating()
+				- usedHeatEnergyForFloating() - usedSteamEnergyForFloating(), 0), enderEnergy);
+	}
+
+	// energy capacity
 	private int getMaxEnderEnergy() {
 		return vehicleScanResult.getEnderOscillator() * FlyingShipsConfiguration.ENERGY_PER_OSCILLATOR.get();
 	}
@@ -862,7 +912,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 		if (vehicleScanResult != null) {
 			data.set(WIND_MAX_KEY, getNecessaryMovementPower());
 			data.set(WIND_KEY, getMovementPower());
-			data.set(FLOATING_MAX_KEY, vehicleScanResult.getDensity());
+			data.set(FLOATING_MAX_KEY, getNecessaryFloatingPower());
 			data.set(FLOATING_KEY, getFloatingPower());
 
 			data.set(WATER_KEY, waterContent);
@@ -876,6 +926,14 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 			data.set(FURNACE_KEY, getFurnaceHeat());
 			data.set(BURN_TIME_KEY, burnTime);
 			data.set(BURN_TIME_MAX_KEY, maxBurnTime);
+
+			data.set(STRUCTURAL_FLOATING_POWER_KEY, usedStructuralEnergyForFloating());
+			data.set(HEAT_FLOATING_POWER_KEY, usedHeatEnergyForFloating());
+			data.set(STEAM_FLOATING_POWER_KEY, usedSteamEnergyForFloating());
+			data.set(ENDER_FLOATING_POWER_KEY, usedEnderEnergyForFloating());
+			data.set(STRUCTURAL_MOVEMENT_POWER_KEY, usedStructuralEnergyForMovement());
+			data.set(STEAM_MOVEMENT_POWER_KEY, usedSteamEnergyForMovement());
+			data.set(ENDER_MOVEMENT_POWER_KEY, usedEnderEnergyForMovement());
 		}
 
 		data.set(COOL_DOWN_KEY, coolDown);
@@ -902,7 +960,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 			coordinates.add(savedCoordinate);
 		}
 		if (mode > 0 && mode < 7) {
-			coordinates.set(6 * coordinatesPage + mode - 1, savedCoordinate);
+			coordinates.get(6 * coordinatesPage + mode - 1).setName(savedCoordinate.getName());
 		}
 		updateData();
 		setChanged();
@@ -1006,6 +1064,54 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 		if (coordinatesPage * 6 + 5 < coordinates.size()) {
 			result.add(coordinates.get(coordinatesPage * 6 + 5));
 		}
+		return result;
+	}
+
+	// client side
+	public void updateMarkersInRange() {
+		if (level == null) {
+			return;
+		}
+
+		final ChunkPos chunkPos = new ChunkPos(getBlockPos());
+		final int range = FlyingShipsConfiguration.MARKER_RANGE.get();
+		for (int x = chunkPos.x - range; x <= chunkPos.x + range; x++) {
+			for (int z = chunkPos.z - range; z <= chunkPos.z + range; z++) {
+				level.getChunk(x, z).getBlockEntities().forEach(
+						(blockPos, entity) -> {
+							if (entity instanceof MarkerBlockEntity) {
+								if (level.getBlockState(blockPos).getBlock().equals(ModBlocks.MARKER.get())) {
+									ModMessages.sendToServer(new GetMarkerNamePacket(blockPos));
+								}
+							}
+						}
+				);
+			}
+		}
+	}
+
+	public Map<String, BlockPos> getMarkersInRange() {
+		final Map<String, BlockPos> result = new HashMap<>();
+		if (level == null) {
+			return result;
+		}
+
+		final ChunkPos chunkPos = new ChunkPos(getBlockPos());
+		final int range = FlyingShipsConfiguration.MARKER_RANGE.get();
+		for (int x = chunkPos.x - range; x <= chunkPos.x + range; x++) {
+			for (int z = chunkPos.z - range; z <= chunkPos.z + range; z++) {
+				level.getChunk(x, z).getBlockEntities().forEach(
+						(blockPos, entity) -> {
+							if (entity instanceof MarkerBlockEntity) {
+								if (((MarkerBlockEntity) entity).isEnabled() && !((MarkerBlockEntity) entity).getMarkerName().isEmpty()) {
+									result.put(((MarkerBlockEntity) entity).getMarkerName(), new BlockPos(blockPos));
+								}
+							}
+						}
+				);
+			}
+		}
+
 		return result;
 	}
 }

@@ -1,13 +1,16 @@
 package hu.xannosz.flyingships.networking;
 
+import hu.xannosz.flyingships.block.Marker;
+import hu.xannosz.flyingships.block.Rudder;
 import hu.xannosz.flyingships.blockentity.RudderBlockEntity;
 import hu.xannosz.flyingships.warp.SavedCoordinate;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent;
 
-import java.util.Objects;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public class SendNewCoordinatePacket {
@@ -47,7 +50,10 @@ public class SendNewCoordinatePacket {
 		NetworkEvent.Context context = supplier.get();
 		context.enqueueWork(() -> {
 			// SERVER SITE
-			BlockEntity entity = Objects.requireNonNull(context.getSender()).getLevel().getBlockEntity(position);
+			if (context.getSender() == null) {
+				return;
+			}
+			BlockEntity entity = context.getSender().getLevel().getBlockEntity(position);
 			if (entity instanceof RudderBlockEntity) {
 				if (name.equals("")) {
 					((RudderBlockEntity) entity).removeCoordinate(mode);
@@ -55,7 +61,19 @@ public class SendNewCoordinatePacket {
 					SavedCoordinate savedCoordinate = new SavedCoordinate();
 					savedCoordinate.setName(name);
 					savedCoordinate.setMarker(marker);
-					savedCoordinate.setCoordinate(position);
+					if (marker.isEmpty()) {
+						savedCoordinate.setCoordinate(position);
+						savedCoordinate.setMarkerDirection(Direction.NORTH);
+					} else {
+						Map<String, BlockPos> markers = ((RudderBlockEntity) entity).getMarkersInRange();
+						if (!markers.containsKey(marker)) {
+							return;
+						}
+						savedCoordinate.setCoordinate(position.subtract(markers.get(marker)));
+						savedCoordinate.setMarkerDirection(context.getSender().getLevel()
+								.getBlockState(markers.get(marker)).getValue(Marker.FACING));
+					}
+					savedCoordinate.setRudderDirection(entity.getBlockState().getValue(Rudder.FACING));
 					((RudderBlockEntity) entity).addCoordinate(mode, savedCoordinate);
 				}
 			}

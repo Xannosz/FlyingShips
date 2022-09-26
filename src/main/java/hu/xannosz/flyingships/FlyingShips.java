@@ -4,6 +4,7 @@ import hu.xannosz.flyingships.block.ModBlocks;
 import hu.xannosz.flyingships.blockentity.ModBlockEntities;
 import hu.xannosz.flyingships.config.FlyingShipsConfiguration;
 import hu.xannosz.flyingships.item.ModItems;
+import hu.xannosz.flyingships.loot.ModLootTables;
 import hu.xannosz.flyingships.networking.ModMessages;
 import hu.xannosz.flyingships.screen.MarkerScreen;
 import hu.xannosz.flyingships.screen.ModMenuTypes;
@@ -31,6 +32,7 @@ public class FlyingShips {
 		ModBlocks.register(modEventBus);
 		ModBlockEntities.register(modEventBus);
 		ModMenuTypes.register(modEventBus);
+		ModLootTables.register(modEventBus);
 
 		modEventBus.addListener(this::commonSetup);
 

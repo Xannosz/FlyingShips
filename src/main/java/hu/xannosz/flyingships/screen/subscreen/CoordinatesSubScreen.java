@@ -15,6 +15,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -59,6 +60,8 @@ public class CoordinatesSubScreen extends SubScreen {
 	private boolean addNewCoordinate = false;
 	private int coordinateNum = 0;
 	private SavedCoordinate newCoordinate;
+	private int markerId = -1;
+	private List<String> markers = new ArrayList<>();
 
 	public CoordinatesSubScreen(RudderScreen rudderScreen) {
 		super(rudderScreen);
@@ -68,6 +71,7 @@ public class CoordinatesSubScreen extends SubScreen {
 	public void init(int x, int y) {
 
 		rudderScreen.getMenu().updateCoordinates();
+		rudderScreen.getMenu().getBlockEntity().updateMarkersInRange();
 
 		pageUp = new LoopBackButton(ButtonConfig.builder()
 				.buttonId(ButtonId.COORDINATE_PAGE_UP)
@@ -575,9 +579,14 @@ public class CoordinatesSubScreen extends SubScreen {
 		}
 		if (addNewCoordinate) {
 			if (newCoordinate != null) {
-				String marker = newCoordinate.getMarker();
-				font.draw(poseStack, Component.literal(marker == null ? "" : marker), EDIT_PANEL_NAME_X,
-						EDIT_PANEL_NAME_Y_2, Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
+				String markerName = "";
+				if (coordinateNum == 0) {
+					markerName = markerId == -1 ? "" : markers.get(markerId);
+				} else {
+					markerName = newCoordinate.getMarker() == null ? "" : newCoordinate.getMarker();
+				}
+				font.draw(poseStack, Component.literal(markerName), EDIT_PANEL_X + EDIT_PANEL_NAME_X + 1,
+						EDIT_PANEL_Y + EDIT_PANEL_NAME_Y_2, Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
 			}
 		}
 		font.draw(poseStack, Component.literal(rudderScreen.getMenu().getCoordinatesPage() + "/" + rudderScreen.getMenu().getCoordinatesMaxPage()), 154,
@@ -621,6 +630,7 @@ public class CoordinatesSubScreen extends SubScreen {
 				coordinateNum = 0;
 				newCoordinate = new SavedCoordinate();
 				name.setValue("");
+				markers = new ArrayList<>(rudderScreen.getMenu().getBlockEntity().getMarkersInRange().keySet());
 			}
 			case EDIT_COORDINATE_1 -> {
 				addNewCoordinate = true;
@@ -660,6 +670,9 @@ public class CoordinatesSubScreen extends SubScreen {
 			}
 			case ADD_COORDINATE -> {
 				newCoordinate.setName(name.getValue());
+				if (coordinateNum == 0) {
+					newCoordinate.setMarker(markerId == -1 ? "" : markers.get(markerId));
+				}
 				ModMessages.sendToServer(
 						new SendNewCoordinatePacket(coordinateNum,
 								rudderScreen.getMenu().getBlockEntity().getBlockPos(), newCoordinate));
@@ -677,9 +690,19 @@ public class CoordinatesSubScreen extends SubScreen {
 				addNewCoordinate = false;
 				newCoordinate = null;
 			}
-			case MARKER_UP -> log.error("marker up not implemented");
-			case MARKER_DOWN -> log.error("marker down not implemented");
-			case ABSOLUTE_COORDINATE -> log.error("absolute coordinate not implemented");
+			case MARKER_UP -> {
+				markerId--;
+				if (markerId < 0) {
+					markerId = markers.size() - 1;
+				}
+			}
+			case MARKER_DOWN -> {
+				markerId++;
+				if (markerId >= markers.size()) {
+					markerId = -1;
+				}
+			}
+			case ABSOLUTE_COORDINATE -> markerId = -1;
 		}
 		rudderScreen.getMenu().updateCoordinates();
 	}
