@@ -1,8 +1,7 @@
 {
 	"credit": "Made with Blockbench",
 	"texture_size": [22, 23],
-	"parent": "block/block",
-	"ambientocclusion": false,
+	"render_type": "cutout",
 	"textures": {
 		"0": "flyingships:block/artificial_floater",
 		"particle": "flyingships:block/artificial_floater"

@@ -4,11 +4,13 @@
 // bugs/optimization
 
 // pre-release
-- terrain scan detect swim and cloud reachability (merge two scanners)
-- submarine mod
-- ship mode
 - correct water/lava handling
-- more fluid
+- density in fluid
+
+(nem szamolni a fluidot a vizvonal alatt,
+vizvonal alatti meretet is vissza jelezni (nem adott fluid blokkok szama)
+celkoordinata emelkedessel jarna (minden eset) akkor levego density kell)
+
 
 // release
 - create check list
@@ -19,16 +21,17 @@
 - correct description in configuration file
 - description in toml file
 - hu
+- readme
 
 // others
-- always landing, or go back from abyss
+- more fluid
+- enable/disable vertical movement (under waterline/ above waterline)
 - show helper text after some time
 - write out coordinates as tooltip message
 - animated steam, water structure
 - question before delete rectangle/coordinate
 - show absolute coordinates in settings in a tooltip
 - multi rudder styles
-- artificial floater texture
 - correct voxel shapes
 - enable/disable marker
 - selectable inner round

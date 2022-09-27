@@ -1,9 +1,9 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "PPP",
-    "PEP",
-    "ORO"
+    " E ",
+    " R ",
+    "OOO"
   ],
   "key": {
     "O": {
@@ -11,9 +11,6 @@
     },
     "E": {
       "item": "minecraft:ender_eye"
-    },
-    "P": {
-      "item": "minecraft:glass_pane"
     },
     "R": {
       "item": "minecraft:end_rod"

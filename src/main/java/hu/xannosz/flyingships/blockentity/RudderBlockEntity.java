@@ -167,7 +167,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	private boolean enableEnderEngine = false;
 	private PowerState powerButtonState = PowerState.OFF;
 	private GuiState guiState = GuiState.MAIN;
-	private LandButtonSettings landButtonSettings = LandButtonSettings.VOID;
+	private LandButtonSettings landButtonSettings = LandButtonSettings.CLOUD_LEVEL;
 	private final ContainerData data = new SimpleContainerData(DATA_SLOT_SIZE);
 
 	// jump data
@@ -448,7 +448,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 
 	private void calculateJumpData() {
 		LiveDataPackage terrainScanMasks = TerrainScanUtil.generateMasks(JumpUtil.createRectangles(getBlockPos(), blockPositions));
-		terrainScanResult = TerrainScanUtil.scanTerrain((ServerLevel) level, terrainScanMasks);
+		terrainScanResult = TerrainScanUtil.scanTerrain((ServerLevel) level, terrainScanMasks, waterLine);
 		vehicleScanResult = VehicleScanUtil.scanVehicle((ServerLevel) level, JumpUtil.createRectangles(getBlockPos(), blockPositions), getBlockState().getValue(Rudder.FACING));
 	}
 
@@ -457,19 +457,20 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 			case UP, DOWN, RIGHT, LEFT, FORWARD, BACKWARD ->
 					selectedWarpDirection = WarpDirection.fromBlockDirection(buttonId, getBlockState().getValue(Rudder.FACING));
 			case LAND -> {
-				landButtonSettings = landButtonSettings.nextState(terrainScanResult);
 				if (vehicleScanResult == null) {
 					break;
 				}
+				landButtonSettings = landButtonSettings.nextState(terrainScanResult,
+						CLOUD_LEVEL + waterLine - vehicleScanResult.getBottomY());
 				if (!landButtonSettings.equals(LandButtonSettings.EMPTY)) {
 					selectedWarpDirection = WarpDirection.fromBlockDirection(buttonId, getBlockState().getValue(Rudder.FACING));
 					switch (landButtonSettings) {
-						case VOID ->
+						case CLOUD_LEVEL ->
 								necessarySpeed = Math.abs(CLOUD_LEVEL + waterLine - vehicleScanResult.getBottomY());
 						case LAND -> necessarySpeed = terrainScanResult.getHeightOfBottom();
 						case TOUCH_CELLING -> necessarySpeed = terrainScanResult.getHeightOfCelling();
 						case SWIM_LAVA, SWIM_WATER ->
-								necessarySpeed = Math.abs(terrainScanResult.getHeightOfBottom() + waterLine);
+								necessarySpeed = Math.abs(terrainScanResult.getHeightOfWaterLine() + waterLine);
 					}
 				} else {
 					if (selectedWarpDirection.equals(WarpDirection.LAND)) {
@@ -519,7 +520,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 				powerButtonState = powerButtonState.nextState(enableSteamEngine);
 				if (!powerButtonState.equals(PowerState.ON)) {
 					selectedWarpDirection = null;
-					landButtonSettings = LandButtonSettings.VOID;
+					landButtonSettings = LandButtonSettings.CLOUD_LEVEL;
 				}
 			}
 			case MENU -> guiState = GuiState.SETTINGS;
@@ -723,7 +724,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 			}
 			case LAND -> {
 				switch (landButtonSettings) {
-					case VOID -> {
+					case CLOUD_LEVEL -> {
 						return new Vec3(0, CLOUD_LEVEL + waterLine - vehicleScanResult.getBottomY(), 0);
 					}
 					case LAND -> {
@@ -733,7 +734,8 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 						return new Vec3(0, terrainScanResult.getHeightOfCelling(), 0);
 					}
 					case SWIM_LAVA, SWIM_WATER -> {
-						return new Vec3(0, -terrainScanResult.getHeightOfBottom() + waterLine, 0);
+						return new Vec3(0,
+								terrainScanResult.getHeightOfWaterLine() + waterLine, 0);
 					}
 				}
 			}
@@ -798,6 +800,10 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	}
 
 	private boolean hasEnoughPowerForFloating() {
+		if (selectedWarpDirection.equals(WarpDirection.DOWN)) {
+			return true;
+		}
+
 		return getFloatingPower() >= getNecessaryFloatingPower();
 	}
 
@@ -867,7 +873,8 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 			data.set(POSITION_MARKER_MID_KEY, terrainScanResult.getFloatingPosition().getKey());
 			data.set(POSITION_MARKER_BOTTOM_KEY, terrainScanResult.getBottomPosition().getKey());
 			data.set(LANDING_BUTTON_KEY, landButtonSettings.getKey());
-			data.set(LANDING_BUTTON_NEXT_KEY, landButtonSettings.nextState(terrainScanResult).getKey());
+			data.set(LANDING_BUTTON_NEXT_KEY, landButtonSettings.nextState(terrainScanResult,
+					CLOUD_LEVEL + waterLine - vehicleScanResult.getBottomY()).getKey());
 		}
 
 		data.set(GUI_STATE_KEY, guiState.getKey());

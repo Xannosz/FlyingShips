@@ -16,9 +16,11 @@ public class TerrainScanUtil {
 	public static final int TOP_OF_MAP = 319;
 	public static final int BOTTOM_OF_MAP = -64;
 
-	public static TerrainScanResponseStruct scanTerrain(ServerLevel level, LiveDataPackage dataPackage) {
+	public static TerrainScanResponseStruct scanTerrain(ServerLevel level, LiveDataPackage dataPackage, int waterLine) {
 
 		TerrainScanResponseStruct responseStruct = new TerrainScanResponseStruct();
+
+		final int vehicleSize = getVehicleSize(dataPackage);
 
 		//calculate touching
 		nextTopMask(dataPackage);
@@ -28,11 +30,36 @@ public class TerrainScanUtil {
 		int heightOfCelling = 0;
 		int heightOfBottom = 0;
 
+		//calculate floating
+		final CageStruct bottomOfBottom = getBottomOfBottom(dataPackage.getBottomMask());
+		bottomOfBottom.setY(bottomOfBottom.getY() + waterLine);
+		responseStruct.setFloatingPosition(getFloatingPosition(level, bottomOfBottom));
+
 		//calculate celling warp / set indicator
 		if (topMaskTouch.equals(Blocks.WATER)) {
 			responseStruct.setCellingPosition(CellingPosition.UNDER_WATER);
+			responseStruct.setFloatingPosition(FloatingPosition.VOID);
+			while (dataPackage.getBottomOfTopMask() < TOP_OF_MAP) {
+				heightOfCelling++;
+				nextTopMask(dataPackage);
+				topMaskTouch = topMaskHasCollision(dataPackage.getTopMask(), level);
+				if (topMaskTouch.equals(Blocks.AIR) || topMaskTouch.equals(Blocks.VOID_AIR)) {
+					responseStruct.setHeightOfWaterLine(heightOfCelling + vehicleSize + 1);
+					break;
+				}
+			}
 		} else if (topMaskTouch.equals(Blocks.LAVA)) {
 			responseStruct.setCellingPosition(CellingPosition.UNDER_LAVA);
+			responseStruct.setFloatingPosition(FloatingPosition.VOID);
+			while (dataPackage.getBottomOfTopMask() < TOP_OF_MAP) {
+				heightOfCelling++;
+				nextTopMask(dataPackage);
+				topMaskTouch = topMaskHasCollision(dataPackage.getTopMask(), level);
+				if (topMaskTouch.equals(Blocks.AIR) || topMaskTouch.equals(Blocks.VOID_AIR)) {
+					responseStruct.setHeightOfWaterLine(heightOfCelling + vehicleSize + 1);
+					break;
+				}
+			}
 		} else if (topMaskTouch.equals(Blocks.AIR)) {
 			while (dataPackage.getBottomOfTopMask() < TOP_OF_MAP) {
 				heightOfCelling++;
@@ -46,6 +73,7 @@ public class TerrainScanUtil {
 			}
 			if (topMaskTouch.equals(Blocks.AIR)) {
 				responseStruct.setCellingPosition(CellingPosition.VOID);
+				responseStruct.setHeightOfCelling(TOP_OF_MAP);
 			}
 		} else {
 			responseStruct.setCellingPosition(CellingPosition.TOUCH_CELLING);
@@ -60,10 +88,12 @@ public class TerrainScanUtil {
 				if (bottomMaskTouch.equals(Blocks.WATER)) {
 					responseStruct.setBottomPosition(BottomPosition.FLY_OVER_WATER);
 					responseStruct.setHeightOfBottom(heightOfBottom);
+					responseStruct.setHeightOfWaterLine(-heightOfBottom);
 					break;
 				} else if (bottomMaskTouch.equals(Blocks.LAVA)) {
 					responseStruct.setBottomPosition(BottomPosition.FLY_OVER_LAVA);
 					responseStruct.setHeightOfBottom(heightOfBottom);
+					responseStruct.setHeightOfWaterLine(-heightOfBottom);
 					break;
 				} else if (!bottomMaskTouch.equals(Blocks.AIR)) {
 					responseStruct.setBottomPosition(BottomPosition.FLY_OVER_FIELD);
@@ -75,14 +105,23 @@ public class TerrainScanUtil {
 				responseStruct.setBottomPosition(BottomPosition.VOID);
 			}
 		} else if (bottomMaskTouch.equals(Blocks.WATER) || bottomMaskTouch.equals(Blocks.LAVA)) {
-			responseStruct.setBottomPosition(BottomPosition.FLY_OVER_FIELD);
-			responseStruct.setHeightOfBottom(dataPackage.getTopOfBottomMask()); //TODO wrong
+			while (dataPackage.getTopOfBottomMask() > BOTTOM_OF_MAP) {
+				heightOfBottom++;
+				nextBottomMask(dataPackage);
+				bottomMaskTouch = bottomMaskHasCollisionWaterMode(dataPackage.getBottomMask(), level);
+				if (!bottomMaskTouch.equals(Blocks.WATER) && !bottomMaskTouch.equals(Blocks.LAVA)) {
+					responseStruct.setBottomPosition(BottomPosition.FLY_OVER_FIELD);
+					responseStruct.setHeightOfBottom(heightOfBottom);
+					break;
+				}
+			}
+			if (bottomMaskTouch.equals(Blocks.AIR) || bottomMaskTouch.equals(Blocks.VOID_AIR) ||
+					bottomMaskTouch.equals(Blocks.WATER) || bottomMaskTouch.equals(Blocks.LAVA)) {
+				responseStruct.setBottomPosition(BottomPosition.VOID);
+			}
 		} else {
 			responseStruct.setBottomPosition(BottomPosition.LANDED);
 		}
-
-		//calculate floating
-		responseStruct.setFloatingPosition(FloatingPosition.VOID);
 
 		return responseStruct;
 	}
@@ -180,5 +219,111 @@ public class TerrainScanUtil {
 			}
 		}
 		return Blocks.AIR;
+	}
+
+	private static Block bottomMaskHasCollisionWaterMode(Set<BlockPos> bottomMask, ServerLevel level) {
+		for (BlockPos blockPos : bottomMask) {
+			Block block = level.getBlockState(blockPos).getBlock();
+			if (!block.equals(Blocks.WATER) && !block.equals(Blocks.LAVA)) {
+				return block;
+			}
+		}
+		return Blocks.WATER;
+	}
+
+	private static CageStruct getBottomOfBottom(Set<BlockPos> bottomMask) {
+		boolean first = true;
+		final CageStruct cageStruct = new CageStruct();
+		for (BlockPos mask : bottomMask) {
+			if (first) {
+				first = false;
+				cageStruct.setY(mask.getY());
+				cageStruct.setXMax(mask.getX());
+				cageStruct.setXMin(mask.getX());
+				cageStruct.setZMax(mask.getZ());
+				cageStruct.setZMin(mask.getZ());
+			} else {
+				if (cageStruct.getY() < mask.getY()) {
+					cageStruct.setY(mask.getY());
+				}
+				if (cageStruct.getXMin() > mask.getX()) {
+					cageStruct.setXMin(mask.getX());
+				}
+				if (cageStruct.getXMax() < mask.getX()) {
+					cageStruct.setXMax(mask.getX());
+				}
+				if (cageStruct.getZMin() > mask.getZ()) {
+					cageStruct.setZMin(mask.getZ());
+				}
+				if (cageStruct.getZMax() < mask.getZ()) {
+					cageStruct.setZMax(mask.getZ());
+				}
+			}
+		}
+		return cageStruct;
+	}
+
+	private static FloatingPosition getFloatingPosition(ServerLevel level, CageStruct bottomOfBottom) {
+		if (level.getBlockState(new BlockPos(bottomOfBottom.getXMin() - 1,
+				bottomOfBottom.getY(), bottomOfBottom.getZMin() - 1)).getBlock().equals(Blocks.WATER)) {
+			return FloatingPosition.SWIM_WATER;
+		}
+		if (level.getBlockState(new BlockPos(bottomOfBottom.getXMin() - 1,
+				bottomOfBottom.getY(), bottomOfBottom.getZMax() + 1)).getBlock().equals(Blocks.WATER)) {
+			return FloatingPosition.SWIM_WATER;
+		}
+		if (level.getBlockState(new BlockPos(bottomOfBottom.getXMax() + 1,
+				bottomOfBottom.getY(), bottomOfBottom.getZMin() - 1)).getBlock().equals(Blocks.WATER)) {
+			return FloatingPosition.SWIM_WATER;
+		}
+		if (level.getBlockState(new BlockPos(bottomOfBottom.getXMax() + 1,
+				bottomOfBottom.getY(), bottomOfBottom.getZMax() + 1)).getBlock().equals(Blocks.WATER)) {
+			return FloatingPosition.SWIM_WATER;
+		}
+
+		if (level.getBlockState(new BlockPos(bottomOfBottom.getXMin() - 1,
+				bottomOfBottom.getY(), bottomOfBottom.getZMin() - 1)).getBlock().equals(Blocks.LAVA)) {
+			return FloatingPosition.SWIM_LAVA;
+		}
+		if (level.getBlockState(new BlockPos(bottomOfBottom.getXMin() - 1,
+				bottomOfBottom.getY(), bottomOfBottom.getZMax() + 1)).getBlock().equals(Blocks.LAVA)) {
+			return FloatingPosition.SWIM_LAVA;
+		}
+		if (level.getBlockState(new BlockPos(bottomOfBottom.getXMax() + 1,
+				bottomOfBottom.getY(), bottomOfBottom.getZMin() - 1)).getBlock().equals(Blocks.LAVA)) {
+			return FloatingPosition.SWIM_LAVA;
+		}
+		if (level.getBlockState(new BlockPos(bottomOfBottom.getXMax() + 1,
+				bottomOfBottom.getY(), bottomOfBottom.getZMax() + 1)).getBlock().equals(Blocks.LAVA)) {
+			return FloatingPosition.SWIM_LAVA;
+		}
+
+		return FloatingPosition.VOID;
+	}
+
+	private static int getVehicleSize(LiveDataPackage dataPackage) {
+		int maxY = 0;
+		int minY = 0;
+		boolean first = true;
+
+		for (BlockPos mask : dataPackage.getTopMask()) {
+			if (first) {
+				first = false;
+				maxY = mask.getY();
+				minY = mask.getY();
+			} else {
+				if (maxY < mask.getY()) {
+					maxY = mask.getY();
+				}
+			}
+		}
+
+		for (BlockPos mask : dataPackage.getBottomMask()) {
+			if (minY > mask.getY()) {
+				minY = mask.getY();
+			}
+		}
+
+		return maxY - minY;
 	}
 }
