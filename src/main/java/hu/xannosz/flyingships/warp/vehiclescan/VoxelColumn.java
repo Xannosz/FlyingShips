@@ -20,13 +20,20 @@ public class VoxelColumn {
 	private int enderOscillator = 0;
 	private int tank = 0;
 	private int artificialFloater = 0;
+	private int blockNumUnderWater = 0;
 
 	private int density = 0;
 	private boolean blocked = false;
 
-	public VoxelColumn(BlockPos blockPos, Block block, ColumnType columnType) {
+	private final int absoluteFluidLine;
+	private final boolean isCommonFluid;
+
+	public VoxelColumn(BlockPos blockPos, Block block, ColumnType columnType, int absoluteFluidLine, boolean isCommonFluid) {
 		this.columnType = columnType;
-		calculateInterestBlock(block);
+		this.absoluteFluidLine = absoluteFluidLine;
+		this.isCommonFluid = isCommonFluid;
+
+		calculateInterestBlock(block, blockPos.getY());
 		switch (columnType) {
 			case X -> {
 				min = blockPos.getX();
@@ -52,7 +59,7 @@ public class VoxelColumn {
 	public boolean add(BlockPos blockPos, Block block) {
 		boolean canAccept = canAcceptInColumn(blockPos);
 		if (canAccept) {
-			calculateInterestBlock(block);
+			calculateInterestBlock(block, blockPos.getY());
 		}
 		return canAccept;
 	}
@@ -102,11 +109,19 @@ public class VoxelColumn {
 		return false;
 	}
 
-	private void calculateInterestBlock(Block block) {
-		density += Util.getDensity(block);
-		if (isAWool(block)) {
-			wool++;
-		} else if (!Util.isHollow(block)) {
+	private void calculateInterestBlock(Block block, int y) {
+		if (y < absoluteFluidLine) {
+			if (!(isCommonFluid && Util.isCommonFluid(block) || !isCommonFluid && Util.isLava(block))) {
+				density += Util.getDensity(block);
+				blockNumUnderWater++;
+			}
+		} else {
+			density += Util.getDensity(block);
+			if (isAWool(block)) {
+				wool++;
+			}
+		}
+		if (!Util.isHollow(block)) {
 			blocked = true;
 		}
 		if (block.equals(ModBlocks.HEATER.get())) {

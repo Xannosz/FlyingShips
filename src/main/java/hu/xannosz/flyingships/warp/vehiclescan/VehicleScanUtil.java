@@ -3,6 +3,10 @@ package hu.xannosz.flyingships.warp.vehiclescan;
 import hu.xannosz.flyingships.block.ModBlocks;
 import hu.xannosz.flyingships.warp.AbsoluteRectangleData;
 import hu.xannosz.flyingships.warp.jump.JumpUtil;
+import hu.xannosz.flyingships.warp.terrainscan.BottomPosition;
+import hu.xannosz.flyingships.warp.terrainscan.CellingPosition;
+import hu.xannosz.flyingships.warp.terrainscan.FloatingPosition;
+import hu.xannosz.flyingships.warp.terrainscan.TerrainScanResponseStruct;
 import lombok.experimental.UtilityClass;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -18,12 +22,14 @@ import static hu.xannosz.flyingships.Util.isFluidTagged;
 
 @UtilityClass
 public class VehicleScanUtil {
-	public static VehicleScanResponseStruct scanVehicle(ServerLevel level, List<AbsoluteRectangleData> rectangleDataList, Direction blockDirection) {
+	public static VehicleScanResponseStruct scanVehicle(ServerLevel level, List<AbsoluteRectangleData> rectangleDataList,
+														Direction blockDirection, TerrainScanResponseStruct terrainScanResponseStruct) {
 		VehicleScanResponseStruct responseStruct = new VehicleScanResponseStruct();
+		final boolean isCommonFluid = isCommonFluid(terrainScanResponseStruct);
 
 		// get block position set
 		Set<BlockPos> blocks = getBlockPosSet(rectangleDataList);
-		VoxelMatrix matrix = new VoxelMatrix(level, blocks);
+		VoxelMatrix matrix = new VoxelMatrix(level, blocks, terrainScanResponseStruct.getAbsoluteWaterLine(), isCommonFluid);
 
 		// get entities
 		Set<Entity> entities = JumpUtil.getEntities(rectangleDataList, new Vec3(0, 0, 0), level).keySet();
@@ -43,7 +49,7 @@ public class VehicleScanUtil {
 		responseStruct.setBottomY(calculateBottomY(matrix.getYColumns()));
 
 		// count blocks
-		countBlocks(responseStruct, matrix.getYColumns());
+		countBlocks(responseStruct, matrix.getYColumns(), matrix.getBlockNumUnderWater());
 
 		// calculate mob density
 		calculateMobDensity(responseStruct, entities, players);
@@ -179,13 +185,15 @@ public class VehicleScanUtil {
 		return bottom;
 	}
 
-	private static void countBlocks(VehicleScanResponseStruct responseStruct, Set<VoxelColumn> columns) {
+	private static void countBlocks(VehicleScanResponseStruct responseStruct, Set<VoxelColumn> columns, int blockUnderWater) {
 		int wool = 0;
 		int heater = 0;
 		int enderOscillator = 0;
 		int tank = 0;
 		int density = 0;
 		int artificialFloater = 0;
+		int blockNumUnderWater = blockUnderWater;
+
 		for (VoxelColumn voxelColumn : columns) {
 			wool += voxelColumn.getWool();
 			heater += voxelColumn.getHeater();
@@ -193,13 +201,16 @@ public class VehicleScanUtil {
 			density += voxelColumn.getDensity();
 			enderOscillator += voxelColumn.getEnderOscillator();
 			artificialFloater += voxelColumn.getArtificialFloater();
+			blockNumUnderWater += voxelColumn.getBlockNumUnderWater();
 		}
+
 		responseStruct.setWool(wool);
 		responseStruct.setHeater(heater);
 		responseStruct.setEnderOscillator(enderOscillator);
 		responseStruct.setTank(tank);
 		responseStruct.setDensity(density);
 		responseStruct.setArtificialFloater(artificialFloater);
+		responseStruct.setBlockNumUnderFluid(blockNumUnderWater);
 	}
 
 	private static void calculateMobDensity(VehicleScanResponseStruct responseStruct, Set<Entity> entities, Set<ServerPlayer> players) {
@@ -211,5 +222,11 @@ public class VehicleScanUtil {
 			density += serverPlayer.getType().getDimensions().height * serverPlayer.getType().getDimensions().width * 10;
 		}
 		responseStruct.setDensity(density);
+	}
+
+	public static boolean isCommonFluid(TerrainScanResponseStruct terrainScanResponseStruct) {
+		return terrainScanResponseStruct.getCellingPosition().equals(CellingPosition.UNDER_WATER) ||
+				terrainScanResponseStruct.getFloatingPosition().equals(FloatingPosition.SWIM_WATER) ||
+				terrainScanResponseStruct.getBottomPosition().equals(BottomPosition.FLY_OVER_WATER);
 	}
 }

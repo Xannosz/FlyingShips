@@ -3,6 +3,7 @@ package hu.xannosz.flyingships;
 import lombok.experimental.UtilityClass;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
@@ -40,7 +41,15 @@ public class Util {
 	}
 
 	public static boolean isFluid(Block block) {
-		return block.equals(Blocks.WATER) || block.equals(Blocks.LAVA);
+		return block instanceof LiquidBlock;
+	}
+
+	public static boolean isCommonFluid(Block block) {
+		return isFluid(block) && !isLava(block);
+	}
+
+	public static boolean isLava(Block block) {
+		return block.equals(Blocks.LAVA);
 	}
 
 	public static boolean isFluidTagged(BlockState block) {

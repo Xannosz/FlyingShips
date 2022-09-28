@@ -1,5 +1,6 @@
 package hu.xannosz.flyingships.warp.terrainscan;
 
+import hu.xannosz.flyingships.Util;
 import hu.xannosz.flyingships.warp.AbsoluteRectangleData;
 import lombok.experimental.UtilityClass;
 import net.minecraft.core.BlockPos;
@@ -7,9 +8,11 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @UtilityClass
 public class TerrainScanUtil {
@@ -31,9 +34,8 @@ public class TerrainScanUtil {
 		int heightOfBottom = 0;
 
 		//calculate floating
-		final CageStruct bottomOfBottom = getBottomOfBottom(dataPackage.getBottomMask());
-		bottomOfBottom.setY(bottomOfBottom.getY() + waterLine);
-		responseStruct.setFloatingPosition(getFloatingPosition(level, bottomOfBottom));
+		final CageStruct cage = getCage(dataPackage.getBottomMask());
+		responseStruct.setFloatingPosition(getFloatingPosition(level, cage, waterLine));
 
 		//calculate celling warp / set indicator
 		if (topMaskTouch.equals(Blocks.WATER)) {
@@ -122,6 +124,8 @@ public class TerrainScanUtil {
 		} else {
 			responseStruct.setBottomPosition(BottomPosition.LANDED);
 		}
+
+		responseStruct.setAbsoluteWaterLine(getAbsoluteFluidLine(level, responseStruct, cage));
 
 		return responseStruct;
 	}
@@ -231,20 +235,24 @@ public class TerrainScanUtil {
 		return Blocks.WATER;
 	}
 
-	private static CageStruct getBottomOfBottom(Set<BlockPos> bottomMask) {
+	private static CageStruct getCage(Set<BlockPos> bottomMask) {
 		boolean first = true;
 		final CageStruct cageStruct = new CageStruct();
 		for (BlockPos mask : bottomMask) {
 			if (first) {
 				first = false;
-				cageStruct.setY(mask.getY());
+				cageStruct.setYMax(mask.getY());
+				cageStruct.setYMin(mask.getY());
 				cageStruct.setXMax(mask.getX());
 				cageStruct.setXMin(mask.getX());
 				cageStruct.setZMax(mask.getZ());
 				cageStruct.setZMin(mask.getZ());
 			} else {
-				if (cageStruct.getY() < mask.getY()) {
-					cageStruct.setY(mask.getY());
+				if (cageStruct.getYMin() > mask.getY()) {
+					cageStruct.setYMin(mask.getY());
+				}
+				if (cageStruct.getYMax() < mask.getY()) {
+					cageStruct.setYMax(mask.getY());
 				}
 				if (cageStruct.getXMin() > mask.getX()) {
 					cageStruct.setXMin(mask.getX());
@@ -263,38 +271,38 @@ public class TerrainScanUtil {
 		return cageStruct;
 	}
 
-	private static FloatingPosition getFloatingPosition(ServerLevel level, CageStruct bottomOfBottom) {
-		if (level.getBlockState(new BlockPos(bottomOfBottom.getXMin() - 1,
-				bottomOfBottom.getY(), bottomOfBottom.getZMin() - 1)).getBlock().equals(Blocks.WATER)) {
+	private static FloatingPosition getFloatingPosition(ServerLevel level, CageStruct cage, int waterLine) {
+		if (level.getBlockState(new BlockPos(cage.getXMin() - 1,
+				cage.getYMin() - waterLine, cage.getZMin() - 1)).getBlock().equals(Blocks.WATER)) {
 			return FloatingPosition.SWIM_WATER;
 		}
-		if (level.getBlockState(new BlockPos(bottomOfBottom.getXMin() - 1,
-				bottomOfBottom.getY(), bottomOfBottom.getZMax() + 1)).getBlock().equals(Blocks.WATER)) {
+		if (level.getBlockState(new BlockPos(cage.getXMin() - 1,
+				cage.getYMin() - waterLine, cage.getZMax() + 1)).getBlock().equals(Blocks.WATER)) {
 			return FloatingPosition.SWIM_WATER;
 		}
-		if (level.getBlockState(new BlockPos(bottomOfBottom.getXMax() + 1,
-				bottomOfBottom.getY(), bottomOfBottom.getZMin() - 1)).getBlock().equals(Blocks.WATER)) {
+		if (level.getBlockState(new BlockPos(cage.getXMax() + 1,
+				cage.getYMin() - waterLine, cage.getZMin() - 1)).getBlock().equals(Blocks.WATER)) {
 			return FloatingPosition.SWIM_WATER;
 		}
-		if (level.getBlockState(new BlockPos(bottomOfBottom.getXMax() + 1,
-				bottomOfBottom.getY(), bottomOfBottom.getZMax() + 1)).getBlock().equals(Blocks.WATER)) {
+		if (level.getBlockState(new BlockPos(cage.getXMax() + 1,
+				cage.getYMin() - waterLine, cage.getZMax() + 1)).getBlock().equals(Blocks.WATER)) {
 			return FloatingPosition.SWIM_WATER;
 		}
 
-		if (level.getBlockState(new BlockPos(bottomOfBottom.getXMin() - 1,
-				bottomOfBottom.getY(), bottomOfBottom.getZMin() - 1)).getBlock().equals(Blocks.LAVA)) {
+		if (level.getBlockState(new BlockPos(cage.getXMin() - 1,
+				cage.getYMin() - waterLine, cage.getZMin() - 1)).getBlock().equals(Blocks.LAVA)) {
 			return FloatingPosition.SWIM_LAVA;
 		}
-		if (level.getBlockState(new BlockPos(bottomOfBottom.getXMin() - 1,
-				bottomOfBottom.getY(), bottomOfBottom.getZMax() + 1)).getBlock().equals(Blocks.LAVA)) {
+		if (level.getBlockState(new BlockPos(cage.getXMin() - 1,
+				cage.getYMin() - waterLine, cage.getZMax() + 1)).getBlock().equals(Blocks.LAVA)) {
 			return FloatingPosition.SWIM_LAVA;
 		}
-		if (level.getBlockState(new BlockPos(bottomOfBottom.getXMax() + 1,
-				bottomOfBottom.getY(), bottomOfBottom.getZMin() - 1)).getBlock().equals(Blocks.LAVA)) {
+		if (level.getBlockState(new BlockPos(cage.getXMax() + 1,
+				cage.getYMin() - waterLine, cage.getZMin() - 1)).getBlock().equals(Blocks.LAVA)) {
 			return FloatingPosition.SWIM_LAVA;
 		}
-		if (level.getBlockState(new BlockPos(bottomOfBottom.getXMax() + 1,
-				bottomOfBottom.getY(), bottomOfBottom.getZMax() + 1)).getBlock().equals(Blocks.LAVA)) {
+		if (level.getBlockState(new BlockPos(cage.getXMax() + 1,
+				cage.getYMin() - waterLine, cage.getZMax() + 1)).getBlock().equals(Blocks.LAVA)) {
 			return FloatingPosition.SWIM_LAVA;
 		}
 
@@ -325,5 +333,41 @@ public class TerrainScanUtil {
 		}
 
 		return maxY - minY;
+	}
+
+	private static int getAbsoluteFluidLine(ServerLevel level, TerrainScanResponseStruct terrainScanResponseStruct, CageStruct cage) {
+		int waterline = cage.getYMin() + 1;
+		Set<BlockPos> externalCage = new HashSet<>(Arrays.asList(
+				new BlockPos(cage.getXMin() - 1, waterline, cage.getZMin() - 1),
+				new BlockPos(cage.getXMin() - 1, waterline, cage.getZMax() + 1),
+				new BlockPos(cage.getXMax() + 1, waterline, cage.getZMin() - 1),
+				new BlockPos(cage.getXMax() + 1, waterline, cage.getZMax() + 1))
+		);
+
+		if (terrainScanResponseStruct.getCellingPosition().equals(CellingPosition.UNDER_LAVA) ||
+				terrainScanResponseStruct.getCellingPosition().equals(CellingPosition.UNDER_WATER) ||
+				terrainScanResponseStruct.getFloatingPosition().equals(FloatingPosition.SWIM_LAVA) ||
+				terrainScanResponseStruct.getFloatingPosition().equals(FloatingPosition.SWIM_WATER)) {
+			while (cageNotColluded(level, externalCage)) {
+				externalCage = moveCage(externalCage);
+				waterline++;
+			}
+			return waterline;
+		}
+
+		return TerrainScanUtil.BOTTOM_OF_MAP;
+	}
+
+	private static boolean cageNotColluded(ServerLevel level, Set<BlockPos> externalCage) {
+		for (BlockPos blockPos : externalCage) {
+			if (Util.isFluid(level.getBlockState(blockPos).getBlock())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static Set<BlockPos> moveCage(Set<BlockPos> externalCage) {
+		return externalCage.stream().map(BlockPos::above).collect(Collectors.toSet());
 	}
 }

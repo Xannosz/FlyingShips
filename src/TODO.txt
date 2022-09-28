@@ -2,15 +2,7 @@
 - item frames sometimes broken during jump
 
 // bugs/optimization
-
-// pre-release
-- correct water/lava handling
-- density in fluid
-
-(nem szamolni a fluidot a vizvonal alatt,
-vizvonal alatti meretet is vissza jelezni (nem adott fluid blokkok szama)
-celkoordinata emelkedessel jarna (minden eset) akkor levego density kell)
-
+- fly over field when touch water
 
 // release
 - create check list
@@ -41,6 +33,7 @@ celkoordinata emelkedessel jarna (minden eset) akkor levego density kell)
 - burning heaters
 - item gate fluid
 - graphical ship borders in the world
+- delete monade annotation
 
 // turn update
 - turn (during jump, without jump, saved coordinates)

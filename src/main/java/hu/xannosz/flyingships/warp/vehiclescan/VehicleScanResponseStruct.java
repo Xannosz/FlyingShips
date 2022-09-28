@@ -18,4 +18,5 @@ public class VehicleScanResponseStruct {
 	private int bottomY;
 	private boolean hyperDriveEngineFound = false;
 	private Set<ServerPlayer> players;
+	private int blockNumUnderFluid;
 }

@@ -10,4 +10,5 @@ public class TerrainScanResponseStruct {
 	private int heightOfCelling = -1;
 	private int heightOfBottom = -1;
 	private int heightOfWaterLine = -1;
+	private int absoluteWaterLine = -1;
 }

@@ -15,11 +15,16 @@ public class VoxelMatrix {
 	private final Set<VoxelColumn> yColumns = new HashSet<>();
 	private final Set<VoxelColumn> zColumns = new HashSet<>();
 
-	public VoxelMatrix(ServerLevel level, Set<BlockPos> blockPosSet) {
+	private int blockNumUnderWater = 0;
+
+	public VoxelMatrix(ServerLevel level, Set<BlockPos> blockPosSet, int absoluteFluidLine, boolean isCommonFluid) {
 		for (BlockPos blockPos : blockPosSet) {
 			Block block = level.getBlockState(blockPos).getBlock();
 
 			if (block.equals(Blocks.AIR)) {
+				if (blockPos.getY() < absoluteFluidLine) {
+					blockNumUnderWater++;
+				}
 				continue;
 			}
 
@@ -31,7 +36,7 @@ public class VoxelMatrix {
 				}
 			}
 			if (!xAccept) {
-				xColumns.add(new VoxelColumn(blockPos, block, ColumnType.X));
+				xColumns.add(new VoxelColumn(blockPos, block, ColumnType.X, absoluteFluidLine, isCommonFluid));
 			}
 
 			boolean yAccept = false;
@@ -42,7 +47,7 @@ public class VoxelMatrix {
 				}
 			}
 			if (!yAccept) {
-				yColumns.add(new VoxelColumn(blockPos, block, ColumnType.Y));
+				yColumns.add(new VoxelColumn(blockPos, block, ColumnType.Y, absoluteFluidLine, isCommonFluid));
 			}
 
 			boolean zAccept = false;
@@ -53,7 +58,7 @@ public class VoxelMatrix {
 				}
 			}
 			if (!zAccept) {
-				zColumns.add(new VoxelColumn(blockPos, block, ColumnType.Z));
+				zColumns.add(new VoxelColumn(blockPos, block, ColumnType.Z, absoluteFluidLine, isCommonFluid));
 			}
 		}
 	}

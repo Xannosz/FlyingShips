@@ -310,7 +310,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 		}
 
 		if (clock % 5 == 0) {
-			vehicleScanResult = VehicleScanUtil.scanVehicle((ServerLevel) level, JumpUtil.createRectangles(getBlockPos(), blockPositions), getBlockState().getValue(Rudder.FACING));
+			calculateJumpData();
 			normalizeEnergies();
 
 			consumeHeatToHoldSteam();
@@ -328,7 +328,6 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 		if (clock % 25 == 0) {
 			if (powerButtonState.equals(PowerState.ON)) {
 				consumeEnderPearl();
-				calculateJumpData();
 			}
 		}
 
@@ -449,7 +448,8 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	private void calculateJumpData() {
 		LiveDataPackage terrainScanMasks = TerrainScanUtil.generateMasks(JumpUtil.createRectangles(getBlockPos(), blockPositions));
 		terrainScanResult = TerrainScanUtil.scanTerrain((ServerLevel) level, terrainScanMasks, waterLine);
-		vehicleScanResult = VehicleScanUtil.scanVehicle((ServerLevel) level, JumpUtil.createRectangles(getBlockPos(), blockPositions), getBlockState().getValue(Rudder.FACING));
+		vehicleScanResult = VehicleScanUtil.scanVehicle((ServerLevel) level, JumpUtil.createRectangles(getBlockPos(), blockPositions),
+				getBlockState().getValue(Rudder.FACING), terrainScanResult);
 	}
 
 	public void executeButtonClick(ButtonId buttonId) {
@@ -746,6 +746,43 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 		return new Vec3(0, 0, 0);
 	}
 
+	private int getYAdditional() {
+		if (selectedWarpDirection == null) {
+			return 0;
+		}
+		switch (selectedWarpDirection) {
+			case UP -> {
+				return necessarySpeed;
+			}
+			case DOWN -> {
+				return -necessarySpeed;
+			}
+			case NORTH, SOUTH, EAST, WEST -> {
+				return 0;
+			}
+			case LAND -> {
+				switch (landButtonSettings) {
+					case CLOUD_LEVEL -> {
+						return CLOUD_LEVEL + waterLine - vehicleScanResult.getBottomY();
+					}
+					case LAND -> {
+						return -terrainScanResult.getHeightOfBottom();
+					}
+					case TOUCH_CELLING -> {
+						return terrainScanResult.getHeightOfCelling();
+					}
+					case SWIM_LAVA, SWIM_WATER -> {
+						return terrainScanResult.getHeightOfWaterLine() + waterLine;
+					}
+				}
+			}
+			case COORDINATE -> {
+				return (int) getCoordinateVector().y;
+			}
+		}
+		return 0;
+	}
+
 	private Vec3 getCoordinateVector() {
 		SavedCoordinate coordinate = coordinates.get(selectedCoordinate);
 		if (coordinate.getMarker().isEmpty()) {
@@ -816,9 +853,13 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	}
 
 	private int usedStructuralEnergyForFloating() {
-		return vehicleScanResult.getLiftSurface() * FlyingShipsConfiguration.LIFT_MULTIPLIER.get() +
+		final int floatingInFluid = VehicleScanUtil.isCommonFluid(terrainScanResult) ?
+				vehicleScanResult.getBlockNumUnderFluid() * FlyingShipsConfiguration.LIFT_OF_IN_WATER.get() :
+				vehicleScanResult.getBlockNumUnderFluid() * FlyingShipsConfiguration.LIFT_OF_IN_LAVA.get();
+		final int floaterPower = vehicleScanResult.getLiftSurface() * FlyingShipsConfiguration.LIFT_MULTIPLIER.get() +
 				vehicleScanResult.getWool() * FlyingShipsConfiguration.BALLOON_MULTIPLIER.get() +
 				vehicleScanResult.getArtificialFloater() * FlyingShipsConfiguration.ARTIFICIAL_FLOATER_LIFT_MULTIPLIER.get();
+		return floaterPower + ((getYAdditional() + waterLine + vehicleScanResult.getBottomY()) > terrainScanResult.getAbsoluteWaterLine() ? 0 : floatingInFluid);
 	}
 
 	private int usedHeatEnergyForFloating() {
