@@ -30,19 +30,19 @@ public class FlyingShipsConfiguration {
 	static {
 		BUILDER.push("Configs for Flying Ships Mod");
 
-		WIND_MULTIPLIER = BUILDER.comment("How strong the wind per wool block")
+		WIND_MULTIPLIER = BUILDER.comment("Wind power per wool block")
 				.define("windMultiplier", 20);
-		LIFT_MULTIPLIER = BUILDER.comment("How many lifting power in the wings")
+		LIFT_MULTIPLIER = BUILDER.comment("Buoyancy per block")
 				.define("liftMultiplier", 15);
-		BALLOON_MULTIPLIER = BUILDER.comment("How many lifting power in a gas balloon (wool block)")
+		BALLOON_MULTIPLIER = BUILDER.comment("How many buoyancy in a gas balloon (wool block)")
 				.define("balloonMultiplier", 60);
-		ARTIFICIAL_FLOATER_LIFT_MULTIPLIER = BUILDER.comment("How many lifting power in a artificial floater")
+		ARTIFICIAL_FLOATER_LIFT_MULTIPLIER = BUILDER.comment("How many buoyancy in a artificial floater")
 				.define("artificialFloaterLiftMultiplier", 720);
 		ARTIFICIAL_FLOATER_MOVEMENT_MULTIPLIER = BUILDER.comment("How many movement power in a artificial floater")
 				.define("artificialFloaterMovementMultiplier", 210);
-		LIFT_OF_IN_WATER = BUILDER.comment("How many lifting power in water")
+		LIFT_OF_IN_WATER = BUILDER.comment("Buoyancy in water")
 				.define("liftOfInWater", 200);
-		LIFT_OF_IN_LAVA = BUILDER.comment("How many lifting power in lava")
+		LIFT_OF_IN_LAVA = BUILDER.comment("Buoyancy in lava")
 				.define("liftOfInLava", 500);
 		SPEED_CONSOLIDATOR = BUILDER.comment("Divider for the energy calculating system")
 				.defineInRange("speedConsolidator", 5000d, 1000d, 10000d);
@@ -51,14 +51,14 @@ public class FlyingShipsConfiguration {
 		ENABLE_SLIDING = BUILDER.comment("Enable short movement without energy consuming")
 				.define("enableSliding", true);
 		COOL_DOWN_TIME = BUILDER.comment("Cool down time in tick")
-				.define("coolDownTime", 200); //500
-		ENERGY_PER_OSCILLATOR = BUILDER.comment("Energy per oscillator")
+				.define("coolDownTime", 500);
+		ENERGY_PER_OSCILLATOR = BUILDER.comment("Energy capacity per ender oscillator")
 				.define("energyPerOscillator", 12000);
-		ENERGY_PER_HEATER = BUILDER.comment("Energy per heater")
+		ENERGY_PER_HEATER = BUILDER.comment("Energy capacity per heater")
 				.define("energyPerHeater", 1000);
-		STEAM_PER_TANK = BUILDER.comment("Steam per tank")
+		STEAM_PER_TANK = BUILDER.comment("Steam capacity per tank")
 				.define("steamPerTank", 3000);
-		WATER_PER_TANK = BUILDER.comment("Water per tank")
+		WATER_PER_TANK = BUILDER.comment("Water capacity per tank")
 				.define("waterPerTank", 1000);
 		ENERGY_PER_ENDER_PEARL = BUILDER.comment("Energy per ender pearl")
 				.define("energyPerEnderPearl", 2500);

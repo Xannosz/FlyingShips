@@ -81,7 +81,7 @@ public class Rudder extends BaseEntityBlock {
 		if (!level.isClientSide()) {
 			BlockEntity entity = level.getBlockEntity(pos);
 			if (entity instanceof RudderBlockEntity) {
-				NetworkHooks.openScreen(((ServerPlayer) player), (RudderBlockEntity) entity, pos);
+				NetworkHooks.openScreen((ServerPlayer) player, (RudderBlockEntity) entity, pos);
 			} else {
 				throw new IllegalStateException("Our Container provider is missing!");
 			}

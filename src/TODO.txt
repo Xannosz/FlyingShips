@@ -1,19 +1,8 @@
 // known bugs
 - item frames sometimes broken during jump
-
-// bugs/optimization
 - fly over field when touch water
 
-// release
-- create check list
-- tests
-- better logo (rudder block)
-- wiki
-- license
-- correct description in configuration file
-- description in toml file
-- hu
-- readme
+// bugs/optimization
 
 // others
 - more fluid
@@ -24,7 +13,6 @@
 - question before delete rectangle/coordinate
 - show absolute coordinates in settings in a tooltip
 - multi rudder styles
-- correct voxel shapes
 - enable/disable marker
 - selectable inner round
 - crystal of levitation no fall damage, when in hand
@@ -33,7 +21,6 @@
 - burning heaters
 - item gate fluid
 - graphical ship borders in the world
-- delete monade annotation
 
 // turn update
 - turn (during jump, without jump, saved coordinates)

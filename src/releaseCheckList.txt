@@ -1,0 +1,24 @@
+- all language file has valid content
+- functional test
+  - hyper drive
+    - test y collusion
+    - test long jump
+  - normal jump
+    - fly
+    - dive
+    - swim
+  - coordinate jump
+    - relative
+    - absolute
+  - more rectangles in one ship
+  - landing
+  - sub rudder
+  - item gate
+  - engine system
+    - structural
+    - heat
+    - steam
+    - ender
+- wiki has valid content
+- configuration file has correct description
+- version in mods.toml and build.gradle

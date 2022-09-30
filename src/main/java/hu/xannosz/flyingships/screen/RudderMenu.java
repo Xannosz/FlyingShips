@@ -1,6 +1,5 @@
 package hu.xannosz.flyingships.screen;
 
-import hu.xannosz.flyingships.Monad;
 import hu.xannosz.flyingships.Util;
 import hu.xannosz.flyingships.block.ModBlocks;
 import hu.xannosz.flyingships.blockentity.RudderBlockEntity;
@@ -47,6 +46,8 @@ public class RudderMenu extends AbstractContainerMenu {
 	@Getter
 	private final ModInputSlot heatInputSlot;
 
+	private final BlockPos firstPosition;
+
 	public RudderMenu(int containerId, Inventory inv, FriendlyByteBuf extraData) {
 		this(containerId, inv, inv.player.level.getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(DATA_SLOT_SIZE));
 	}
@@ -57,6 +58,7 @@ public class RudderMenu extends AbstractContainerMenu {
 		checkContainerSize(inv, 3);
 		this.blockEntity = ((RudderBlockEntity) blockEntity);
 		level = inv.player.level;
+		firstPosition = inv.player.getOnPos();
 
 		this.data = data;
 
@@ -93,7 +95,6 @@ public class RudderMenu extends AbstractContainerMenu {
 	// THIS YOU HAVE TO DEFINE!
 	private static final int TE_INVENTORY_SLOT_COUNT = 3;  // must be the number of slots you have!
 
-	@Monad
 	@Override
 	public @NotNull ItemStack quickMoveStack(@NotNull Player playerIn, int index) {
 		Slot sourceSlot = slots.get(index);
@@ -128,8 +129,11 @@ public class RudderMenu extends AbstractContainerMenu {
 
 	@Override
 	public boolean stillValid(@NotNull Player player) {
-		return stillValid(ContainerLevelAccess.create(level, blockEntity.getBlockPos()),
-				player, ModBlocks.RUDDER.get());
+		return ContainerLevelAccess.create(level, firstPosition).evaluate((lev, pos) ->
+				lev.getBlockState(blockEntity.getBlockPos()).is(ModBlocks.RUDDER.get())
+						&& player.distanceToSqr((double) pos.getX() + 0.5D,
+						(double) pos.getY() + 0.5D,
+						(double) pos.getZ() + 0.5D) <= 64.0D, true);
 	}
 
 	private void addPlayerInventory(Inventory playerInventory) {

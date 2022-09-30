@@ -1,6 +1,5 @@
 package hu.xannosz.flyingships.screen;
 
-import hu.xannosz.flyingships.Monad;
 import hu.xannosz.flyingships.block.ModBlocks;
 import hu.xannosz.flyingships.blockentity.MarkerBlockEntity;
 import hu.xannosz.flyingships.networking.GetMarkerNamePacket;
@@ -57,7 +56,6 @@ public class MarkerMenu extends AbstractContainerMenu {
 	// THIS YOU HAVE TO DEFINE!
 	private static final int TE_INVENTORY_SLOT_COUNT = 0;  // must be the number of slots you have!
 
-	@Monad
 	@Override
 	public @NotNull ItemStack quickMoveStack(@NotNull Player playerIn, int index) {
 		Slot sourceSlot = slots.get(index);

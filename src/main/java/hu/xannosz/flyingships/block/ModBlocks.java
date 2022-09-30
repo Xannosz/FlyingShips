@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -42,7 +43,21 @@ public class ModBlocks {
 	);
 
 	public static final RegistryObject<Block> ENDER_OSCILLATOR = registerBlock("ender_oscillator",
-			() -> new EnderOscillator(BlockBehaviour.Properties.of(Material.GLASS).lightLevel(state -> 12).noOcclusion().strength(1.5F, 6.0F).sound(SoundType.GLASS))
+			() -> new ShapedBlock(BlockBehaviour.Properties.of(Material.GLASS).lightLevel(state -> 12).noOcclusion().strength(1.5F, 6.0F).sound(SoundType.GLASS),
+					Shapes.or(
+							Block.box(2, 0, 2, 14, 1, 14),
+							Block.box(6, 1, 6, 10, 3, 10),
+
+							Block.box(7, 1, 7, 9, 14, 9),
+							Block.box(5, 9, 5, 11, 15, 11),
+
+							Block.box(6, 8, 6, 10, 9, 10),
+							Block.box(6, 15, 6, 10, 16, 10),
+							Block.box(6, 10, 4, 10, 14, 5),
+							Block.box(6, 10, 11, 10, 14, 12),
+							Block.box(4, 10, 6, 5, 14, 10),
+							Block.box(11, 10, 6, 12, 14, 10)
+					))
 	);
 
 	public static final RegistryObject<Block> MARKER = registerBlock("marker",
@@ -54,7 +69,11 @@ public class ModBlocks {
 	);
 
 	public static final RegistryObject<Block> ARTIFICIAL_FLOATER = registerBlock("artificial_floater",
-			() -> new Block(BlockBehaviour.Properties.of(Material.GLASS).noOcclusion().strength(1.5F, 6.0F).sound(SoundType.GLASS))
+			() -> new ShapedBlock(BlockBehaviour.Properties.of(Material.GLASS).noOcclusion().strength(1.5F, 6.0F).sound(SoundType.GLASS),
+					Shapes.or(
+							Block.box(2, 0, 2, 14, 1, 14),
+							Block.box(3, 1, 3, 13, 16, 13)
+					))
 	);
 
 	private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> blockCreator) {

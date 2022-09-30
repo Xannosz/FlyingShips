@@ -506,7 +506,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 					//consume energy
 					consumeEnergy();
 					setChanged();
-					JumpUtil.jump((ServerLevel) level, getBlockPos(), blockPositions, getAdditional());
+					JumpUtil.jump((ServerLevel) level, getBlockPos(), blockPositions, getAdditional(isHyperJump));
 					//restore energy if jump not success
 					enderEnergy = storedEnderEnergy;
 					heatEnergy = storedHeatEnergy;
@@ -699,10 +699,10 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 		return false;
 	}
 
-	private Vec3 getAdditional() {
+	private Vec3 getAdditional(boolean isHyperJump) {
 		Vec3 perturbation = new Vec3(
-				isHyperDriveEnabled() ? new Random().nextInt(-300, 300) : 0, 0,
-				isHyperDriveEnabled() ? new Random().nextInt(-300, 300) : 0);
+				isHyperJump ? new Random().nextInt(-300, 300) : 0, 0,
+				isHyperJump ? new Random().nextInt(-300, 300) : 0);
 		switch (selectedWarpDirection) {
 			case UP -> {
 				return new Vec3(0, necessarySpeed, 0);
@@ -711,16 +711,16 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 				return new Vec3(0, -necessarySpeed, 0);
 			}
 			case NORTH -> {
-				return new Vec3(0, 0, -necessarySpeed).add(perturbation);
+				return (new Vec3(0, 0, -necessarySpeed).add(perturbation));
 			}
 			case SOUTH -> {
-				return new Vec3(0, 0, necessarySpeed).add(perturbation);
+				return (new Vec3(0, 0, necessarySpeed).add(perturbation));
 			}
 			case EAST -> {
-				return new Vec3(necessarySpeed, 0, 0).add(perturbation);
+				return (new Vec3(necessarySpeed, 0, 0).add(perturbation));
 			}
 			case WEST -> {
-				return new Vec3(-necessarySpeed, 0, 0).add(perturbation);
+				return (new Vec3(-necessarySpeed, 0, 0).add(perturbation));
 			}
 			case LAND -> {
 				switch (landButtonSettings) {

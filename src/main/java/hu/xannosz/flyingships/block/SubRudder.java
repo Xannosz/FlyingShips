@@ -70,7 +70,7 @@ public class SubRudder extends BaseEntityBlock {
 				BlockPos rudderPosition = pos.offset(((SubRudderBlockEntity) entity).getRudderPosition());
 				BlockEntity rudderEntity = level.getBlockEntity(rudderPosition);
 				if (rudderEntity instanceof RudderBlockEntity) {
-					NetworkHooks.openScreen(((ServerPlayer) player), (RudderBlockEntity) rudderEntity, rudderPosition);
+					NetworkHooks.openScreen((ServerPlayer) player, (RudderBlockEntity) rudderEntity, rudderPosition);
 				} else {
 					player.sendSystemMessage(Component.translatable("message.subRudderNotConnected"));
 				}
