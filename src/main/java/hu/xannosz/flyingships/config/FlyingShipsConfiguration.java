@@ -14,7 +14,6 @@ public class FlyingShipsConfiguration {
 	public static final ForgeConfigSpec.ConfigValue<Integer> LIFT_OF_IN_WATER;
 	public static final ForgeConfigSpec.ConfigValue<Integer> LIFT_OF_IN_LAVA;
 	public static final ForgeConfigSpec.ConfigValue<Double> SPEED_CONSOLIDATOR;
-	public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_FLY;
 	public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_SLIDING;
 
 	public static final ForgeConfigSpec.ConfigValue<Integer> COOL_DOWN_TIME;
@@ -46,8 +45,6 @@ public class FlyingShipsConfiguration {
 				.define("liftOfInLava", 500);
 		SPEED_CONSOLIDATOR = BUILDER.comment("Divider for the energy calculating system")
 				.defineInRange("speedConsolidator", 5000d, 1000d, 10000d);
-		ENABLE_FLY = BUILDER.comment("Enable fly")
-				.define("enableFly", true);
 		ENABLE_SLIDING = BUILDER.comment("Enable short movement without energy consuming")
 				.define("enableSliding", true);
 		COOL_DOWN_TIME = BUILDER.comment("Cool down time in tick")

@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
@@ -78,19 +79,45 @@ public class ItemGateBlockEntity extends BlockEntity {
 					return lazyItemHandler.cast();
 				}
 
-				if (directionWrappedHandlerMap.containsKey(side)) {
-					Direction localDir = this.getBlockState().getValue(ItemGate.FACING);
+				Direction localDir = this.getBlockState().getValue(ItemGate.FACING);
 
-					if (side == Direction.UP || side == Direction.DOWN) {
-						return directionWrappedHandlerMap.get(side).cast();
-					}
+				if (side == Direction.UP || side == Direction.DOWN) {
+					return directionWrappedHandlerMap.get(side).cast();
+				}
 
-					return switch (localDir) {
-						default -> directionWrappedHandlerMap.get(side.getOpposite()).cast();
-						case EAST -> directionWrappedHandlerMap.get(side.getClockWise()).cast();
-						case SOUTH -> directionWrappedHandlerMap.get(side).cast();
-						case WEST -> directionWrappedHandlerMap.get(side.getCounterClockWise()).cast();
-					};
+				return switch (localDir) {
+					default -> directionWrappedHandlerMap.get(side.getOpposite()).cast();
+					case EAST -> directionWrappedHandlerMap.get(side.getClockWise()).cast();
+					case SOUTH -> directionWrappedHandlerMap.get(side).cast();
+					case WEST -> directionWrappedHandlerMap.get(side.getCounterClockWise()).cast();
+				};
+			}
+		}
+
+		if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+			if (level == null) {
+				return super.getCapability(cap, side);
+			}
+
+			BlockEntity entity = level.getBlockEntity(getBlockPos().offset(rudderPosition));
+			if (entity instanceof RudderBlockEntity) {
+				Direction localDir = this.getBlockState().getValue(ItemGate.FACING);
+
+				if (side == Direction.UP || side == Direction.DOWN || side == null) {
+					return super.getCapability(cap, side);
+				}
+
+				Direction locatedDirection;
+
+				switch (localDir) {
+					default -> locatedDirection = side.getOpposite();
+					case EAST -> locatedDirection = side.getClockWise();
+					case SOUTH -> locatedDirection = side;
+					case WEST -> locatedDirection = side.getCounterClockWise();
+				}
+
+				if (locatedDirection == Direction.NORTH) {
+					return LazyOptional.of(() -> new WrappedFluidHandler((RudderBlockEntity) entity)).cast();
 				}
 			}
 		}

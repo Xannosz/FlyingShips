@@ -1,6 +1,7 @@
 package hu.xannosz.flyingships.blockentity;
 
 import hu.xannosz.flyingships.Util;
+import hu.xannosz.flyingships.block.Heater;
 import hu.xannosz.flyingships.block.ModBlocks;
 import hu.xannosz.flyingships.block.Rudder;
 import hu.xannosz.flyingships.config.FlyingShipsConfiguration;
@@ -182,6 +183,8 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	private int burnTime;
 	private int maxBurnTime;
 	private int steamEnergy = 0;
+	@Setter
+	@Getter
 	private int waterContent = 0;
 
 	public RudderBlockEntity(BlockPos blockPos, BlockState blockState) {
@@ -313,6 +316,8 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 			calculateJumpData();
 			normalizeEnergies();
 
+			updateHeaters();
+
 			consumeHeatToHoldSteam();
 
 			if (powerButtonState.equals(PowerState.ON)) {
@@ -356,6 +361,23 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 		burnTime--;
 		if (burnTime < 0) {
 			burnTime = 0;
+		}
+	}
+
+	private void updateHeaters() {
+		if (level == null) {
+			return;
+		}
+		if (burnTime > 0) {
+			vehicleScanResult.getHeaterBlocks().forEach(
+					blockPos -> level.setBlock(blockPos, ModBlocks.HEATER.get().defaultBlockState()
+							.setValue(Heater.LIT, true), 2, 0)
+			);
+		} else {
+			vehicleScanResult.getHeaterBlocks().forEach(
+					blockPos -> level.setBlock(blockPos, ModBlocks.HEATER.get().defaultBlockState()
+							.setValue(Heater.LIT, false), 2, 0)
+			);
 		}
 	}
 
@@ -897,7 +919,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 		return vehicleScanResult.getTank() * FlyingShipsConfiguration.STEAM_PER_TANK.get();
 	}
 
-	private int getMaxWaterContent() {
+	public int getMaxWaterContent() {
 		return vehicleScanResult.getTank() * FlyingShipsConfiguration.WATER_PER_TANK.get();
 	}
 

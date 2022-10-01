@@ -47,5 +47,6 @@
   "gui.text.west": "WEST / x-",
   "gui.text.up": "ZENITH / y+",
   "gui.text.down": "NADIR / y-",
-  "gui.text.waterLine": "ship's draft"
+  "gui.text.waterLine": "ship's draft",
+  "gui.text.marker": "Marker: %s"
 }

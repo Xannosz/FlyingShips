@@ -47,5 +47,6 @@
   "gui.text.west": "NYUGAT / x-",
   "gui.text.up": "ZENIT / y+",
   "gui.text.down": "NADÍR / y-",
-  "gui.text.waterLine": "merülés"
+  "gui.text.waterLine": "merülés",
+  "gui.text.marker": "Jeladó: %s"
 }

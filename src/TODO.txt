@@ -3,24 +3,26 @@
 - fly over field when touch water
 
 // bugs/optimization
+- if marker unreachable, it flood the chat
+- settings panel engine type literal
+- terrain scan refactor (merge with vehicle scan)
+- save players after jump
+- warning on start
 
-// others
-- more fluid
-- enable/disable vertical movement (under waterline/ above waterline)
-- show helper text after some time
-- write out coordinates as tooltip message
-- animated steam, water structure
+// user friendly update
 - question before delete rectangle/coordinate
-- show absolute coordinates in settings in a tooltip
-- multi rudder styles
-- enable/disable marker
-- selectable inner round
-- crystal of levitation no fall damage, when in hand
+- graphical ship borders in the world
+- enable/disable vertical movement (under waterline / above waterline)
+
+// compatible update
+- more fluid
 - extend hollow blocks list
 - calculate block density from material
-- burning heaters
-- item gate fluid
-- graphical ship borders in the world
+
+// immersive update
+- multi rudder styles
+- selectable inner round
+- enable/disable marker
 
 // turn update
 - turn (during jump, without jump, saved coordinates)
@@ -35,6 +37,3 @@
 
 // computer update
 - computercraft integration
-
-// other mod
-- transporter (only Y)

@@ -57,6 +57,13 @@ public class CoordinatesSubScreen extends SubScreen {
 
 	private LoopBackEditBox name;
 
+	private HelpMessage coordinate1;
+	private HelpMessage coordinate2;
+	private HelpMessage coordinate3;
+	private HelpMessage coordinate4;
+	private HelpMessage coordinate5;
+	private HelpMessage coordinate6;
+
 	private boolean addNewCoordinate = false;
 	private int coordinateNum = 0;
 	private SavedCoordinate newCoordinate;
@@ -463,6 +470,13 @@ public class CoordinatesSubScreen extends SubScreen {
 		name = new LoopBackEditBox(rudderScreen.getFont(), x + EDIT_PANEL_X + EDIT_PANEL_NAME_X,
 				y + EDIT_PANEL_Y + EDIT_PANEL_NAME_Y_1, EDIT_PANEL_NAME_W, EDIT_PANEL_NAME_H,
 				Component.empty().withStyle(ChatFormatting.DARK_GRAY), ButtonId.EDITION_COORDINATE_DONE, rudderScreen);
+
+		coordinate1 = new HelpMessage(5, 11, 144, 13, x, y, 10, 22, rudderScreen);
+		coordinate2 = new HelpMessage(5, 26, 144, 13, x, y, 10, 37, rudderScreen);
+		coordinate3 = new HelpMessage(5, 41, 144, 13, x, y, 10, 52, rudderScreen);
+		coordinate4 = new HelpMessage(5, 56, 144, 13, x, y, 10, 67, rudderScreen);
+		coordinate5 = new HelpMessage(5, 71, 144, 13, x, y, 10, 72, rudderScreen);
+		coordinate6 = new HelpMessage(5, 86, 144, 13, x, y, 10, 97, rudderScreen);
 	}
 
 	@Override
@@ -579,7 +593,7 @@ public class CoordinatesSubScreen extends SubScreen {
 		}
 		if (addNewCoordinate) {
 			if (newCoordinate != null) {
-				String markerName = "";
+				String markerName;
 				if (coordinateNum == 0) {
 					markerName = markerId == -1 ? "" : markers.get(markerId);
 				} else {
@@ -595,7 +609,38 @@ public class CoordinatesSubScreen extends SubScreen {
 
 	@Override
 	public void renderToolTips(PoseStack poseStack, int mouseX, int mouseY, int x, int y) {
+		List<SavedCoordinate> savedCoordinates = rudderScreen.getMenu().getCoordinates();
 
+		if (savedCoordinates.size() > 0) {
+			coordinate1.render(poseStack, mouseX, mouseY,
+					Component.literal(savedCoordinates.get(0).getCoordinate().toShortString()),
+					Component.translatable("gui.text.marker", savedCoordinates.get(0).getMarker()));
+		}
+		if (savedCoordinates.size() > 1) {
+			coordinate2.render(poseStack, mouseX, mouseY,
+					Component.literal(savedCoordinates.get(1).getCoordinate().toShortString()),
+					Component.translatable("gui.text.marker", savedCoordinates.get(1).getMarker()));
+		}
+		if (savedCoordinates.size() > 2) {
+			coordinate3.render(poseStack, mouseX, mouseY,
+					Component.literal(savedCoordinates.get(2).getCoordinate().toShortString()),
+					Component.translatable("gui.text.marker", savedCoordinates.get(2).getMarker()));
+		}
+		if (savedCoordinates.size() > 3) {
+			coordinate4.render(poseStack, mouseX, mouseY,
+					Component.literal(savedCoordinates.get(3).getCoordinate().toShortString()),
+					Component.translatable("gui.text.marker", savedCoordinates.get(3).getMarker()));
+		}
+		if (savedCoordinates.size() > 4) {
+			coordinate5.render(poseStack, mouseX, mouseY,
+					Component.literal(savedCoordinates.get(4).getCoordinate().toShortString()),
+					Component.translatable("gui.text.marker", savedCoordinates.get(4).getMarker()));
+		}
+		if (savedCoordinates.size() > 5) {
+			coordinate6.render(poseStack, mouseX, mouseY,
+					Component.literal(savedCoordinates.get(5).getCoordinate().toShortString()),
+					Component.translatable("gui.text.marker", savedCoordinates.get(5).getMarker()));
+		}
 	}
 
 	@Override

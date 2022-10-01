@@ -55,7 +55,11 @@ public class SettingsSubScreen extends SubScreen {
 	private GraphicalButton enableHeatEngine;
 	private GraphicalButton enableSteamEngine;
 	private GraphicalButton enableEnderEngine;
+
 	private HelpMessage waterLineMessage;
+	private HelpMessage rec1Message;
+	private HelpMessage rec2Message;
+	private HelpMessage rec3Message;
 
 	private boolean addNewRec = false;
 
@@ -370,6 +374,9 @@ public class SettingsSubScreen extends SubScreen {
 				.build());
 
 		waterLineMessage = new HelpMessage(170, 11, 22, 8, x, y, 173, 13, rudderScreen);
+		rec1Message = new HelpMessage(5, 12, 144, 27, x, y, 10, 22, rudderScreen);
+		rec2Message = new HelpMessage(5, 41, 144, 27, x, y, 10, 51, rudderScreen);
+		rec3Message = new HelpMessage(5, 70, 144, 27, x, y, 10, 80, rudderScreen);
 	}
 
 	@Override
@@ -532,6 +539,25 @@ public class SettingsSubScreen extends SubScreen {
 	@Override
 	public void renderToolTips(PoseStack poseStack, int mouseX, int mouseY, int x, int y) {
 		waterLineMessage.render(poseStack, mouseX, mouseY, Component.translatable("gui.text.waterLine"));
+
+		final List<BlockPos> blocks = rudderScreen.getMenu().getBlockPosStruct();
+		final BlockPos rudderPosition = rudderScreen.getMenu().getBlockEntity().getBlockPos();
+
+		if (blocks.size() > 0) {
+			rec1Message.render(poseStack, mouseX, mouseY,
+					Component.literal(blocks.get(0).offset(rudderPosition).toShortString()),
+					Component.literal(blocks.get(1).offset(rudderPosition).toShortString()));
+		}
+		if (blocks.size() > 2) {
+			rec2Message.render(poseStack, mouseX, mouseY,
+					Component.literal(blocks.get(2).offset(rudderPosition).toShortString()),
+					Component.literal(blocks.get(3).offset(rudderPosition).toShortString()));
+		}
+		if (blocks.size() > 4) {
+			rec3Message.render(poseStack, mouseX, mouseY,
+					Component.literal(blocks.get(4).offset(rudderPosition).toShortString()),
+					Component.literal(blocks.get(5).offset(rudderPosition).toShortString()));
+		}
 	}
 
 	@Override

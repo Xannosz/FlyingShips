@@ -54,6 +54,9 @@ public class VehicleScanUtil {
 		// calculate mob density
 		calculateMobDensity(responseStruct, entities, players);
 
+		// list heaters
+		responseStruct.setHeaterBlocks(getHeaterBlocks(level, blocks));
+
 		// calculate wind surface
 		if (blockDirection.equals(Direction.NORTH) || blockDirection.equals(Direction.SOUTH)) {
 			responseStruct.setWindSurface(calculateSurface(matrix.getZColumns()));
@@ -222,6 +225,16 @@ public class VehicleScanUtil {
 			density += serverPlayer.getType().getDimensions().height * serverPlayer.getType().getDimensions().width * 10;
 		}
 		responseStruct.setDensity(density);
+	}
+
+	private static Set<BlockPos> getHeaterBlocks(ServerLevel level, Set<BlockPos> blocks) {
+		Set<BlockPos> result = new HashSet<>();
+		for (BlockPos block : blocks) {
+			if (level.getBlockState(block).getBlock().equals(ModBlocks.HEATER.get())) {
+				result.add(block);
+			}
+		}
+		return result;
 	}
 
 	public static boolean isCommonFluid(TerrainScanResponseStruct terrainScanResponseStruct) {

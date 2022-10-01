@@ -1,6 +1,7 @@
 package hu.xannosz.flyingships.warp.vehiclescan;
 
 import lombok.Data;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.Set;
@@ -19,4 +20,5 @@ public class VehicleScanResponseStruct {
 	private boolean hyperDriveEngineFound = false;
 	private Set<ServerPlayer> players;
 	private int blockNumUnderFluid;
+	private Set<BlockPos> heaterBlocks;
 }

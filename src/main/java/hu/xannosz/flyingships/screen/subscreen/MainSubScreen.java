@@ -308,6 +308,7 @@ public class MainSubScreen extends SubScreen {
 		coolDown = new Gauge(x + 112, y + 15, 1, 33, 30, 30);
 
 		speedStepMessage = new HelpMessage(113, 59, 44, 8, x, y, 105, 90, rudderScreen);
+		speedStepMessage.setDelay(300);
 		windMessage = new HelpMessage(65, 7, 15, 87, x, y, 65, 95, rudderScreen);
 		floatingMessage = new HelpMessage(46, 7, 15, 87, x, y, 46, 95, rudderScreen);
 		steamMessage = new HelpMessage(8, 7, 15, 87, x, y, 8, 95, rudderScreen);
