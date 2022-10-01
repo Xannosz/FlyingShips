@@ -112,6 +112,9 @@ public class JumpUtil {
 
 			//reset chunks force load
 			resetChunkForceLoad(chunks, level);
+
+			//save chunks
+			saveChunks(chunks);
 		} catch (Exception ex) {
 			log.error("Exception during jump, whit ship", ex);
 		}
@@ -378,5 +381,9 @@ public class JumpUtil {
 	private static void resetChunkForceLoad(Map<LevelChunk, Boolean> chunks, ServerLevel level) {
 		chunks.forEach((chunk, isForced) ->
 				level.setChunkForced(chunk.getPos().x, chunk.getPos().z, isForced));
+	}
+
+	private static void saveChunks(Map<LevelChunk, Boolean> chunks){
+		chunks.forEach((chunk, isForced) -> chunk.setUnsaved(true));
 	}
 }

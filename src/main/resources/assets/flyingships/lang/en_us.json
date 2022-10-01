@@ -48,5 +48,8 @@
   "gui.text.up": "ZENITH / y+",
   "gui.text.down": "NADIR / y-",
   "gui.text.waterLine": "ship's draft",
-  "gui.text.marker": "Marker: %s"
+  "gui.text.marker": "Marker: %s",
+  "gui.text.heat.engine": "heat",
+  "gui.text.steam.engine": "steam",
+  "gui.text.ender.engine": "ender"
 }

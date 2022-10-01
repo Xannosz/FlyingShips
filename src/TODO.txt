@@ -3,11 +3,7 @@
 - fly over field when touch water
 
 // bugs/optimization
-- if marker unreachable, it flood the chat
-- settings panel engine type literal
 - terrain scan refactor (merge with vehicle scan)
-- save players after jump
-- warning on start
 
 // user friendly update
 - question before delete rectangle/coordinate

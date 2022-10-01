@@ -525,11 +525,11 @@ public class SettingsSubScreen extends SubScreen {
 			font.draw(poseStack, Component.literal("" + rudderScreen.getMenu().getWaterLine()), 173,
 					13, Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
 
-			font.draw(poseStack, Component.literal("heat"), 173,
+			font.draw(poseStack, Component.translatable("gui.text.heat.engine"), 173,
 					13 + SETTINGS_REC_BUTTON_GRAPHICAL_ROW_BUTTON_ADDITIONAL, Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
-			font.draw(poseStack, Component.literal("steam"), 173,
+			font.draw(poseStack, Component.translatable("gui.text.steam.engine"), 173,
 					13 + 2 * SETTINGS_REC_BUTTON_GRAPHICAL_ROW_BUTTON_ADDITIONAL, Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
-			font.draw(poseStack, Component.literal("ender"), 173,
+			font.draw(poseStack, Component.translatable("gui.text.ender.engine"), 173,
 					13 + 3 * SETTINGS_REC_BUTTON_GRAPHICAL_ROW_BUTTON_ADDITIONAL, Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
 		}
 		font.draw(poseStack, Component.literal("" + rudderScreen.getMenu().getBlockPosPage() + "/" + rudderScreen.getMenu().getBlockPosMaxPage()), 154,

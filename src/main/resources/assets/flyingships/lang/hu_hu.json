@@ -48,5 +48,8 @@
   "gui.text.up": "ZENIT / y+",
   "gui.text.down": "NADÍR / y-",
   "gui.text.waterLine": "merülés",
-  "gui.text.marker": "Jeladó: %s"
+  "gui.text.marker": "Jeladó: %s",
+  "gui.text.heat.engine": "hő",
+  "gui.text.steam.engine": "gőz",
+  "gui.text.ender.engine": "ender"
 }

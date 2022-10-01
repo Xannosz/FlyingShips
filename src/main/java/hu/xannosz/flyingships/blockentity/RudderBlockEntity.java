@@ -587,36 +587,42 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 			case JUMP_TO_COORDINATE_1 -> {
 				selectedCoordinate = coordinatesPage * 6;
 				selectedWarpDirection = WarpDirection.COORDINATE;
+				isMarkerInRange();
 				final Vec3 coordinate = getCoordinateVector();
 				necessarySpeed = (int) Math.abs(coordinate.x + coordinate.y + coordinate.z);
 			}
 			case JUMP_TO_COORDINATE_2 -> {
 				selectedCoordinate = coordinatesPage * 6 + 1;
 				selectedWarpDirection = WarpDirection.COORDINATE;
+				isMarkerInRange();
 				final Vec3 coordinate = getCoordinateVector();
 				necessarySpeed = (int) Math.abs(coordinate.x + coordinate.y + coordinate.z);
 			}
 			case JUMP_TO_COORDINATE_3 -> {
 				selectedCoordinate = coordinatesPage * 6 + 2;
 				selectedWarpDirection = WarpDirection.COORDINATE;
+				isMarkerInRange();
 				final Vec3 coordinate = getCoordinateVector();
 				necessarySpeed = (int) Math.abs(coordinate.x + coordinate.y + coordinate.z);
 			}
 			case JUMP_TO_COORDINATE_4 -> {
 				selectedCoordinate = coordinatesPage * 6 + 3;
 				selectedWarpDirection = WarpDirection.COORDINATE;
+				isMarkerInRange();
 				final Vec3 coordinate = getCoordinateVector();
 				necessarySpeed = (int) Math.abs(coordinate.x + coordinate.y + coordinate.z);
 			}
 			case JUMP_TO_COORDINATE_5 -> {
 				selectedCoordinate = coordinatesPage * 6 + 4;
 				selectedWarpDirection = WarpDirection.COORDINATE;
+				isMarkerInRange();
 				final Vec3 coordinate = getCoordinateVector();
 				necessarySpeed = (int) Math.abs(coordinate.x + coordinate.y + coordinate.z);
 			}
 			case JUMP_TO_COORDINATE_6 -> {
 				selectedCoordinate = coordinatesPage * 6 + 5;
 				selectedWarpDirection = WarpDirection.COORDINATE;
+				isMarkerInRange();
 				final Vec3 coordinate = getCoordinateVector();
 				necessarySpeed = (int) Math.abs(coordinate.x + coordinate.y + coordinate.z);
 			}
@@ -665,6 +671,13 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 					player.sendSystemMessage(Component.translatable("message.noWarpDirection")));
 			return false;
 		}
+		if (selectedWarpDirection.equals(WarpDirection.COORDINATE) &&
+				!coordinates.get(selectedCoordinate).getMarker().isEmpty() &&
+				getMarkersInRange().get(coordinates.get(selectedCoordinate).getMarker()) == null) {
+			vehicleScanResult.getPlayers().forEach(player ->
+					player.sendSystemMessage(Component.translatable("message.markerOutOfRange", coordinates.get(selectedCoordinate).getMarker())));
+			return false;
+		}
 		if (necessarySpeed <= 0) {
 			vehicleScanResult.getPlayers().forEach(player ->
 					player.sendSystemMessage(Component.translatable("message.zeroSpeed")));
@@ -698,13 +711,6 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 		if (!isNormalDirection() && isHyperDriveEnabled()) {
 			vehicleScanResult.getPlayers().forEach(player ->
 					player.sendSystemMessage(Component.translatable("message.useHyperDriveWithNormalDirection")));
-			return false;
-		}
-		if (selectedWarpDirection.equals(WarpDirection.COORDINATE) &&
-				!coordinates.get(selectedCoordinate).getMarker().isEmpty() &&
-				getMarkersInRange().get(coordinates.get(selectedCoordinate).getMarker()) == null) {
-			vehicleScanResult.getPlayers().forEach(player ->
-					player.sendSystemMessage(Component.translatable("message.markerOutOfRange", coordinates.get(selectedCoordinate).getMarker())));
 			return false;
 		}
 
@@ -811,15 +817,23 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 			return new Vec3(coordinate.getCoordinate().getX() - getBlockPos().getX(), coordinate.getCoordinate().getY() - getBlockPos().getY(), coordinate.getCoordinate().getZ() - getBlockPos().getZ());
 		} else {
 			final BlockPos markerPosition = getMarkersInRange().get(coordinate.getMarker());
-			if (markerPosition == null) {
-				vehicleScanResult.getPlayers().forEach(player ->
-						player.sendSystemMessage(Component.translatable("message.markerOutOfRange", coordinate.getMarker())));
-			} else {
+			if (markerPosition != null) {
 				final BlockPos target = markerPosition.offset(coordinate.getCoordinate());
 				return new Vec3(target.getX() - getBlockPos().getX(), target.getY() - getBlockPos().getY(), target.getZ() - getBlockPos().getZ());
 			}
 		}
 		return new Vec3(0, 0, 0);
+	}
+
+	private void isMarkerInRange() {
+		SavedCoordinate coordinate = coordinates.get(selectedCoordinate);
+		if (!coordinate.getMarker().isEmpty()) {
+			final BlockPos markerPosition = getMarkersInRange().get(coordinate.getMarker());
+			if (markerPosition == null) {
+				vehicleScanResult.getPlayers().forEach(player ->
+						player.sendSystemMessage(Component.translatable("message.markerOutOfRange", coordinate.getMarker())));
+			}
+		}
 	}
 
 	// power handling
