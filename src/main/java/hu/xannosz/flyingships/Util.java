@@ -22,7 +22,9 @@ public class Util {
 			Blocks.STONE_SLAB);
 
 	public static final int CLOUD_LEVEL = 196;
-	public static final int RUDDER_TYPES = 5;
+	public static final int RUDDER_TYPES = 2; //started from zero
+
+	public static final List<String> INNER_ROUNDS = Arrays.asList("gui.innerRound.base", "gui.innerRound.triangle", "gui.innerRound.submarine", "gui.innerRound.modern");
 
 	public static int convertBitArrayToInt(boolean[] booleans) {
 		int value = 0;

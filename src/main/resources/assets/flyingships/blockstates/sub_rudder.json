@@ -1,18 +1,48 @@
 {
   "variants": {
-    "facing=east": {
+    "facing=east,type=0": {
       "model": "flyingships:block/sub_rudder",
       "y": 90
     },
-    "facing=north": {
+    "facing=north,type=0": {
       "model": "flyingships:block/sub_rudder"
     },
-    "facing=south": {
+    "facing=south,type=0": {
       "model": "flyingships:block/sub_rudder",
       "y": 180
     },
-    "facing=west": {
+    "facing=west,type=0": {
       "model": "flyingships:block/sub_rudder",
+      "y": 270
+    },
+    "facing=east,type=1": {
+      "model": "flyingships:block/modern_sub_rudder",
+      "y": 90
+    },
+    "facing=north,type=1": {
+      "model": "flyingships:block/modern_sub_rudder"
+    },
+    "facing=south,type=1": {
+      "model": "flyingships:block/modern_sub_rudder",
+      "y": 180
+    },
+    "facing=west,type=1": {
+      "model": "flyingships:block/modern_sub_rudder",
+      "y": 270
+    },
+    "facing=east,type=2": {
+      "model": "flyingships:block/ship_sub_rudder",
+      "y": 90
+    },
+    "facing=north,type=2": {
+      "model": "flyingships:block/ship_sub_rudder"
+    },
+    "facing=south,type=2": {
+      "model": "flyingships:block/ship_sub_rudder",
+      "y": 180
+    },
+    "facing=west,type=2": {
+      "model": "flyingships:block/ship_sub_rudder",
       "y": 270
     }
   }

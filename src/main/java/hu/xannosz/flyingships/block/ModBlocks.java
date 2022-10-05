@@ -21,11 +21,11 @@ public class ModBlocks {
 	public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, FlyingShips.MOD_ID);
 
 	public static final RegistryObject<Block> RUDDER = registerBlock("rudder",
-			() -> new Rudder(BlockBehaviour.Properties.of(Material.WOOD).strength(1.5F, 6.0F).sound(SoundType.WOOD))
+			() -> new Rudder(BlockBehaviour.Properties.of(Material.WOOD).strength(1.5F, 6.0F).sound(SoundType.WOOD).noOcclusion())
 	);
 
 	public static final RegistryObject<Block> SUB_RUDDER = registerBlock("sub_rudder",
-			() -> new SubRudder(BlockBehaviour.Properties.of(Material.WOOD).strength(1.5F, 6.0F).sound(SoundType.WOOD))
+			() -> new SubRudder(BlockBehaviour.Properties.of(Material.WOOD).strength(1.5F, 6.0F).sound(SoundType.WOOD).noOcclusion())
 	);
 
 	public static final RegistryObject<Block> TANK = registerBlock("tank",

@@ -3,6 +3,7 @@ package hu.xannosz.flyingships.screen.subscreen;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hu.xannosz.flyingships.FlyingShips;
+import hu.xannosz.flyingships.Util;
 import hu.xannosz.flyingships.networking.AddRectanglePacket;
 import hu.xannosz.flyingships.networking.ModMessages;
 import hu.xannosz.flyingships.screen.RudderScreen;
@@ -56,10 +57,13 @@ public class SettingsSubScreen extends SubScreen {
 	private GraphicalButton enableSteamEngine;
 	private GraphicalButton enableEnderEngine;
 
+	private GraphicalButton selectInnerRound;
+
 	private HelpMessage waterLineMessage;
 	private HelpMessage rec1Message;
 	private HelpMessage rec2Message;
 	private HelpMessage rec3Message;
+	private HelpMessage innerRoundMessage;
 
 	private boolean addNewRec = false;
 
@@ -373,10 +377,28 @@ public class SettingsSubScreen extends SubScreen {
 				.hoveredY(SETTINGS_SMALL_BUTTON_MAIN_ROW_Y + 2 * SETTINGS_SMALL_BUTTON_MAIN_ROW_ADDITIONAL)
 				.build());
 
+		selectInnerRound = new GraphicalButton(ButtonConfig.builder()
+				.buttonId(ButtonId.NEXT_INNER_ROUND)
+				.position(rudderScreen.getMenu().getBlockEntity().getBlockPos())
+				.isDefaultButtonDrawNeeded(false)
+				.debugMode(DEBUG_MODE)
+				.hitBoxX(x + 172)
+				.hitBoxY(y + 68)
+				.hitBoxW(49)
+				.hitBoxH(9)
+				.graphicalX(x + 172)
+				.graphicalY(y + 68)
+				.graphicalW(49)
+				.graphicalH(9)
+				.hoveredX(164)
+				.hoveredY(194)
+				.build());
+
 		waterLineMessage = new HelpMessage(170, 11, 22, 8, x, y, 173, 13, rudderScreen);
 		rec1Message = new HelpMessage(5, 12, 144, 27, x, y, 10, 22, rudderScreen);
 		rec2Message = new HelpMessage(5, 41, 144, 27, x, y, 10, 51, rudderScreen);
 		rec3Message = new HelpMessage(5, 70, 144, 27, x, y, 10, 80, rudderScreen);
+		innerRoundMessage = new HelpMessage(172, 68, 49, 9, x, y, 175, 71, rudderScreen);
 	}
 
 	@Override
@@ -409,6 +431,8 @@ public class SettingsSubScreen extends SubScreen {
 		rudderScreen.addRenderable(enableHeatEngine);
 		rudderScreen.addRenderable(enableSteamEngine);
 		rudderScreen.addRenderable(enableEnderEngine);
+
+		rudderScreen.addRenderable(selectInnerRound);
 	}
 
 	@Override
@@ -433,6 +457,8 @@ public class SettingsSubScreen extends SubScreen {
 			enableHeatEngine.setVisibility(true);
 			enableSteamEngine.setVisibility(true);
 			enableEnderEngine.setVisibility(true);
+
+			selectInnerRound.setVisibility(true);
 		} else {
 			pageUp.setVisibility(false);
 			pageDown.setVisibility(false);
@@ -451,6 +477,8 @@ public class SettingsSubScreen extends SubScreen {
 			enableHeatEngine.setVisibility(false);
 			enableSteamEngine.setVisibility(false);
 			enableEnderEngine.setVisibility(false);
+
+			selectInnerRound.setVisibility(false);
 		}
 
 		if (visibility && addNewRec) {
@@ -534,6 +562,9 @@ public class SettingsSubScreen extends SubScreen {
 		}
 		font.draw(poseStack, Component.literal("" + rudderScreen.getMenu().getBlockPosPage() + "/" + rudderScreen.getMenu().getBlockPosMaxPage()), 154,
 				90, Objects.requireNonNull(ChatFormatting.WHITE.getColor()));
+
+		font.draw(poseStack, Component.translatable(Util.INNER_ROUNDS.get(rudderScreen.getMenu().getInnerRoundType())), 172,
+				69, Objects.requireNonNull(ChatFormatting.DARK_GRAY.getColor()));
 	}
 
 	@Override
@@ -558,6 +589,8 @@ public class SettingsSubScreen extends SubScreen {
 					Component.literal(blocks.get(4).offset(rudderPosition).toShortString()),
 					Component.literal(blocks.get(5).offset(rudderPosition).toShortString()));
 		}
+
+		innerRoundMessage.render(poseStack, mouseX, mouseY, Component.translatable("gui.text.innerRoundStyle"));
 	}
 
 	@Override

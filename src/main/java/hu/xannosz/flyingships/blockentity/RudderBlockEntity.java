@@ -120,7 +120,8 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	public static final int STRUCTURAL_MOVEMENT_POWER_KEY = 57;
 	public static final int STEAM_MOVEMENT_POWER_KEY = 58;
 	public static final int ENDER_MOVEMENT_POWER_KEY = 59;
-	public static final int DATA_SLOT_SIZE = 60;
+	public static final int INNER_ROUND_TYPE_KEY = 60;
+	public static final int DATA_SLOT_SIZE = 61;
 
 	public static final int[] STEPS = new int[]{1, 10, 100, 1000, 10000, 100000};
 
@@ -160,6 +161,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	private int coordinatesPage = 0;
 	private int coolDown = FlyingShipsConfiguration.COOL_DOWN_TIME.get();
 	private int waterLine = 0;
+	private int innerRound = 0;
 	@Getter
 	private boolean enableHeatEngine = false;
 	@Getter
@@ -246,6 +248,8 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 		tag.putBoolean("rudder.enableSteamEngine", enableSteamEngine);
 		tag.putBoolean("rudder.enableEnderEngine", enableEnderEngine);
 
+		tag.putInt("rudder.innerRound", innerRound);
+
 		super.saveAdditional(tag);
 	}
 
@@ -282,6 +286,8 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 		enableSteamEngine = nbt.getBoolean("rudder.enableSteamEngine");
 		enableEnderEngine = nbt.getBoolean("rudder.enableEnderEngine");
 
+		innerRound = nbt.getInt("rudder.innerRound");
+
 		updateData();
 	}
 
@@ -291,7 +297,17 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 			inventory.setItem(i, itemHandler.getStackInSlot(i));
 		}
 
-		Containers.dropContents(Objects.requireNonNull(level), worldPosition, inventory);
+		if (level != null) {
+			Containers.dropContents(level, worldPosition, inventory);
+
+			if (vehicleScanResult == null) {
+				return;
+			}
+			vehicleScanResult.getHeaterBlocks().forEach(
+					blockPos -> level.setBlock(blockPos, ModBlocks.HEATER.get().defaultBlockState()
+							.setValue(Heater.LIT, false), 2, 0)
+			);
+		}
 	}
 
 	@SuppressWarnings("unused")
@@ -368,15 +384,24 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 		if (level == null) {
 			return;
 		}
+
 		if (burnTime > 0) {
 			vehicleScanResult.getHeaterBlocks().forEach(
-					blockPos -> level.setBlock(blockPos, ModBlocks.HEATER.get().defaultBlockState()
-							.setValue(Heater.LIT, true), 2, 0)
+					blockPos -> {
+						if (!level.getBlockState(blockPos).getValue(Heater.LIT)) {
+							level.setBlock(blockPos, ModBlocks.HEATER.get().defaultBlockState()
+									.setValue(Heater.LIT, true), 2, 0);
+						}
+					}
 			);
 		} else {
 			vehicleScanResult.getHeaterBlocks().forEach(
-					blockPos -> level.setBlock(blockPos, ModBlocks.HEATER.get().defaultBlockState()
-							.setValue(Heater.LIT, false), 2, 0)
+					blockPos -> {
+						if (level.getBlockState(blockPos).getValue(Heater.LIT)) {
+							level.setBlock(blockPos, ModBlocks.HEATER.get().defaultBlockState()
+									.setValue(Heater.LIT, false), 2, 0);
+						}
+					}
 			);
 		}
 	}
@@ -638,6 +663,10 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 				if (!enableHeatEngine) {
 					enableSteamEngine = false;
 				}
+			}
+			case NEXT_INNER_ROUND -> {
+				innerRound++;
+				innerRound %= Util.INNER_ROUNDS.size();
 			}
 		}
 		updateSpeed();
@@ -1023,6 +1052,8 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 		data.set(COOL_DOWN_KEY, coolDown);
 		data.set(WATER_LINE_KEY, waterLine);
 		data.set(COORDINATES_BLINK_KEY, Util.convertBitArrayToInt(getCoordinateBlinkArray()));
+
+		data.set(INNER_ROUND_TYPE_KEY, innerRound);
 	}
 
 	public void addRectangle(int mode, BlockPos blockPos1, BlockPos blockPos2) {

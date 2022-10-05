@@ -1,15 +1,17 @@
 package hu.xannosz.flyingships.screen.widget;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Setter;
 
 import static net.minecraftforge.client.gui.ScreenUtils.drawTexturedModalRect;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class Gauge {
 	private final int x;
 	private final int y;
-	private final int u;
+	@Setter
+	private int u;
 	private final int v;
 	private final int w;
 	private final int h;

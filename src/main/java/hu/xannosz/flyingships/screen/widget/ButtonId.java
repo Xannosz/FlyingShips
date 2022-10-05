@@ -72,5 +72,7 @@ public enum ButtonId {
 
 	ENDER_ENGINE,
 	STEAM_ENGINE,
-	HEAT_ENGINE
+	HEAT_ENGINE,
+
+	NEXT_INNER_ROUND
 }

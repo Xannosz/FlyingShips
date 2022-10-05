@@ -7,6 +7,7 @@
     - fly
     - dive
     - swim
+  - swim in lava
   - coordinate jump
     - relative
     - absolute
@@ -19,6 +20,11 @@
     - heat
     - steam
     - ender
+  - wand
+    - connect
+    - deselect
+    - add rec
+    - change model
 - wiki has valid content
 - configuration file has correct description
 - version in mods.toml and build.gradle

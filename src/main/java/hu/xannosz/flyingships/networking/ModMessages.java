@@ -75,6 +75,11 @@ public class ModMessages {
 				.encoder(GetMarkerNamePacket::toBytes)
 				.consumerMainThread(GetMarkerNamePacket::handler)
 				.add();
+		INSTANCE.messageBuilder(UpdateBlockStatePacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+				.decoder(UpdateBlockStatePacket::new)
+				.encoder(UpdateBlockStatePacket::toBytes)
+				.consumerMainThread(UpdateBlockStatePacket::handler)
+				.add();
 	}
 
 	public static <MSG> void sendToServer(MSG message) {

@@ -1,24 +1,18 @@
 // known bugs
 - item frames sometimes broken during jump
-- fly over field when touch water
 
 // bugs/optimization
 - terrain scan refactor (merge with vehicle scan)
-
-// user friendly update
-- question before delete rectangle/coordinate
-- graphical ship borders in the world
-- enable/disable vertical movement (under waterline / above waterline)
-
-// compatible update
+- fly over field when touch water
 - more fluid
+
+// official release
 - extend hollow blocks list
 - calculate block density from material
-
-// immersive update
-- multi rudder styles
-- selectable inner round
 - enable/disable marker
+- question before delete rectangle/coordinate
+- enable/disable vertical movement (under waterline / above waterline)
+- test fluid gate
 
 // turn update
 - turn (during jump, without jump, saved coordinates)

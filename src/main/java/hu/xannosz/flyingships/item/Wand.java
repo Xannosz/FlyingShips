@@ -2,10 +2,10 @@ package hu.xannosz.flyingships.item;
 
 import hu.xannosz.flyingships.block.ModBlocks;
 import hu.xannosz.flyingships.blockentity.RudderBlockEntity;
-import hu.xannosz.flyingships.blockentity.SubRudderBlockEntity;
 import hu.xannosz.flyingships.networking.AddRectanglePacket;
 import hu.xannosz.flyingships.networking.ConnectToRudder;
 import hu.xannosz.flyingships.networking.ModMessages;
+import hu.xannosz.flyingships.networking.UpdateBlockStatePacket;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -59,9 +59,9 @@ public class Wand extends Item {
 		final BlockPos rudderPosition = rudderPositionTag == null ? null : NbtUtils.readBlockPos((CompoundTag) rudderPositionTag);
 		final BlockPos firstPosition = firstPositionTag == null ? null : NbtUtils.readBlockPos((CompoundTag) firstPositionTag);
 
-		final WandMode mode = calculateWandMode(block, rudderPosition, firstPosition, useOnContext.getPlayer().isShiftKeyDown(), clickedPosition, player);
+		final WandMode mode = calculateWandMode(block, rudderPosition, firstPosition, useOnContext.getPlayer().isShiftKeyDown());
 
-		if (!isValidContext(player, clickedPosition, block, shipUUID, rudderPosition, firstPosition, mode)) {
+		if (!isValidContext(player, block, shipUUID, rudderPosition, firstPosition, mode)) {
 			return InteractionResult.FAIL;
 		}
 
@@ -99,7 +99,7 @@ public class Wand extends Item {
 				ModMessages.sendToServer(new ConnectToRudder(clickedPosition, rudderPosition));
 				player.sendSystemMessage(Component.translatable("message.connectedToRudder", rudderPosition.toShortString()));
 			}
-			case STRUCTURE_CHANGE -> player.sendSystemMessage(Component.literal("STRUCTURE_CHANGE not implemented"));
+			case STRUCTURE_CHANGE -> ModMessages.sendToServer(new UpdateBlockStatePacket(clickedPosition));
 			case DELETION -> {
 				if (itemStack.getOrCreateTag().contains(FIRST_POSITION_TAG)) {
 					itemStack.getOrCreateTag().remove(FIRST_POSITION_TAG);
@@ -116,12 +116,14 @@ public class Wand extends Item {
 		return InteractionResult.SUCCESS;
 	}
 
-	private WandMode calculateWandMode(Block block, BlockPos rudderPosition, BlockPos firstPosition, boolean isShiftDown, BlockPos clickedPosition, Player player) {
+	private WandMode calculateWandMode(Block block, BlockPos rudderPosition, BlockPos firstPosition, boolean isShiftDown) {
+		if (rudderPosition == null && block.equals(ModBlocks.SUB_RUDDER.get())) {
+			return WandMode.STRUCTURE_CHANGE;
+		}
 		if (rudderPosition == null) {
 			return WandMode.SELECT_SHIP;
 		}
-		if (block.equals(ModBlocks.RUDDER.get()) ||
-				(block.equals(ModBlocks.SUB_RUDDER.get()) && subRudderConnectedToRudderInternal(clickedPosition, rudderPosition, player))) {
+		if (block.equals(ModBlocks.RUDDER.get())) {
 			return WandMode.STRUCTURE_CHANGE;
 		}
 		if (block.equals(ModBlocks.SUB_RUDDER.get()) || block.equals(ModBlocks.ITEM_GATE.get())) {
@@ -136,7 +138,7 @@ public class Wand extends Item {
 		return WandMode.ADD_REC;
 	}
 
-	private boolean isValidContext(Player player, BlockPos clickedPosition, Block block, String shipUUID, BlockPos rudderPosition, BlockPos firstPosition, WandMode mode) {
+	private boolean isValidContext(Player player, Block block, String shipUUID, BlockPos rudderPosition, BlockPos firstPosition, WandMode mode) {
 		boolean result = true;
 		switch (mode) {
 			case SELECT_SHIP -> result = isRudderBlock(block, player);
@@ -152,11 +154,10 @@ public class Wand extends Item {
 				result &= nonNullFirstPosition(firstPosition, player);
 			}
 			case STRUCTURE_CHANGE -> {
-				result = nonNullUUID(shipUUID, player);
-				result &= nonNullRudderPosition(rudderPosition, player);
-				result &= UUIDMatch(shipUUID, rudderPosition, player);
-				if (block.equals(ModBlocks.SUB_RUDDER.get())) {
-					result &= subRudderConnectedToRudder(clickedPosition, rudderPosition, player);
+				if (block.equals(ModBlocks.RUDDER.get())) {
+					result = nonNullUUID(shipUUID, player);
+					result &= nonNullRudderPosition(rudderPosition, player);
+					result &= UUIDMatch(shipUUID, rudderPosition, player);
 				}
 			}
 			case DELETION -> {
@@ -211,23 +212,6 @@ public class Wand extends Item {
 		}
 		player.sendSystemMessage(Component.translatable("message.firstPositionNotSelected"));
 		return false;
-	}
-
-	private boolean subRudderConnectedToRudder(BlockPos clickedPosition, BlockPos rudderPosition, Player player) {
-		if (subRudderConnectedToRudderInternal(clickedPosition, rudderPosition, player)) {
-			return true;
-		}
-		player.sendSystemMessage(Component.translatable("message.notConnectedToRudder", rudderPosition.toShortString()));
-		return false;
-	}
-
-	private boolean subRudderConnectedToRudderInternal(BlockPos clickedPosition, BlockPos rudderPosition, Player player) {
-		BlockEntity entity = player.level.getBlockEntity(clickedPosition);
-		if (!(entity instanceof SubRudderBlockEntity)) {
-			return false;
-		}
-
-		return rudderPosition.equals(((SubRudderBlockEntity) entity).getRudderPosition());
 	}
 
 	@Override

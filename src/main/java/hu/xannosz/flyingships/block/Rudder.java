@@ -9,6 +9,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -19,6 +20,9 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,7 +41,7 @@ public class Rudder extends BaseEntityBlock {
 
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext blockPlaceContext) {
-		return this.defaultBlockState().setValue(FACING, blockPlaceContext.getHorizontalDirection().getOpposite());
+		return this.defaultBlockState().setValue(FACING, blockPlaceContext.getHorizontalDirection().getOpposite()).setValue(TYPE,0);
 	}
 
 	@Override
@@ -71,7 +75,7 @@ public class Rudder extends BaseEntityBlock {
 
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> blockStateBuilder) {
-		blockStateBuilder.add(FACING);
+		blockStateBuilder.add(FACING).add(TYPE);
 	}
 
 	@Override
@@ -100,5 +104,13 @@ public class Rudder extends BaseEntityBlock {
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@NotNull Level level, @NotNull BlockState blockState, @NotNull BlockEntityType<T> blockEntityType) {
 		return createTickerHelper(blockEntityType, ModBlockEntities.RUDDER_BLOCK_ENTITY.get(), RudderBlockEntity::tick);
+	}
+
+	@SuppressWarnings("deprecation")
+	public @NotNull VoxelShape getShape(@NotNull BlockState blockState, @NotNull BlockGetter blockGetter, @NotNull BlockPos blockPos, @NotNull CollisionContext collisionContext) {
+		if(blockState.getValue(TYPE)==2){
+			return Block.box(1, 0, 1, 15, 21, 15);
+		}
+		return Shapes.block();
 	}
 }

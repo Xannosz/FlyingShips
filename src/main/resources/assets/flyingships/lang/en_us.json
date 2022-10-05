@@ -51,5 +51,10 @@
   "gui.text.marker": "Marker: %s",
   "gui.text.heat.engine": "heat",
   "gui.text.steam.engine": "steam",
-  "gui.text.ender.engine": "ender"
+  "gui.text.ender.engine": "ender",
+  "gui.innerRound.base": "Original",
+  "gui.innerRound.triangle": "Triangle",
+  "gui.innerRound.submarine": "Submarine",
+  "gui.innerRound.modern": "Modern",
+  "gui.text.innerRoundStyle": "inner round style"
 }

@@ -367,4 +367,8 @@ public class RudderMenu extends AbstractContainerMenu {
 	public int usedEnderEnergyForMovement() {
 		return data.get(ENDER_MOVEMENT_POWER_KEY);
 	}
+
+	public int getInnerRoundType() {
+		return data.get(INNER_ROUND_TYPE_KEY);
+	}
 }

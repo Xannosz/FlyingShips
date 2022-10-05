@@ -51,5 +51,10 @@
   "gui.text.marker": "Jeladó: %s",
   "gui.text.heat.engine": "hő",
   "gui.text.steam.engine": "gőz",
-  "gui.text.ender.engine": "ender"
+  "gui.text.ender.engine": "ender",
+  "gui.innerRound.base": "Eredeti",
+  "gui.innerRound.triangle": "Háromszög",
+  "gui.innerRound.submarine": "U Boot",
+  "gui.innerRound.modern": "Modern",
+  "gui.text.innerRoundStyle": "Belső gyűrű stílusa"
 }

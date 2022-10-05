@@ -455,6 +455,8 @@ public class MainSubScreen extends SubScreen {
 		floating.render(poseStack, (int) (random.nextFloat(0.9f, 1.1f) * rudderScreen.getMenu().getFloating()), (int) (1.2 * rudderScreen.getMenu().getFloatingMax()), partialTick);
 
 		RenderSystem.setShaderTexture(0, INNER_ROUND_TEXTURE);
+		drawTexturedModalRect(poseStack, x + 112, y + 15, 1 + rudderScreen.getMenu().getInnerRoundType() * 32, 1, 30, 30, partialTick);
+		coolDown.setU(1 + rudderScreen.getMenu().getInnerRoundType() * 32);
 		coolDown.render(poseStack, rudderScreen.getMenu().getCoolDown(), FlyingShipsConfiguration.COOL_DOWN_TIME.get(), partialTick);
 		RenderSystem.setShaderTexture(0, TEXTURE);
 	}
