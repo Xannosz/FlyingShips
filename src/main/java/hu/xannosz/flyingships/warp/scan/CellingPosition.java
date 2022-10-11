@@ -1,4 +1,4 @@
-package hu.xannosz.flyingships.warp.terrainscan;
+package hu.xannosz.flyingships.warp.scan;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

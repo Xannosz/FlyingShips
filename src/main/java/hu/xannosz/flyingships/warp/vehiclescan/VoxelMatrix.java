@@ -22,7 +22,7 @@ public class VoxelMatrix {
 			Block block = level.getBlockState(blockPos).getBlock();
 
 			if (block.equals(Blocks.AIR)) {
-				if (blockPos.getY() < absoluteFluidLine) {
+				if (blockPos.getY() <= absoluteFluidLine) {
 					blockNumUnderWater++;
 				}
 				continue;

@@ -58,6 +58,10 @@ public class Util {
 		return block.hasProperty(BlockStateProperties.WATERLOGGED) && block.getValue(BlockStateProperties.WATERLOGGED);
 	}
 
+	public static boolean isNotField(Block block) {
+		return block.equals(Blocks.AIR) || block.equals(Blocks.VOID_AIR) || isFluid(block);
+	}
+
 	public static boolean isHollow(Block block) {
 		return block.defaultBlockState().hasProperty(BlockStateProperties.WATERLOGGED) || HOLLOW_BLOCKS.contains(block);
 	}

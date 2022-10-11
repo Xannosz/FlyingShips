@@ -3,10 +3,10 @@ package hu.xannosz.flyingships.warp.vehiclescan;
 import hu.xannosz.flyingships.block.ModBlocks;
 import hu.xannosz.flyingships.warp.AbsoluteRectangleData;
 import hu.xannosz.flyingships.warp.jump.JumpUtil;
-import hu.xannosz.flyingships.warp.terrainscan.BottomPosition;
-import hu.xannosz.flyingships.warp.terrainscan.CellingPosition;
-import hu.xannosz.flyingships.warp.terrainscan.FloatingPosition;
-import hu.xannosz.flyingships.warp.terrainscan.TerrainScanResponseStruct;
+import hu.xannosz.flyingships.warp.scan.ScanResult;
+import hu.xannosz.flyingships.warp.scan.BottomPosition;
+import hu.xannosz.flyingships.warp.scan.CellingPosition;
+import hu.xannosz.flyingships.warp.scan.FloatingPosition;
 import lombok.experimental.UtilityClass;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,13 +23,13 @@ import static hu.xannosz.flyingships.Util.isFluidTagged;
 @UtilityClass
 public class VehicleScanUtil {
 	public static VehicleScanResponseStruct scanVehicle(ServerLevel level, List<AbsoluteRectangleData> rectangleDataList,
-														Direction blockDirection, TerrainScanResponseStruct terrainScanResponseStruct) {
+														Direction blockDirection, ScanResult terrainScanResponseStruct) {
 		VehicleScanResponseStruct responseStruct = new VehicleScanResponseStruct();
 		final boolean isCommonFluid = isCommonFluid(terrainScanResponseStruct);
 
 		// get block position set
 		Set<BlockPos> blocks = getBlockPosSet(rectangleDataList);
-		VoxelMatrix matrix = new VoxelMatrix(level, blocks, terrainScanResponseStruct.getAbsoluteWaterLine(), isCommonFluid);
+		VoxelMatrix matrix = new VoxelMatrix(level, blocks, terrainScanResponseStruct.getAbsoluteFluidLine(), isCommonFluid);
 
 		// get entities
 		Set<Entity> entities = JumpUtil.getEntities(rectangleDataList, new Vec3(0, 0, 0), level).keySet();
@@ -96,7 +96,7 @@ public class VehicleScanUtil {
 		return fluid;
 	}
 
-	public static boolean inRectangles(List<AbsoluteRectangleData> rectangleDataList, BlockPos blockPos) {
+	private static boolean inRectangles(List<AbsoluteRectangleData> rectangleDataList, BlockPos blockPos) {
 		for (AbsoluteRectangleData rectangleData : rectangleDataList) {
 			if (rectangleData.getNorthWestCorner().getX() <= blockPos.getX() && blockPos.getX() <= rectangleData.getSouthEastCorner().getX() &&
 					rectangleData.getNorthWestCorner().getY() <= blockPos.getY() && blockPos.getY() <= rectangleData.getSouthEastCorner().getY() &&
@@ -237,7 +237,7 @@ public class VehicleScanUtil {
 		return result;
 	}
 
-	public static boolean isCommonFluid(TerrainScanResponseStruct terrainScanResponseStruct) {
+	public static boolean isCommonFluid(ScanResult terrainScanResponseStruct) {
 		return terrainScanResponseStruct.getCellingPosition().equals(CellingPosition.UNDER_WATER) ||
 				terrainScanResponseStruct.getFloatingPosition().equals(FloatingPosition.SWIM_WATER) ||
 				terrainScanResponseStruct.getBottomPosition().equals(BottomPosition.FLY_OVER_WATER);

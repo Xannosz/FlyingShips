@@ -1,4 +1,4 @@
-package hu.xannosz.flyingships.warp.terrainscan;
+package hu.xannosz.flyingships.warp.scan;
 
 import hu.xannosz.flyingships.ThisCodeShouldBeNeverReach;
 import lombok.Getter;
@@ -17,7 +17,7 @@ public enum LandButtonSettings {
 	private final int key;
 
 	@Nonnull
-	public LandButtonSettings nextState(TerrainScanResponseStruct terrainScanResponseStruct, int toCloudLevel) {
+	public LandButtonSettings nextState(ScanResult terrainScanResponseStruct, int toCloudLevel) {
 		LandButtonSettings nextState = this.internalNextState();
 		int i = 0;
 		while (!nextState.isValidLanding(terrainScanResponseStruct, toCloudLevel) && i < 5) {
@@ -52,11 +52,11 @@ public enum LandButtonSettings {
 		throw new ThisCodeShouldBeNeverReach();
 	}
 
-	private boolean isValidLanding(TerrainScanResponseStruct terrainScanResponseStruct, int toCloudLevel) {
+	private boolean isValidLanding(ScanResult terrainScanResponseStruct, int toCloudLevel) {
 		switch (this) {
 			case CLOUD_LEVEL -> {
-				return ((toCloudLevel > 0 && toCloudLevel < terrainScanResponseStruct.getHeightOfCelling()) ||
-						(toCloudLevel < 0 && -toCloudLevel < terrainScanResponseStruct.getHeightOfBottom())) &&
+				return ((toCloudLevel > 0 && toCloudLevel < terrainScanResponseStruct.getMaxCelling()) ||
+						(toCloudLevel < 0 && -toCloudLevel < terrainScanResponseStruct.getMaxBottom())) &&
 						!terrainScanResponseStruct.getCellingPosition().equals(CellingPosition.UNDER_WATER) &&
 						!terrainScanResponseStruct.getCellingPosition().equals(CellingPosition.UNDER_LAVA);
 			}

@@ -110,7 +110,7 @@ public class VoxelColumn {
 	}
 
 	private void calculateInterestBlock(Block block, int y) {
-		if (y < absoluteFluidLine) {
+		if (y <= absoluteFluidLine) {
 			if (!(isCommonFluid && Util.isCommonFluid(block) || !isCommonFluid && Util.isLava(block))) {
 				density += Util.getDensity(block);
 				blockNumUnderWater++;

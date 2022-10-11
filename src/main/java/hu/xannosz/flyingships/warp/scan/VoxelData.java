@@ -1,4 +1,4 @@
-package hu.xannosz.flyingships.warp.terrainscan;
+package hu.xannosz.flyingships.warp.scan;
 
 import net.minecraft.core.BlockPos;
 

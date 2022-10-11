@@ -15,10 +15,9 @@ import hu.xannosz.flyingships.warp.PowerState;
 import hu.xannosz.flyingships.warp.SavedCoordinate;
 import hu.xannosz.flyingships.warp.WarpDirection;
 import hu.xannosz.flyingships.warp.jump.JumpUtil;
-import hu.xannosz.flyingships.warp.terrainscan.LandButtonSettings;
-import hu.xannosz.flyingships.warp.terrainscan.LiveDataPackage;
-import hu.xannosz.flyingships.warp.terrainscan.TerrainScanResponseStruct;
-import hu.xannosz.flyingships.warp.terrainscan.TerrainScanUtil;
+import hu.xannosz.flyingships.warp.scan.ScanResult;
+import hu.xannosz.flyingships.warp.scan.Scanner;
+import hu.xannosz.flyingships.warp.scan.LandButtonSettings;
 import hu.xannosz.flyingships.warp.vehiclescan.VehicleScanResponseStruct;
 import hu.xannosz.flyingships.warp.vehiclescan.VehicleScanUtil;
 import lombok.Getter;
@@ -148,7 +147,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	private String uuid = null;
 	private int selectedCoordinate = -1;
 	private WarpDirection selectedWarpDirection;
-	private TerrainScanResponseStruct terrainScanResult;
+	private ScanResult terrainScanResult;
 	private VehicleScanResponseStruct vehicleScanResult;
 	@Getter
 	private int clock = 0;
@@ -493,8 +492,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	}
 
 	private void calculateJumpData() {
-		LiveDataPackage terrainScanMasks = TerrainScanUtil.generateMasks(JumpUtil.createRectangles(getBlockPos(), blockPositions));
-		terrainScanResult = TerrainScanUtil.scanTerrain((ServerLevel) level, terrainScanMasks, waterLine);
+		terrainScanResult = Scanner.scan((ServerLevel) level, JumpUtil.createRectangles(getBlockPos(), blockPositions), waterLine);
 		vehicleScanResult = VehicleScanUtil.scanVehicle((ServerLevel) level, JumpUtil.createRectangles(getBlockPos(), blockPositions),
 				getBlockState().getValue(Rudder.FACING), terrainScanResult);
 	}
@@ -514,10 +512,9 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 					switch (landButtonSettings) {
 						case CLOUD_LEVEL ->
 								necessarySpeed = Math.abs(CLOUD_LEVEL + waterLine - vehicleScanResult.getBottomY());
-						case LAND -> necessarySpeed = terrainScanResult.getHeightOfBottom();
-						case TOUCH_CELLING -> necessarySpeed = terrainScanResult.getHeightOfCelling();
-						case SWIM_LAVA, SWIM_WATER ->
-								necessarySpeed = Math.abs(terrainScanResult.getHeightOfWaterLine() + waterLine);
+						case LAND -> necessarySpeed = terrainScanResult.getMaxBottom();
+						case TOUCH_CELLING -> necessarySpeed = terrainScanResult.getMaxCelling();
+						case SWIM_LAVA, SWIM_WATER -> necessarySpeed = Math.abs(terrainScanResult.getToFluidLine());
 					}
 				} else {
 					if (selectedWarpDirection.equals(WarpDirection.LAND)) {
@@ -747,11 +744,11 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 	}
 
 	private boolean collusionOnY() {
-		if (selectedWarpDirection.equals(WarpDirection.UP) && terrainScanResult.getHeightOfCelling() > -1) {
-			return necessarySpeed > terrainScanResult.getHeightOfCelling();
+		if (selectedWarpDirection.equals(WarpDirection.UP) && terrainScanResult.getMaxCelling() > -1) {
+			return necessarySpeed > terrainScanResult.getMaxCelling();
 		}
-		if (selectedWarpDirection.equals(WarpDirection.DOWN) && terrainScanResult.getHeightOfBottom() > -1) {
-			return necessarySpeed > terrainScanResult.getHeightOfBottom();
+		if (selectedWarpDirection.equals(WarpDirection.DOWN) && terrainScanResult.getMaxBottom() > -1) {
+			return necessarySpeed > terrainScanResult.getMaxBottom();
 		}
 		return false;
 	}
@@ -785,14 +782,14 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 						return new Vec3(0, CLOUD_LEVEL + waterLine - vehicleScanResult.getBottomY(), 0);
 					}
 					case LAND -> {
-						return new Vec3(0, -terrainScanResult.getHeightOfBottom(), 0);
+						return new Vec3(0, -terrainScanResult.getMaxBottom(), 0);
 					}
 					case TOUCH_CELLING -> {
-						return new Vec3(0, terrainScanResult.getHeightOfCelling(), 0);
+						return new Vec3(0, terrainScanResult.getMaxCelling(), 0);
 					}
 					case SWIM_LAVA, SWIM_WATER -> {
 						return new Vec3(0,
-								terrainScanResult.getHeightOfWaterLine() + waterLine, 0);
+								terrainScanResult.getToFluidLine(), 0);
 					}
 				}
 			}
@@ -823,13 +820,13 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 						return CLOUD_LEVEL + waterLine - vehicleScanResult.getBottomY();
 					}
 					case LAND -> {
-						return -terrainScanResult.getHeightOfBottom();
+						return -terrainScanResult.getMaxBottom();
 					}
 					case TOUCH_CELLING -> {
-						return terrainScanResult.getHeightOfCelling();
+						return terrainScanResult.getMaxCelling();
 					}
 					case SWIM_LAVA, SWIM_WATER -> {
-						return terrainScanResult.getHeightOfWaterLine() + waterLine;
+						return terrainScanResult.getToFluidLine();
 					}
 				}
 			}
@@ -924,7 +921,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider {
 		final int floaterPower = vehicleScanResult.getLiftSurface() * FlyingShipsConfiguration.LIFT_MULTIPLIER.get() +
 				vehicleScanResult.getWool() * FlyingShipsConfiguration.BALLOON_MULTIPLIER.get() +
 				vehicleScanResult.getArtificialFloater() * FlyingShipsConfiguration.ARTIFICIAL_FLOATER_LIFT_MULTIPLIER.get();
-		return floaterPower + ((getYAdditional() + waterLine + vehicleScanResult.getBottomY()) > terrainScanResult.getAbsoluteWaterLine() ? 0 : floatingInFluid);
+		return floaterPower + ((getYAdditional() + waterLine + vehicleScanResult.getBottomY()) > terrainScanResult.getAbsoluteFluidLine() ? 0 : floatingInFluid);
 	}
 
 	private int usedHeatEnergyForFloating() {

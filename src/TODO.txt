@@ -2,9 +2,6 @@
 - item frames sometimes broken during jump
 
 // bugs/optimization
-- terrain scan refactor (merge with vehicle scan)
-- fly over field when touch water
-- more fluid
 
 // official release
 - extend hollow blocks list
@@ -27,3 +24,8 @@
 
 // computer update
 - computercraft integration
+
+// immersive
+- submarine (cooper) trap door
+- ruins (SG rings like)
+- periscope (camera and monitor?)

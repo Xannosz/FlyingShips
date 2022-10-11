@@ -4,7 +4,6 @@ import hu.xannosz.flyingships.networking.ModMessages;
 import hu.xannosz.flyingships.networking.PlaySoundPacket;
 import hu.xannosz.flyingships.warp.AbsoluteRectangleData;
 import hu.xannosz.flyingships.warp.BlockPosStruct;
-import hu.xannosz.flyingships.warp.terrainscan.TerrainScanUtil;
 import hu.xannosz.flyingships.warp.vehiclescan.VehicleScanUtil;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import lombok.experimental.UtilityClass;
@@ -56,12 +55,12 @@ public class JumpUtil {
 			final Map<LevelChunk, Boolean> chunks = getChunks(rectangles, additional, level);
 
 			//get shell
-			final Set<BlockPos> sourceShell = TerrainScanUtil.getShell(rectangles, true);
+			final Set<BlockPos> sourceShell = getShell(rectangles, true);
 			//target shell
 			final Set<BlockPos> targetShell = sourceShell.stream().map(
 					blockPos -> blockPos.offset(additional.x, additional.y, additional.z)).collect(Collectors.toSet());
 			//source inner shell
-			final Set<BlockPos> sourceInnerShell = TerrainScanUtil.getShell(rectangles, false);
+			final Set<BlockPos> sourceInnerShell = getShell(rectangles, false);
 
 			//sound effect
 			playSoundEffect(pivotPointPosition, players, level.getPlayers((serverPlayer -> true)));
@@ -383,7 +382,42 @@ public class JumpUtil {
 				level.setChunkForced(chunk.getPos().x, chunk.getPos().z, isForced));
 	}
 
-	private static void saveChunks(Map<LevelChunk, Boolean> chunks){
+	private static void saveChunks(Map<LevelChunk, Boolean> chunks) {
 		chunks.forEach((chunk, isForced) -> chunk.setUnsaved(true));
+	}
+
+	private static Set<BlockPos> getShell(List<AbsoluteRectangleData> rectangleDataList, boolean outer) {
+		Set<BlockPos> result = new HashSet<>();
+		for (AbsoluteRectangleData rectangleData : rectangleDataList) {
+			int minX = rectangleData.getNorthWestCorner().getX() - (outer ? 1 : 0);
+			int maxX = rectangleData.getSouthEastCorner().getX() + (outer ? 1 : 0);
+			int minY = rectangleData.getNorthWestCorner().getY() - (outer ? 1 : 0);
+			int maxY = rectangleData.getSouthEastCorner().getY() + (outer ? 1 : 0);
+			int minZ = rectangleData.getNorthWestCorner().getZ() - (outer ? 1 : 0);
+			int maxZ = rectangleData.getSouthEastCorner().getZ() + (outer ? 1 : 0);
+
+			for (int y = rectangleData.getNorthWestCorner().getY(); y <= rectangleData.getSouthEastCorner().getY(); y++) {
+				for (int z = rectangleData.getNorthWestCorner().getZ(); z <= rectangleData.getSouthEastCorner().getZ(); z++) {
+					result.add(new BlockPos(minX, y, z));
+					result.add(new BlockPos(maxX, y, z));
+				}
+			}
+
+			for (int x = rectangleData.getNorthWestCorner().getX(); x <= rectangleData.getSouthEastCorner().getX(); x++) {
+				for (int y = rectangleData.getNorthWestCorner().getY(); y <= rectangleData.getSouthEastCorner().getY(); y++) {
+					result.add(new BlockPos(x, y, minZ));
+					result.add(new BlockPos(x, y, maxZ));
+				}
+			}
+
+			for (int x = rectangleData.getNorthWestCorner().getX(); x <= rectangleData.getSouthEastCorner().getX(); x++) {
+				for (int z = rectangleData.getNorthWestCorner().getZ(); z <= rectangleData.getSouthEastCorner().getZ(); z++) {
+					result.add(new BlockPos(x, minY, z));
+					result.add(new BlockPos(x, maxY, z));
+				}
+			}
+		}
+
+		return result;
 	}
 }

@@ -1,4 +1,4 @@
-package hu.xannosz.flyingships.warp.terrainscan;
+package hu.xannosz.flyingships.warp.scan;
 
 import lombok.Data;
 
@@ -9,5 +9,5 @@ public class CageStruct {
 	private int zMin;
 	private int zMax;
 	private int yMin;
-	private int yMax;
+	private int yMax; //TODO remove
 }
