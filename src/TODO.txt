@@ -3,13 +3,22 @@
 
 // bugs/optimization
 
+// on server additional features
+- ruins (SG rings like)
+
+// official alfa
+- description page
+- test fluid gate
+
+// official beta
+- wiki
+- question before delete rectangle/coordinate
+- enable/disable vertical movement (under waterline / above waterline)
+
 // official release
 - extend hollow blocks list
 - calculate block density from material
 - enable/disable marker
-- question before delete rectangle/coordinate
-- enable/disable vertical movement (under waterline / above waterline)
-- test fluid gate
 
 // turn update
 - turn (during jump, without jump, saved coordinates)
@@ -24,8 +33,3 @@
 
 // computer update
 - computercraft integration
-
-// immersive
-- submarine (cooper) trap door
-- ruins (SG rings like)
-- periscope (camera and monitor?)

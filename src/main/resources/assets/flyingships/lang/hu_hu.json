@@ -11,6 +11,7 @@
   "block.flyingships.marker": "Jeladó",
   "block.flyingships.sub_rudder": "Alkormány",
   "block.flyingships.artificial_floater": "Lebegtető",
+  "block.flyingships.cooper_trapdoor": "Réz csapóajtó",
   "text.wand.lessInfo": "Téglatesteket add hozzá a kiválasztott hajóhoz",
   "text.wand.moreInfo1": "Hajó kiválasztásához jobb klikk a kormány bolkkra\nAzután jobb klikk egy blokkra, az egyik majd a másik sarkon, és a téglatest hozzá is lett adva a hajóhoz.",
   "text.wand.moreInfo2": "Shift jobb klikk a kiválasztott sarok törléséhez (nem törli a hajóból)",

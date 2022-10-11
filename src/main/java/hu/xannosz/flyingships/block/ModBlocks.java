@@ -76,6 +76,10 @@ public class ModBlocks {
 					))
 	);
 
+	public static final RegistryObject<Block> COOPER_TRAPDOOR = registerBlock("cooper_trapdoor",
+			() -> new ModdedTrapDoorBlock(BlockBehaviour.Properties.of(Material.WOOD)
+					.strength(5f).noOcclusion()));
+
 	private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> blockCreator) {
 		RegistryObject<T> block = BLOCKS.register(name, blockCreator);
 		registerBlockItem(name, block);
