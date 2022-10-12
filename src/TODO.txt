@@ -12,12 +12,10 @@
 
 // official beta
 - wiki
-- question before delete rectangle/coordinate
 - enable/disable vertical movement (under waterline / above waterline)
 
 // official release
-- extend hollow blocks list
-- calculate block density from material
+- question before delete rectangle/coordinate
 - enable/disable marker
 
 // turn update
@@ -30,6 +28,7 @@
 - dimension change
 - block as a dimension button
 - configurable reachable dimensions
+- disable coordinates from other dimensions
 
 // computer update
 - computercraft integration

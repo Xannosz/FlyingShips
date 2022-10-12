@@ -6,6 +6,7 @@ import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 @Getter
 public class VoxelColumn {
@@ -28,12 +29,12 @@ public class VoxelColumn {
 	private final int absoluteFluidLine;
 	private final boolean isCommonFluid;
 
-	public VoxelColumn(BlockPos blockPos, Block block, ColumnType columnType, int absoluteFluidLine, boolean isCommonFluid) {
+	public VoxelColumn(BlockPos blockPos, BlockState blockState, ColumnType columnType, int absoluteFluidLine, boolean isCommonFluid) {
 		this.columnType = columnType;
 		this.absoluteFluidLine = absoluteFluidLine;
 		this.isCommonFluid = isCommonFluid;
 
-		calculateInterestBlock(block, blockPos.getY());
+		calculateInterestBlock(blockState, blockPos.getY());
 		switch (columnType) {
 			case X -> {
 				min = blockPos.getX();
@@ -56,10 +57,10 @@ public class VoxelColumn {
 		}
 	}
 
-	public boolean add(BlockPos blockPos, Block block) {
+	public boolean add(BlockPos blockPos, BlockState blockState) {
 		boolean canAccept = canAcceptInColumn(blockPos);
 		if (canAccept) {
-			calculateInterestBlock(block, blockPos.getY());
+			calculateInterestBlock(blockState, blockPos.getY());
 		}
 		return canAccept;
 	}
@@ -109,14 +110,15 @@ public class VoxelColumn {
 		return false;
 	}
 
-	private void calculateInterestBlock(Block block, int y) {
+	private void calculateInterestBlock(BlockState blockState, int y) {
+		final Block block = blockState.getBlock();
 		if (y <= absoluteFluidLine) {
 			if (!(isCommonFluid && Util.isCommonFluid(block) || !isCommonFluid && Util.isLava(block))) {
-				density += Util.getDensity(block);
+				density += Util.getDensity(blockState);
 				blockNumUnderWater++;
 			}
 		} else {
-			density += Util.getDensity(block);
+			density += Util.getDensity(blockState);
 			if (isAWool(block)) {
 				wool++;
 			}
