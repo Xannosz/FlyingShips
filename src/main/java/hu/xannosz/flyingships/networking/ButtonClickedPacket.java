@@ -1,6 +1,6 @@
 package hu.xannosz.flyingships.networking;
 
-import hu.xannosz.flyingships.blockentity.RudderBlockEntity;
+import hu.xannosz.flyingships.blockentity.ButtonUser;
 import hu.xannosz.flyingships.screen.widget.ButtonId;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -35,8 +35,8 @@ public class ButtonClickedPacket {
 		context.enqueueWork(() -> {
 			// SERVER SITE
 			BlockEntity entity = Objects.requireNonNull(context.getSender()).getLevel().getBlockEntity(position);
-			if (entity instanceof RudderBlockEntity) {
-				((RudderBlockEntity) entity).executeButtonClick(buttonId);
+			if (entity instanceof ButtonUser) {
+				((ButtonUser) entity).executeButtonClick(buttonId);
 			}
 		});
 	}

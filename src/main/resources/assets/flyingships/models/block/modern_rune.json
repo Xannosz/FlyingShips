@@ -1,0 +1,22 @@
+{
+  "texture_size": [48, 48],
+  "render_type": "cutout",
+  "textures": {
+    "0": "flyingships:block/modern_rune",
+    "particle": "flyingships:block/modern_rune"
+  },
+  "elements": [
+    {
+      "from": [-16, 0, -16],
+      "to": [32, 1, 32],
+      "faces": {
+        "north": {"uv": [0, 0, 16, 0.3], "texture": "#0"},
+        "east": {"uv": [0, 0, 16, 0.3], "texture": "#0"},
+        "south": {"uv": [0, 0, 16, 0.3], "texture": "#0"},
+        "west": {"uv": [0, 0, 16, 0.3], "texture": "#0"},
+        "up": {"uv": [0, 0, 16, 16], "texture": "#0"},
+        "down": {"uv": [0, 0, 16, 16], "texture": "#0"}
+      }
+    }
+  ]
+}

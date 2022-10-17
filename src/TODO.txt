@@ -3,12 +3,10 @@
 
 // bugs/optimization
 
-// on server additional features
-- ruins (SG rings like)
-
 // official alfa
 - description page
 - test fluid gate
+- check future functions
 
 // official beta
 - wiki
@@ -16,13 +14,13 @@
 
 // official release
 - question before delete rectangle/coordinate
-- enable/disable marker
 
-// turn update
-- turn (during jump, without jump, saved coordinates)
-- relative to marker direction
-- marker spinning with wand (or can place)
-- write out marker direction
+// SG-1 update
+- pel'tak rudder style
+- pel'tak subrudder style
+- ha'tak inner round style
+- pj inner round style
+- rings rune style
 
 // dimension update
 - dimension change
@@ -30,5 +28,12 @@
 - configurable reachable dimensions
 - disable coordinates from other dimensions
 
+// turn update
+- turn (during jump, without jump, saved coordinates)
+- relative to marker direction
+- marker spinning with wand (or can place)
+- write out marker direction
+
 // computer update
 - computercraft integration
+- energy converter block, all energy to ender propulsion

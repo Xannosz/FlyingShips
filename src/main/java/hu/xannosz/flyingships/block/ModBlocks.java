@@ -76,9 +76,14 @@ public class ModBlocks {
 					))
 	);
 
+	@SuppressWarnings("unused")
 	public static final RegistryObject<Block> COOPER_TRAPDOOR = registerBlock("cooper_trapdoor",
 			() -> new ModdedTrapDoorBlock(BlockBehaviour.Properties.of(Material.WOOD)
 					.strength(5f).noOcclusion()));
+
+	public static final RegistryObject<Block> RUNE = registerBlock("rune",
+			() -> new Rune(BlockBehaviour.Properties.of(Material.WOOD).lightLevel(state -> 12).noOcclusion().strength(1.5F, 6.0F).sound(SoundType.WOOD))
+	);
 
 	private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> blockCreator) {
 		RegistryObject<T> block = BLOCKS.register(name, blockCreator);

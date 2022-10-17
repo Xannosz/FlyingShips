@@ -33,6 +33,12 @@ public class ModBlockEntities {
 							MarkerBlockEntity::new,
 							ModBlocks.MARKER.get()).build(null));
 
+	public static final RegistryObject<BlockEntityType<RuneBlockEntity>> RUNE_BLOCK_ENTITY =
+			BLOCK_ENTITIES.register("rune_block_entity", () ->
+					BlockEntityType.Builder.of(
+							RuneBlockEntity::new,
+							ModBlocks.RUNE.get()).build(null));
+
 
 	public static void register(IEventBus eventBus) {
 		BLOCK_ENTITIES.register(eventBus);

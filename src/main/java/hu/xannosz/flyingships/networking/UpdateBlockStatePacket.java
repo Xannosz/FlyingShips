@@ -3,6 +3,7 @@ package hu.xannosz.flyingships.networking;
 import hu.xannosz.flyingships.Util;
 import hu.xannosz.flyingships.block.ModBlocks;
 import hu.xannosz.flyingships.block.Rudder;
+import hu.xannosz.flyingships.block.Rune;
 import hu.xannosz.flyingships.block.SubRudder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -39,11 +40,16 @@ public class UpdateBlockStatePacket {
 				currentState++;
 				currentState %= Util.RUDDER_TYPES + 1;
 				context.getSender().level.setBlock(position, blockState.setValue(Rudder.TYPE, currentState), 3);
-			} else {
+			} else if (blockState.getBlock().equals(ModBlocks.SUB_RUDDER.get())) {
 				int currentState = blockState.getValue(SubRudder.TYPE);
 				currentState++;
 				currentState %= Util.RUDDER_TYPES + 1;
 				context.getSender().level.setBlock(position, blockState.setValue(SubRudder.TYPE, currentState), 3);
+			} else if (blockState.getBlock().equals(ModBlocks.RUNE.get())) {
+				int currentState = blockState.getValue(Rune.TYPE);
+				currentState++;
+				currentState %= Util.RUNE_TYPES + 1;
+				context.getSender().level.setBlock(position, blockState.setValue(Rune.TYPE, currentState), 3);
 			}
 		});
 	}

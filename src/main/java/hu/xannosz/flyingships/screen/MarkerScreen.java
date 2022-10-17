@@ -5,9 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hu.xannosz.flyingships.FlyingShips;
 import hu.xannosz.flyingships.networking.ModMessages;
 import hu.xannosz.flyingships.networking.SendNewMarkerNamePacket;
-import hu.xannosz.flyingships.screen.widget.ButtonId;
-import hu.xannosz.flyingships.screen.widget.LoopBackEditBox;
-import hu.xannosz.flyingships.screen.widget.ScreenWithButton;
+import hu.xannosz.flyingships.screen.widget.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -20,6 +18,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
+import static hu.xannosz.flyingships.screen.RudderScreen.DEBUG_MODE;
+
 @OnlyIn(Dist.CLIENT)
 public class MarkerScreen extends AbstractContainerScreen<MarkerMenu> implements ScreenWithButton {
 
@@ -28,12 +28,14 @@ public class MarkerScreen extends AbstractContainerScreen<MarkerMenu> implements
 	private int x;
 	private int y;
 
+	private GraphicalButton enabledButton;
+	private GraphicalButton disabledButton;
 	private LoopBackEditBox markerName;
 	private boolean markerNameUpdated = false;
 
-	public MarkerScreen(MarkerMenu rudderMenu, Inventory inventory, Component title) {
-		super(rudderMenu, inventory, title);
-		imageHeight = 126;
+	public MarkerScreen(MarkerMenu markerMenu, Inventory inventory, Component title) {
+		super(markerMenu, inventory, title);
+		imageHeight = 45;
 	}
 
 	@Override
@@ -48,6 +50,11 @@ public class MarkerScreen extends AbstractContainerScreen<MarkerMenu> implements
 				Component.empty().withStyle(ChatFormatting.DARK_GRAY), ButtonId.MARKER_NAME_EDITION_DONE, this);
 		markerName.setEditable(true);
 
+		enabledButton = new GraphicalButton(generateConfig(188));
+		disabledButton = new GraphicalButton(generateConfig(176));
+
+		addRenderableWidget(enabledButton);
+		addRenderableWidget(disabledButton);
 		addRenderableWidget(markerName);
 	}
 
@@ -58,6 +65,13 @@ public class MarkerScreen extends AbstractContainerScreen<MarkerMenu> implements
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.setShaderTexture(0, TEXTURE);
 		this.blit(poseStack, x, y, 0, 0, imageWidth, imageHeight);
+		if (menu.isEnabled()) {
+			enabledButton.setVisibility(true);
+			disabledButton.setVisibility(false);
+		} else {
+			enabledButton.setVisibility(false);
+			disabledButton.setVisibility(true);
+		}
 	}
 
 	@Override
@@ -98,5 +112,26 @@ public class MarkerScreen extends AbstractContainerScreen<MarkerMenu> implements
 			markerNameUpdated = false;
 		}
 		menu.updateName();
+	}
+
+	private ButtonConfig generateConfig(int u) {
+		return ButtonConfig.builder()
+				.buttonId(ButtonId.MARKER_SET_ENABLED)
+				.position(menu.getBlockEntity().getBlockPos())
+				.isDefaultButtonDrawNeeded(true)
+				.debugMode(DEBUG_MODE)
+				.hitBoxX(x + 156)
+				.hitBoxY(y + 9)
+				.hitBoxW(12)
+				.hitBoxH(12)
+				.graphicalX(x + 156)
+				.graphicalY(y + 9)
+				.graphicalW(12)
+				.graphicalH(12)
+				.buttonX(u)
+				.buttonY(0)
+				.hoveredX(u)
+				.hoveredY(12)
+				.build();
 	}
 }

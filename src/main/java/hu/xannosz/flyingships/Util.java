@@ -26,6 +26,7 @@ public class Util {
 
 	public static final int CLOUD_LEVEL = 196;
 	public static final int RUDDER_TYPES = 2; //started from zero
+	public static final int RUNE_TYPES = 1; //started from zero
 
 	public static final List<String> INNER_ROUNDS = Arrays.asList("gui.innerRound.base", "gui.innerRound.triangle", "gui.innerRound.submarine", "gui.innerRound.modern");
 

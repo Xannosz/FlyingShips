@@ -15,9 +15,9 @@ import hu.xannosz.flyingships.warp.PowerState;
 import hu.xannosz.flyingships.warp.SavedCoordinate;
 import hu.xannosz.flyingships.warp.WarpDirection;
 import hu.xannosz.flyingships.warp.jump.JumpUtil;
+import hu.xannosz.flyingships.warp.scan.LandButtonSettings;
 import hu.xannosz.flyingships.warp.scan.ScanResult;
 import hu.xannosz.flyingships.warp.scan.Scanner;
-import hu.xannosz.flyingships.warp.scan.LandButtonSettings;
 import hu.xannosz.flyingships.warp.vehiclescan.VehicleScanResponseStruct;
 import hu.xannosz.flyingships.warp.vehiclescan.VehicleScanUtil;
 import lombok.Getter;
@@ -55,7 +55,7 @@ import static net.minecraft.world.item.crafting.RecipeType.SMELTING;
 import static net.minecraftforge.common.ForgeHooks.getBurnTime;
 
 @Slf4j
-public class RudderBlockEntity extends BlockEntity implements MenuProvider {
+public class RudderBlockEntity extends BlockEntity implements MenuProvider, ButtonUser {
 
 	public static final int SPEED_KEY = 0;
 	public static final int STEP_KEY = 1;

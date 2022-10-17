@@ -80,6 +80,11 @@ public class ModMessages {
 				.encoder(UpdateBlockStatePacket::toBytes)
 				.consumerMainThread(UpdateBlockStatePacket::handler)
 				.add();
+		INSTANCE.messageBuilder(RuneActivationPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+				.decoder(RuneActivationPacket::new)
+				.encoder(RuneActivationPacket::toBytes)
+				.consumerMainThread(RuneActivationPacket::handler)
+				.add();
 	}
 
 	public static <MSG> void sendToServer(MSG message) {

@@ -9,6 +9,7 @@ import hu.xannosz.flyingships.networking.ModMessages;
 import hu.xannosz.flyingships.screen.MarkerScreen;
 import hu.xannosz.flyingships.screen.ModMenuTypes;
 import hu.xannosz.flyingships.screen.RudderScreen;
+import hu.xannosz.flyingships.screen.RuneScreen;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -51,6 +52,7 @@ public class FlyingShips {
 		public static void onClientSetup(FMLClientSetupEvent event) {
 			MenuScreens.register(ModMenuTypes.RUDDER_MENU.get(), RudderScreen::new);
 			MenuScreens.register(ModMenuTypes.MARKER_MENU.get(), MarkerScreen::new);
+			MenuScreens.register(ModMenuTypes.RUNE_MENU.get(), RuneScreen::new);
 		}
 	}
 }

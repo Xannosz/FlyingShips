@@ -115,7 +115,7 @@ public class JumpUtil {
 			//save chunks
 			saveChunks(chunks);
 		} catch (Exception ex) {
-			log.error("Exception during jump, whit ship", ex);
+			log.error("Exception during jump", ex);
 		}
 	}
 
@@ -419,5 +419,58 @@ public class JumpUtil {
 		}
 
 		return result;
+	}
+
+	public static void useRune(ServerLevel level, BlockPos source, BlockPos target) {
+		try {
+			final AbsoluteRectangleData sourceData = new AbsoluteRectangleData();
+			sourceData.setNorthWestCorner(new BlockPos(source.getX() - 1, source.getY() - 1, source.getZ() - 1));
+			sourceData.setSouthEastCorner(new BlockPos(source.getX() + 2, source.getY() + 2, source.getZ() + 2));
+			sourceData.setStructureSize(new Vec3i(5, 5, 5));
+
+			final AbsoluteRectangleData targetData = new AbsoluteRectangleData();
+			targetData.setNorthWestCorner(new BlockPos(target.getX() - 1, target.getY() - 1, target.getZ() - 1));
+			targetData.setSouthEastCorner(new BlockPos(target.getX() + 2, target.getY() + 2, target.getZ() + 2));
+			targetData.setStructureSize(new Vec3i(5, 5, 5));
+
+			final Vec3 sourceAdditional = new Vec3(target.getX() - source.getX(), target.getY() - source.getY(), target.getZ() - source.getZ());
+			final Vec3 targetAdditional = new Vec3(source.getX() - target.getX(), source.getY() - target.getY(), source.getZ() - target.getZ());
+
+			//save entities
+			final Map<Entity, Vec3> entities = getEntities(Collections.singletonList(sourceData), sourceAdditional, level);
+			entities.putAll(getEntities(Collections.singletonList(targetData), targetAdditional, level));
+			//save players
+			final Map<ServerPlayer, Vec3> players = getPlayers(Collections.singletonList(sourceData), sourceAdditional, level);
+			players.putAll(getPlayers(Collections.singletonList(targetData), targetAdditional, level));
+			//get chunks
+			final Map<LevelChunk, Boolean> chunks = getChunks(Collections.singletonList(sourceData), sourceAdditional, level); // target chunks added automatically
+
+			//sound effect
+			playSoundEffect(source, players, level.getPlayers((serverPlayer -> true)));
+			//sound effect
+			playSoundEffect(target, players, level.getPlayers((serverPlayer -> true)));
+			//effects on player
+			addEffectsToPlayers(players);
+
+			//force load chunks
+			forceLoadChunks(chunks, level);
+
+			//update chunks (reload structure)
+			updateChunks(chunks);
+			//teleport entities
+			teleportEntities(entities);
+			//teleport players
+			teleportPlayers(players);
+			//update chunks (reload entities)
+			updateChunks(chunks);
+
+			//reset chunks force load
+			resetChunkForceLoad(chunks, level);
+
+			//save chunks
+			saveChunks(chunks);
+		} catch (Exception ex) {
+			log.error("Exception during rune usage", ex);
+		}
 	}
 }

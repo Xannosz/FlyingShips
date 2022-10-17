@@ -24,6 +24,7 @@ public class FlyingShipsConfiguration {
 	public static final ForgeConfigSpec.ConfigValue<Integer> ENERGY_PER_ENDER_PEARL;
 	public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_COLLUSION_DETECTION_ON_Y;
 	public static final ForgeConfigSpec.ConfigValue<Integer> MARKER_RANGE;
+	public static final ForgeConfigSpec.ConfigValue<Integer> RUNE_RANGE;
 
 
 	static {
@@ -63,6 +64,8 @@ public class FlyingShipsConfiguration {
 				.define("enableCollusionDetectionOnY", true);
 		MARKER_RANGE = BUILDER.comment("Detection range of markers in chunk")
 				.defineInRange("markerRange", 12, 6, 32);
+		RUNE_RANGE = BUILDER.comment("Detection range of runes in chunk")
+				.defineInRange("runeRange", 12, 6, 32);
 
 		BUILDER.pop();
 		SPEC = BUILDER.build();

@@ -2,10 +2,7 @@ package hu.xannosz.flyingships.item;
 
 import hu.xannosz.flyingships.block.ModBlocks;
 import hu.xannosz.flyingships.blockentity.RudderBlockEntity;
-import hu.xannosz.flyingships.networking.AddRectanglePacket;
-import hu.xannosz.flyingships.networking.ConnectToRudder;
-import hu.xannosz.flyingships.networking.ModMessages;
-import hu.xannosz.flyingships.networking.UpdateBlockStatePacket;
+import hu.xannosz.flyingships.networking.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -111,17 +108,22 @@ public class Wand extends Item {
 				itemStack.getOrCreateTag().remove(SHIP_UUID_TAG);
 				player.sendSystemMessage(Component.translatable("message.shipNameDeleted"));
 			}
+			case RUNE_ACTIVATION -> ModMessages.sendToServer(new RuneActivationPacket(clickedPosition));
 		}
 
 		return InteractionResult.SUCCESS;
 	}
 
 	private WandMode calculateWandMode(Block block, BlockPos rudderPosition, BlockPos firstPosition, boolean isShiftDown) {
-		if (rudderPosition == null && block.equals(ModBlocks.SUB_RUDDER.get())) {
+		if (rudderPosition == null &&
+				(block.equals(ModBlocks.SUB_RUDDER.get()) || block.equals(ModBlocks.RUNE.get()))) {
 			return WandMode.STRUCTURE_CHANGE;
 		}
-		if (rudderPosition == null) {
+		if (rudderPosition == null && block.equals(ModBlocks.RUDDER.get())) {
 			return WandMode.SELECT_SHIP;
+		}
+		if (rudderPosition == null){
+			return WandMode.RUNE_ACTIVATION;
 		}
 		if (block.equals(ModBlocks.RUDDER.get())) {
 			return WandMode.STRUCTURE_CHANGE;
@@ -260,6 +262,6 @@ public class Wand extends Item {
 	}
 
 	private enum WandMode {
-		SELECT_SHIP, SELECT_FIRST_POS, ADD_REC, CONNECT, STRUCTURE_CHANGE, DELETION
+		SELECT_SHIP, SELECT_FIRST_POS, ADD_REC, CONNECT, STRUCTURE_CHANGE, DELETION, RUNE_ACTIVATION
 	}
 }
