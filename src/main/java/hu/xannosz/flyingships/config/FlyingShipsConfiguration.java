@@ -31,19 +31,19 @@ public class FlyingShipsConfiguration {
 		BUILDER.push("Configs for Flying Ships Mod");
 
 		WIND_MULTIPLIER = BUILDER.comment("Wind power per wool block")
-				.define("windMultiplier", 20);
+				.define("windMultiplier", 40);
 		LIFT_MULTIPLIER = BUILDER.comment("Buoyancy per block")
-				.define("liftMultiplier", 15);
+				.define("liftMultiplier", 20);
 		BALLOON_MULTIPLIER = BUILDER.comment("How many buoyancy in a gas balloon (wool block)")
-				.define("balloonMultiplier", 60);
+				.define("balloonMultiplier", 75);
 		ARTIFICIAL_FLOATER_LIFT_MULTIPLIER = BUILDER.comment("How many buoyancy in a artificial floater")
-				.define("artificialFloaterLiftMultiplier", 720);
+				.define("artificialFloaterLiftMultiplier", 830);
 		ARTIFICIAL_FLOATER_MOVEMENT_MULTIPLIER = BUILDER.comment("How many movement power in a artificial floater")
-				.define("artificialFloaterMovementMultiplier", 210);
+				.define("artificialFloaterMovementMultiplier", 340);
 		LIFT_OF_IN_WATER = BUILDER.comment("Buoyancy in water")
-				.define("liftOfInWater", 200);
+				.define("liftOfInWater", 350);
 		LIFT_OF_IN_LAVA = BUILDER.comment("Buoyancy in lava")
-				.define("liftOfInLava", 500);
+				.define("liftOfInLava", 650);
 		SPEED_CONSOLIDATOR = BUILDER.comment("Divider for the energy calculating system")
 				.defineInRange("speedConsolidator", 5000d, 1000d, 10000d);
 		ENABLE_SLIDING = BUILDER.comment("Enable short movement without energy consuming")

@@ -29,9 +29,10 @@ public class GetMarkerNamePacket {
 		context.enqueueWork(() -> {
 			// SERVER SITE
 			BlockEntity entity = Objects.requireNonNull(context.getSender()).getLevel().getBlockEntity(position);
-			if (entity instanceof MarkerBlockEntity) {
+			if (entity instanceof MarkerBlockEntity markerBlockEntity) {
 				ModMessages.sendToPlayer(
-						new SendSavedMarkerNamePacket(position, ((MarkerBlockEntity) entity).getMarkerName()),
+						new SendSavedMarkerNamePacket(position,
+								markerBlockEntity.getMarkerName(), markerBlockEntity.isEnabled()),
 						context.getSender());
 			}
 		});

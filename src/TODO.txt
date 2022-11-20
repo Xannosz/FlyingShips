@@ -3,17 +3,15 @@
 
 // bugs/optimization
 
-// official alfa
-- description page
-- test fluid gate
+// official programming
 - check future functions
-
-// official beta
-- wiki
 - enable/disable vertical movement (under waterline / above waterline)
 
-// official release
-- question before delete rectangle/coordinate
+// official non programming
+- test fluid gate
+- build gradle remove "example mod"
+- description page
+- wiki
 
 // SG-1 update
 - pel'tak rudder style
@@ -37,3 +35,5 @@
 // computer update
 - computercraft integration
 - energy converter block, all energy to ender propulsion
+- copper coil propulsion for big ships
+- create save command (magic wand?)
