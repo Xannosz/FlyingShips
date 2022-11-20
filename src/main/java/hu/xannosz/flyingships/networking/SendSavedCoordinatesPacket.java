@@ -1,18 +1,18 @@
 package hu.xannosz.flyingships.networking;
 
-import hu.xannosz.flyingships.blockentity.RudderBlockEntity;
 import hu.xannosz.flyingships.warp.SavedCoordinate;
-import net.minecraft.client.Minecraft;
+import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Supplier;
 
+@Getter
 public class SendSavedCoordinatesPacket {
 	private final BlockPos position;
 	private final int count;
@@ -49,12 +49,10 @@ public class SendSavedCoordinatesPacket {
 
 	public void handler(Supplier<NetworkEvent.Context> supplier) {
 		NetworkEvent.Context context = supplier.get();
-		context.enqueueWork(() -> {
-			// CLIENT SITE
-			BlockEntity entity = Objects.requireNonNull(Minecraft.getInstance().level).getBlockEntity(position);
-			if (entity instanceof RudderBlockEntity) {
-				((RudderBlockEntity) entity).setCoordinates(savedCoordinates);
-			}
-		});
+		context.enqueueWork(() ->
+				// CLIENT SITE
+				DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
+						ClientPacketHandlerClass.handleSendSavedCoordinatesPacket(this, supplier))
+		);
 	}
 }

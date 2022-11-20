@@ -1,15 +1,15 @@
 package hu.xannosz.flyingships.networking;
 
-import hu.xannosz.flyingships.blockentity.MarkerBlockEntity;
-import net.minecraft.client.Minecraft;
+import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 
-import java.util.Objects;
 import java.util.function.Supplier;
 
+@Getter
 public class SendSavedMarkerNamePacket {
 	private final BlockPos position;
 	private final String markerName;
@@ -35,13 +35,10 @@ public class SendSavedMarkerNamePacket {
 
 	public void handler(Supplier<NetworkEvent.Context> supplier) {
 		NetworkEvent.Context context = supplier.get();
-		context.enqueueWork(() -> {
-			// CLIENT SITE
-			BlockEntity entity = Objects.requireNonNull(Minecraft.getInstance().level).getBlockEntity(position);
-			if (entity instanceof MarkerBlockEntity markerBlockEntity) {
-				markerBlockEntity.setMarkerName(markerName);
-				markerBlockEntity.setEnabled(isEnabled);
-			}
-		});
+		context.enqueueWork(() ->
+				// CLIENT SITE
+				DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
+						ClientPacketHandlerClass.handleSendSavedMarkerNamePacket(this, supplier))
+		);
 	}
 }
