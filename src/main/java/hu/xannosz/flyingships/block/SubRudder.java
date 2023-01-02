@@ -39,7 +39,7 @@ public class SubRudder extends BaseEntityBlock {
 	}
 
 	public BlockState getStateForPlacement(BlockPlaceContext blockPlaceContext) {
-		return this.defaultBlockState().setValue(FACING, blockPlaceContext.getHorizontalDirection().getOpposite()).setValue(TYPE,0);
+		return this.defaultBlockState().setValue(FACING, blockPlaceContext.getHorizontalDirection().getOpposite()).setValue(TYPE, 0);
 	}
 
 	@Override
@@ -94,8 +94,15 @@ public class SubRudder extends BaseEntityBlock {
 
 	@SuppressWarnings("deprecation")
 	public @NotNull VoxelShape getShape(@NotNull BlockState blockState, @NotNull BlockGetter blockGetter, @NotNull BlockPos blockPos, @NotNull CollisionContext collisionContext) {
-		if(blockState.getValue(TYPE)==2){
+		if (blockState.getValue(TYPE) == 2) {
 			return Block.box(1, 0, 1, 15, 21, 15);
+		}
+		if (blockState.getValue(TYPE) == 3) {
+			if (blockState.getValue(FACING).equals(Direction.NORTH) ||
+					blockState.getValue(FACING).equals(Direction.SOUTH)) {
+				return Block.box(0, 0, 3, 16, 18, 13);
+			}
+			return Block.box(3, 0, 0, 13, 18, 16);
 		}
 		return Shapes.block();
 	}

@@ -2,6 +2,8 @@
 - item frames sometimes broken during jump
 
 // bugs/optimization
+- long tick jump restarts week servers (call a function on tick without tile entity)
+- change base rune to two times symmetric
 
 // official programming
 - check future functions
@@ -12,13 +14,6 @@
 - build gradle remove "example mod"
 - description page
 - wiki
-
-// SG-1 update
-- pel'tak rudder style
-- pel'tak subrudder style
-- ha'tak inner round style
-- pj inner round style
-- rings rune style
 
 // dimension update
 - dimension change
@@ -36,4 +31,3 @@
 - computercraft integration
 - energy converter block, all energy to ender propulsion
 - copper coil propulsion for big ships
-- create save command (magic wand?)

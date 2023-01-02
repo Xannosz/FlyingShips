@@ -58,6 +58,8 @@
   "gui.innerRound.triangle": "Háromszög",
   "gui.innerRound.submarine": "U Boot",
   "gui.innerRound.modern": "Modern",
+  "gui.innerRound.jumper": "Ugró",
+  "gui.innerRound.pyramid": "Piramis",
   "gui.text.innerRoundStyle": "belső gyűrű stílusa",
   "gui.text.rune.north": "ÉSZAK",
   "gui.text.rune.south": "DÉL",

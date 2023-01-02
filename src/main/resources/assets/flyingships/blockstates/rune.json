@@ -1,6 +1,8 @@
 {
   "variants": {
     "type=0": {"model": "flyingships:block/rune"},
-    "type=1": {"model": "flyingships:block/modern_rune"}
+    "type=1": {"model": "flyingships:block/modern_rune"},
+    "type=2": {"model": "flyingships:block/stop_rune"},
+    "type=3": {"model": "flyingships:block/ring_rune"}
   }
 }

@@ -25,10 +25,11 @@ public class Util {
 	private static final Map<Material, Integer> DENSITY_MAP = new HashMap<>();
 
 	public static final int CLOUD_LEVEL = 196;
-	public static final int RUDDER_TYPES = 2; //started from zero
-	public static final int RUNE_TYPES = 1; //started from zero
+	public static final int RUDDER_TYPES = 3; //started from zero
+	public static final int RUNE_TYPES = 3; //started from zero
 
-	public static final List<String> INNER_ROUNDS = Arrays.asList("gui.innerRound.base", "gui.innerRound.triangle", "gui.innerRound.submarine", "gui.innerRound.modern");
+	public static final List<String> INNER_ROUNDS = Arrays.asList("gui.innerRound.base", "gui.innerRound.triangle",
+			"gui.innerRound.submarine", "gui.innerRound.modern", "gui.innerRound.jumper", "gui.innerRound.pyramid");
 
 	static {
 		DENSITY_MAP.put(Material.AIR, 0);

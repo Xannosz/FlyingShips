@@ -58,6 +58,8 @@
   "gui.innerRound.triangle": "Triangle",
   "gui.innerRound.submarine": "Submarine",
   "gui.innerRound.modern": "Modern",
+  "gui.innerRound.jumper": "Jumper",
+  "gui.innerRound.pyramid": "Pyramid",
   "gui.text.innerRoundStyle": "inner round style",
   "gui.text.rune.north": "NORTH",
   "gui.text.rune.south": "SOUTH",
