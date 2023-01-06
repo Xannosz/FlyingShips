@@ -1,21 +1,24 @@
 package hu.xannosz.flyingships.warp.vehiclescan;
 
+import hu.xannosz.flyingships.Util;
 import hu.xannosz.flyingships.block.ModBlocks;
 import hu.xannosz.flyingships.warp.AbsoluteRectangleData;
 import hu.xannosz.flyingships.warp.jump.JumpUtil;
-import hu.xannosz.flyingships.warp.scan.ScanResult;
 import hu.xannosz.flyingships.warp.scan.BottomPosition;
 import hu.xannosz.flyingships.warp.scan.CellingPosition;
 import hu.xannosz.flyingships.warp.scan.FloatingPosition;
+import hu.xannosz.flyingships.warp.scan.ScanResult;
 import lombok.experimental.UtilityClass;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static hu.xannosz.flyingships.Util.isFluid;
 import static hu.xannosz.flyingships.Util.isFluidTagged;
@@ -56,6 +59,11 @@ public class VehicleScanUtil {
 
 		// list heaters
 		responseStruct.setHeaterBlocks(getHeaterBlocks(level, blocks));
+
+		// list coils
+		Set<BlockPos> coilCores = getCoilCores(level, blocks);
+		responseStruct.setCoils(coilCores.stream().map(core -> measureCoil(level, blocks, core))
+				.collect(Collectors.toSet()));
 
 		// calculate wind surface
 		if (blockDirection.equals(Direction.NORTH) || blockDirection.equals(Direction.SOUTH)) {
@@ -235,6 +243,167 @@ public class VehicleScanUtil {
 			}
 		}
 		return result;
+	}
+
+	private static Set<BlockPos> getCoilCores(ServerLevel level, Set<BlockPos> blocks) {
+		Set<BlockPos> result = new HashSet<>();
+		for (BlockPos block : blocks) {
+			if (level.getBlockState(block).getBlock().equals(ModBlocks.COIL_CORE.get())) {
+				result.add(block);
+			}
+		}
+		return result;
+	}
+
+	private static int measureCoil(ServerLevel level, Set<BlockPos> blocks, BlockPos core) {
+		if (isCoilCoreBlock(level, core, 0, 1, 0) &&
+				isCoilCoreBlock(level, core, 0, -1, 0) &&
+				!isCoilCoreBlock(level, core, 1, 0, 0) &&
+				!isCoilCoreBlock(level, core, -1, 0, 0) &&
+				!isCoilCoreBlock(level, core, 0, 0, 1) &&
+				!isCoilCoreBlock(level, core, 0, 0, -1)
+		) {
+			return checkCoilLayers(level, core, blocks, 0, 1, 0);
+		}
+		if (!isCoilCoreBlock(level, core, 0, 1, 0) &&
+				!isCoilCoreBlock(level, core, 0, -1, 0) &&
+				isCoilCoreBlock(level, core, 1, 0, 0) &&
+				isCoilCoreBlock(level, core, -1, 0, 0) &&
+				!isCoilCoreBlock(level, core, 0, 0, 1) &&
+				!isCoilCoreBlock(level, core, 0, 0, -1)
+		) {
+			return checkCoilLayers(level, core, blocks, 1, 0, 0);
+		}
+		if (!isCoilCoreBlock(level, core, 0, 1, 0) &&
+				!isCoilCoreBlock(level, core, 0, -1, 0) &&
+				!isCoilCoreBlock(level, core, 1, 0, 0) &&
+				!isCoilCoreBlock(level, core, -1, 0, 0) &&
+				isCoilCoreBlock(level, core, 0, 0, 1) &&
+				isCoilCoreBlock(level, core, 0, 0, -1)
+		) {
+			return checkCoilLayers(level, core, blocks, 0, 0, 1);
+		}
+		return 0;
+	}
+
+	private static boolean isCoilCoreBlock(ServerLevel level, BlockPos coilCore, int x, int y, int z) {
+		return level.getBlockState(coilCore.offset(x, y, z)).getBlock().equals(Blocks.IRON_BLOCK);
+	}
+
+	private static boolean isCoilWireBlock(ServerLevel level, BlockPos coilCore, Set<BlockPos> blocks,
+										   int x, int y, int z) {
+		if (!blocks.contains(coilCore.offset(x, y, z))) {
+			return false;
+		}
+		return Util.COPPER_BLOCKS.contains(level.getBlockState(coilCore.offset(x, y, z)).getBlock());
+	}
+
+	private static int checkCoilLayers(ServerLevel level, BlockPos coilCore, Set<BlockPos> blocks,
+									   int x, int y, int z) {
+		int up = 0;
+		int down = 0;
+
+		for (int m = 1; ; m += 2) {
+			if (isCoilLayer(level, coilCore, blocks, x * m, y * m, z * m)) {
+				up++;
+			} else {
+				break;
+			}
+		}
+
+		for (int m = 1; ; m += 2) {
+			if (isCoilLayer(level, coilCore, blocks, -x * m, -y * m, -z * m)) {
+				down++;
+			} else {
+				break;
+			}
+		}
+
+		if (up >= 2 && down >= 2) {
+			return up + down;
+		}
+
+		return 0;
+	}
+
+	private static boolean isCoilLayer(ServerLevel level, BlockPos coilCore, Set<BlockPos> blocks,
+									   int x, int y, int z) {
+		if (x == 0 && z == 0) {
+			return level.getBlockState(coilCore.offset(x, y, z)).getBlock().equals(Blocks.IRON_BLOCK) &&
+					level.getBlockState(coilCore.offset(x, y > 0 ? y + 1 : y - 1, z))
+							.getBlock().equals(Blocks.IRON_BLOCK) &&
+
+					isCoilWireBlock(level, coilCore, blocks, x + 2, y, z + 1) &&
+					isCoilWireBlock(level, coilCore, blocks, x + 2, y, z) &&
+					isCoilWireBlock(level, coilCore, blocks, x + 2, y, z - 1) &&
+					isCoilWireBlock(level, coilCore, blocks, x + 2, y, z - 2) &&
+
+					isCoilWireBlock(level, coilCore, blocks, x + 1, y, z - 2) &&
+					isCoilWireBlock(level, coilCore, blocks, x, y, z - 2) &&
+					isCoilWireBlock(level, coilCore, blocks, x - 1, y, z - 2) &&
+					isCoilWireBlock(level, coilCore, blocks, x - 2, y, z - 2) &&
+
+					isCoilWireBlock(level, coilCore, blocks, x - 2, y, z - 1) &&
+					isCoilWireBlock(level, coilCore, blocks, x - 2, y, z) &&
+					isCoilWireBlock(level, coilCore, blocks, x - 2, y, z + 1) &&
+					isCoilWireBlock(level, coilCore, blocks, x - 2, y, z + 2) &&
+
+					isCoilWireBlock(level, coilCore, blocks, x - 1, y, z + 2) &&
+					isCoilWireBlock(level, coilCore, blocks, x, y, z + 2) &&
+					isCoilWireBlock(level, coilCore, blocks, x + 1, y, z + 2) &&
+					isCoilWireBlock(level, coilCore, blocks, x + 2, y, z + 2);
+		}
+		if (x == 0 && y == 0) {
+			return level.getBlockState(coilCore.offset(x, y, z)).getBlock().equals(Blocks.IRON_BLOCK) &&
+					level.getBlockState(coilCore.offset(x, y, z > 0 ? z + 1 : z - 1))
+							.getBlock().equals(Blocks.IRON_BLOCK) &&
+
+					isCoilWireBlock(level, coilCore, blocks, x + 2, y + 1, z) &&
+					isCoilWireBlock(level, coilCore, blocks, x + 2, y, z) &&
+					isCoilWireBlock(level, coilCore, blocks, x + 2, y - 1, z) &&
+					isCoilWireBlock(level, coilCore, blocks, x + 2, y - 2, z) &&
+
+					isCoilWireBlock(level, coilCore, blocks, x + 1, y - 2, z) &&
+					isCoilWireBlock(level, coilCore, blocks, x, y - 2, z) &&
+					isCoilWireBlock(level, coilCore, blocks, x - 1, y - 2, z) &&
+					isCoilWireBlock(level, coilCore, blocks, x - 2, y - 2, z) &&
+
+					isCoilWireBlock(level, coilCore, blocks, x - 2, y - 1, z) &&
+					isCoilWireBlock(level, coilCore, blocks, x - 2, y, z) &&
+					isCoilWireBlock(level, coilCore, blocks, x - 2, y + 1, z) &&
+					isCoilWireBlock(level, coilCore, blocks, x - 2, y + 2, z) &&
+
+					isCoilWireBlock(level, coilCore, blocks, x - 1, y + 2, z) &&
+					isCoilWireBlock(level, coilCore, blocks, x, y + 2, z) &&
+					isCoilWireBlock(level, coilCore, blocks, x + 1, y + 2, z) &&
+					isCoilWireBlock(level, coilCore, blocks, x + 2, y + 2, z);
+		}
+		if (y == 0 && z == 0) {
+			return level.getBlockState(coilCore.offset(x, y, z)).getBlock().equals(Blocks.IRON_BLOCK) &&
+					level.getBlockState(coilCore.offset(x > 0 ? x + 1 : x - 1, y, z))
+							.getBlock().equals(Blocks.IRON_BLOCK) &&
+
+					isCoilWireBlock(level, coilCore, blocks, x, y + 2, z + 1) &&
+					isCoilWireBlock(level, coilCore, blocks, x, y + 2, z) &&
+					isCoilWireBlock(level, coilCore, blocks, x, y + 2, z - 1) &&
+					isCoilWireBlock(level, coilCore, blocks, x, y + 2, z - 2) &&
+
+					isCoilWireBlock(level, coilCore, blocks, x, y + 1, z - 2) &&
+					isCoilWireBlock(level, coilCore, blocks, x, y, z - 2) &&
+					isCoilWireBlock(level, coilCore, blocks, x, y - 1, z - 2) &&
+					isCoilWireBlock(level, coilCore, blocks, x, y - 2, z - 2) &&
+
+					isCoilWireBlock(level, coilCore, blocks, x, y - 2, z - 1) &&
+					isCoilWireBlock(level, coilCore, blocks, x, y - 2, z) &&
+					isCoilWireBlock(level, coilCore, blocks, x, y - 2, z + 1) &&
+					isCoilWireBlock(level, coilCore, blocks, x, y - 2, z + 2) &&
+
+					isCoilWireBlock(level, coilCore, blocks, x, y - 1, z + 2) &&
+					isCoilWireBlock(level, coilCore, blocks, x, y, z + 2) &&
+					isCoilWireBlock(level, coilCore, blocks, x, y + 1, z + 2) &&
+					isCoilWireBlock(level, coilCore, blocks, x, y + 2, z + 2);
+		}
+		return false;
 	}
 
 	public static boolean isCommonFluid(ScanResult terrainScanResponseStruct) {

@@ -21,4 +21,5 @@ public class VehicleScanResponseStruct {
 	private Set<ServerPlayer> players;
 	private int blockNumUnderFluid;
 	private Set<BlockPos> heaterBlocks;
+	private Set<Integer> coils;
 }

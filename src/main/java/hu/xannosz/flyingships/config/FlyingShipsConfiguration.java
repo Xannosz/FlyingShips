@@ -15,7 +15,8 @@ public class FlyingShipsConfiguration {
 	public static final ForgeConfigSpec.ConfigValue<Integer> LIFT_OF_IN_LAVA;
 	public static final ForgeConfigSpec.ConfigValue<Double> SPEED_CONSOLIDATOR;
 	public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_SLIDING;
-
+	public static final ForgeConfigSpec.ConfigValue<Integer> POWER_OF_COIL;
+	public static final ForgeConfigSpec.ConfigValue<Double> COIL_MULTIPLIER;
 	public static final ForgeConfigSpec.ConfigValue<Integer> COOL_DOWN_TIME;
 	public static final ForgeConfigSpec.ConfigValue<Integer> ENERGY_PER_OSCILLATOR;
 	public static final ForgeConfigSpec.ConfigValue<Integer> ENERGY_PER_HEATER;
@@ -25,7 +26,6 @@ public class FlyingShipsConfiguration {
 	public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_COLLUSION_DETECTION_ON_Y;
 	public static final ForgeConfigSpec.ConfigValue<Integer> MARKER_RANGE;
 	public static final ForgeConfigSpec.ConfigValue<Integer> RUNE_RANGE;
-
 
 	static {
 		BUILDER.push("Configs for Flying Ships Mod");
@@ -48,6 +48,10 @@ public class FlyingShipsConfiguration {
 				.defineInRange("speedConsolidator", 5000d, 1000d, 10000d);
 		ENABLE_SLIDING = BUILDER.comment("Enable short movement without energy consuming")
 				.define("enableSliding", true);
+		POWER_OF_COIL= BUILDER.comment("Coil base energy")
+				.defineInRange("powerOfCoil", 450, 200, 1000);
+		COIL_MULTIPLIER= BUILDER.comment("Multiple coil energy for each coil layer")
+				.defineInRange("coilMultiplier", 1.5d, 1.2d, 2.2d);
 		COOL_DOWN_TIME = BUILDER.comment("Cool down time in tick")
 				.define("coolDownTime", 500);
 		ENERGY_PER_OSCILLATOR = BUILDER.comment("Energy capacity per ender oscillator")

@@ -11,7 +11,6 @@
 
 // official non programming
 - test fluid gate
-- build gradle remove "example mod"
 - description page
 - wiki
 
@@ -30,4 +29,3 @@
 // computer update
 - computercraft integration
 - energy converter block, all energy to ender propulsion
-- copper coil propulsion for big ships

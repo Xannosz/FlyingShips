@@ -881,7 +881,8 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider, Butt
 
 	private int usedStructuralEnergyForMovement() {
 		return vehicleScanResult.getWindSurface() * FlyingShipsConfiguration.WIND_MULTIPLIER.get() +
-				vehicleScanResult.getArtificialFloater() * FlyingShipsConfiguration.ARTIFICIAL_FLOATER_MOVEMENT_MULTIPLIER.get();
+				vehicleScanResult.getArtificialFloater() * FlyingShipsConfiguration.ARTIFICIAL_FLOATER_MOVEMENT_MULTIPLIER.get() +
+				getCoilEnergy(vehicleScanResult);
 	}
 
 	private int usedSteamEnergyForMovement() {
@@ -920,7 +921,8 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider, Butt
 				vehicleScanResult.getBlockNumUnderFluid() * FlyingShipsConfiguration.LIFT_OF_IN_LAVA.get();
 		final int floaterPower = vehicleScanResult.getLiftSurface() * FlyingShipsConfiguration.LIFT_MULTIPLIER.get() +
 				vehicleScanResult.getWool() * FlyingShipsConfiguration.BALLOON_MULTIPLIER.get() +
-				vehicleScanResult.getArtificialFloater() * FlyingShipsConfiguration.ARTIFICIAL_FLOATER_LIFT_MULTIPLIER.get();
+				vehicleScanResult.getArtificialFloater() * FlyingShipsConfiguration.ARTIFICIAL_FLOATER_LIFT_MULTIPLIER.get() +
+				getCoilEnergy(vehicleScanResult);
 		return floaterPower + ((getYAdditional() + waterLine + vehicleScanResult.getBottomY()) > terrainScanResult.getAbsoluteFluidLine() ? 0 : floatingInFluid);
 	}
 
@@ -961,6 +963,16 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider, Butt
 
 	public int getMaxWaterContent() {
 		return vehicleScanResult.getTank() * FlyingShipsConfiguration.WATER_PER_TANK.get();
+	}
+
+	private int getCoilEnergy(VehicleScanResponseStruct vehicleScanResult) {
+		int energy = 0;
+		for (int coil : vehicleScanResult.getCoils()) {
+			if (coil > 0) {
+				energy += FlyingShipsConfiguration.POWER_OF_COIL.get() * Math.pow(FlyingShipsConfiguration.COIL_MULTIPLIER.get(), coil);
+			}
+		}
+		return energy;
 	}
 
 	private void updateData() {

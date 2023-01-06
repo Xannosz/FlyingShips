@@ -85,6 +85,10 @@ public class ModBlocks {
 			() -> new Rune(BlockBehaviour.Properties.of(Material.WOOD).lightLevel(state -> 12).noOcclusion().strength(1.5F, 6.0F).sound(SoundType.WOOD))
 	);
 
+	public static final RegistryObject<Block> COIL_CORE = registerBlock("coil_core",
+			() -> new Block(BlockBehaviour.Properties.of(Material.METAL).strength(1.5F, 6.0F).sound(SoundType.METAL))
+	);
+
 	private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> blockCreator) {
 		RegistryObject<T> block = BLOCKS.register(name, blockCreator);
 		registerBlockItem(name, block);

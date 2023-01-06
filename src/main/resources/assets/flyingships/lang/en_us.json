@@ -13,6 +13,7 @@
   "block.flyingships.artificial_floater": "Artificial Floater",
   "block.flyingships.cooper_trapdoor": "Cooper Trapdoor",
   "block.flyingships.rune": "Rune",
+  "block.flyingships.coil_core": "Coil Core",
   "text.wand.lessInfo": "Add rectangles to the selected ship",
   "text.wand.moreInfo1": "Right click for a rudder block to select the ship\nThen right click on a block to select the first corner and right click to select the other corner and add to the ship.",
   "text.wand.moreInfo2": "Shift right click to delete selected corner (not from ship)",

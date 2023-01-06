@@ -31,6 +31,13 @@ public class Util {
 	public static final List<String> INNER_ROUNDS = Arrays.asList("gui.innerRound.base", "gui.innerRound.triangle",
 			"gui.innerRound.submarine", "gui.innerRound.modern", "gui.innerRound.jumper", "gui.innerRound.pyramid");
 
+	public static final List<Block> COPPER_BLOCKS = Arrays.asList(
+			Blocks.OXIDIZED_COPPER, Blocks.WEATHERED_COPPER, Blocks.EXPOSED_COPPER, Blocks.COPPER_BLOCK,
+			Blocks.OXIDIZED_CUT_COPPER, Blocks.WEATHERED_CUT_COPPER, Blocks.EXPOSED_CUT_COPPER,
+			Blocks.CUT_COPPER, Blocks.WAXED_COPPER_BLOCK, Blocks.WAXED_WEATHERED_COPPER,
+			Blocks.WAXED_EXPOSED_COPPER, Blocks.WAXED_OXIDIZED_COPPER, Blocks.WAXED_OXIDIZED_CUT_COPPER,
+			Blocks.WAXED_WEATHERED_CUT_COPPER, Blocks.WAXED_EXPOSED_CUT_COPPER, Blocks.WAXED_CUT_COPPER);
+
 	static {
 		DENSITY_MAP.put(Material.AIR, 0);
 		DENSITY_MAP.put(Material.STRUCTURAL_AIR, 0);
