@@ -1,16 +1,14 @@
 // known bugs
-- item frames sometimes broken during jump
+- item frames sometimes broken during jump (just on non-full blocks)
 
 // bugs/optimization
 - long tick jump restarts week servers (call a function on tick without tile entity)
-- change base rune to two times symmetric
 
 // official programming
 - check future functions
 - enable/disable vertical movement (under waterline / above waterline)
 
 // official non programming
-- test fluid gate
 - description page
 - wiki
 
@@ -28,4 +26,3 @@
 
 // computer update
 - computercraft integration
-- energy converter block, all energy to ender propulsion
