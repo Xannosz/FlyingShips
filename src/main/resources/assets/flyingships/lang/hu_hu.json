@@ -14,6 +14,8 @@
   "block.flyingships.cooper_trapdoor": "Réz Csapóajtó",
   "block.flyingships.rune": "Rúna",
   "block.flyingships.coil_core": "Tekercs Mag",
+  "block.flyingships.admin_engine": "Admin Hajtómű",
+  "block.flyingships.copy_block": "Másoló Block",
   "text.wand.lessInfo": "Téglatesteket add hozzá a kiválasztott hajóhoz",
   "text.wand.moreInfo1": "Hajó kiválasztásához jobb klikk a kormány bolkkra\nAzután jobb klikk egy blokkra, az egyik majd a másik sarkon, és a téglatest hozzá is lett adva a hajóhoz.",
   "text.wand.moreInfo2": "Shift jobb klikk a kiválasztott sarok törléséhez (nem törli a hajóból)",

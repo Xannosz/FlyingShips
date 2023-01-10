@@ -89,6 +89,14 @@ public class ModBlocks {
 			() -> new Block(BlockBehaviour.Properties.of(Material.METAL).strength(1.5F, 6.0F).sound(SoundType.METAL))
 	);
 
+	public static final RegistryObject<Block> ADMIN_ENGINE = registerBlock("admin_engine",
+			() -> new Block(BlockBehaviour.Properties.of(Material.METAL).strength(1.5F, 6.0F).sound(SoundType.METAL))
+	);
+
+	public static final RegistryObject<Block> COPY_BLOCK = registerBlock("copy_block",
+			() -> new Block(BlockBehaviour.Properties.of(Material.METAL).strength(1.5F, 6.0F).sound(SoundType.METAL))
+	);
+
 	private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> blockCreator) {
 		RegistryObject<T> block = BLOCKS.register(name, blockCreator);
 		registerBlockItem(name, block);

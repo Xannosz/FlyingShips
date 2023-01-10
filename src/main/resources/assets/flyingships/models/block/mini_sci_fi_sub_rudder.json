@@ -1,0 +1,10 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "flyingships:block/mini_sci_fi_sub_rudder",
+    "side": "flyingships:block/mini_sci_fi_rudder_side",
+    "top": "flyingships:block/mini_sci_fi_rudder_side",
+    "bottom": "flyingships:block/mini_sci_fi_rudder_side",
+    "particle": "flyingships:block/mini_sci_fi_rudder_side"
+  }
+}

@@ -204,6 +204,7 @@ public class VehicleScanUtil {
 		int density = 0;
 		int artificialFloater = 0;
 		int blockNumUnderWater = blockUnderWater;
+		boolean copyMode = false;
 
 		for (VoxelColumn voxelColumn : columns) {
 			wool += voxelColumn.getWool();
@@ -213,6 +214,7 @@ public class VehicleScanUtil {
 			enderOscillator += voxelColumn.getEnderOscillator();
 			artificialFloater += voxelColumn.getArtificialFloater();
 			blockNumUnderWater += voxelColumn.getBlockNumUnderWater();
+			copyMode |= voxelColumn.isCopyMode();
 		}
 
 		responseStruct.setWool(wool);
@@ -222,6 +224,7 @@ public class VehicleScanUtil {
 		responseStruct.setDensity(density);
 		responseStruct.setArtificialFloater(artificialFloater);
 		responseStruct.setBlockNumUnderFluid(blockNumUnderWater);
+		responseStruct.setCopyMode(copyMode);
 	}
 
 	private static void calculateMobDensity(VehicleScanResponseStruct responseStruct, Set<Entity> entities, Set<ServerPlayer> players) {

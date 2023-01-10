@@ -34,7 +34,8 @@ import static hu.xannosz.flyingships.Util.*;
 @UtilityClass
 public class JumpUtil {
 
-	public static void jump(ServerLevel level, BlockPos pivotPointPosition, List<BlockPosStruct> blockPositions, Vec3 additional) {
+	public static boolean jump(ServerLevel level, BlockPos pivotPointPosition, List<BlockPosStruct> blockPositions,
+							   Vec3 additional, boolean copyMode) {
 		try {
 			//create absolute coordinates
 			final List<AbsoluteRectangleData> rectangles = createRectangles(pivotPointPosition, blockPositions);
@@ -66,7 +67,7 @@ public class JumpUtil {
 			//check collision -> send error message and return
 			if (hasCollisionOnTarget(rectangles, additional, level)) {
 				sendErrorMessage(players);
-				return;
+				return false;
 			}
 
 			//get removable fluids
@@ -74,13 +75,15 @@ public class JumpUtil {
 			final Set<BlockPos> waterTagged = new HashSet<>();
 			getRemovableFluids(level, rectangles, additional, sourceShell, removableFluids, waterTagged);
 
-			//delete structure
-			deleteStructure(rectangles, level);
-			//delete inner shell with update
-			sourceInnerShell.forEach(blockPos -> {
-				level.setBlock(blockPos, Blocks.WATER.defaultBlockState().setValue(BlockStateProperties.LEVEL, 1), 5);
-				level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 5);
-			});
+			if (!copyMode) {
+				//delete structure
+				deleteStructure(rectangles, level);
+				//delete inner shell with update
+				sourceInnerShell.forEach(blockPos -> {
+					level.setBlock(blockPos, Blocks.WATER.defaultBlockState().setValue(BlockStateProperties.LEVEL, 1), 5);
+					level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 5);
+				});
+			}
 
 			//clean place
 			cleanPlace(rectangles, additional, level);
@@ -108,9 +111,11 @@ public class JumpUtil {
 
 			//save chunks
 			saveChunks(chunks);
+			return true;
 		} catch (Exception ex) {
 			log.error("Exception during jump", ex);
 		}
+		return false;
 	}
 
 	public static List<AbsoluteRectangleData> createRectangles(BlockPos pivotPointPosition, List<BlockPosStruct> blockPositions) {
@@ -142,12 +147,12 @@ public class JumpUtil {
 					for (int z = rectangleData.getNorthWestCorner().getZ(); z <= rectangleData.getSouthEastCorner().getZ(); z++) {
 						final BlockPos position = new BlockPos(x, y, z);
 						final BlockEntity blockEntity = level.getBlockEntity(position);
-						final BlockState state =  level.getBlockState(position);
+						final BlockState state = level.getBlockState(position);
 
-						if(PRE_PROCESS.contains(state.getBlock())){
-							rectangleData.getPostStructureBlocks().put(position,state);
-						}else{
-							rectangleData.getStructureBlocks().put(position,state);
+						if (PRE_PROCESS.contains(state.getBlock())) {
+							rectangleData.getPostStructureBlocks().put(position, state);
+						} else {
+							rectangleData.getStructureBlocks().put(position, state);
 						}
 
 						if (blockEntity != null) {

@@ -5,8 +5,6 @@
 // bugs/optimization
 
 // features
-- mini sci-fi rudder
-- admin engine
 
 // official programming
 - check future functions

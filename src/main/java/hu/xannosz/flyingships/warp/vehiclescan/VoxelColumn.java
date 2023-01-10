@@ -22,6 +22,7 @@ public class VoxelColumn {
 	private int tank = 0;
 	private int artificialFloater = 0;
 	private int blockNumUnderWater = 0;
+	private boolean copyMode = false;
 
 	private int density = 0;
 	private boolean blocked = false;
@@ -137,6 +138,12 @@ public class VoxelColumn {
 		}
 		if (block.equals(ModBlocks.ARTIFICIAL_FLOATER.get())) {
 			artificialFloater++;
+		}
+		if (block.equals(ModBlocks.ADMIN_ENGINE.get())) {
+			artificialFloater += 1000;
+		}
+		if (block.equals(ModBlocks.COPY_BLOCK.get())) {
+			copyMode = true;
 		}
 	}
 

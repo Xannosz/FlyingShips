@@ -29,7 +29,7 @@ public class Util {
 	private static final Map<Material, Integer> DENSITY_MAP = new HashMap<>();
 
 	public static final int CLOUD_LEVEL = 196;
-	public static final int RUDDER_TYPES = 3; //started from zero
+	public static final int RUDDER_TYPES = 4; //started from zero
 	public static final int RUNE_TYPES = 3; //started from zero
 
 	public static final String BLOCK_POS_X_FIELD_NAME;

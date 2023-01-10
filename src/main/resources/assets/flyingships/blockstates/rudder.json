@@ -59,6 +59,21 @@
     "facing=west,type=3": {
       "model": "flyingships:block/sci_fi_rudder",
       "y": 270
+    },
+    "facing=east,type=4": {
+      "model": "flyingships:block/mini_sci_fi_rudder",
+      "y": 90
+    },
+    "facing=north,type=4": {
+      "model": "flyingships:block/mini_sci_fi_rudder"
+    },
+    "facing=south,type=4": {
+      "model": "flyingships:block/mini_sci_fi_rudder",
+      "y": 180
+    },
+    "facing=west,type=4": {
+      "model": "flyingships:block/mini_sci_fi_rudder",
+      "y": 270
     }
   }
 }

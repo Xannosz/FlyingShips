@@ -22,4 +22,5 @@ public class VehicleScanResponseStruct {
 	private int blockNumUnderFluid;
 	private Set<BlockPos> heaterBlocks;
 	private Set<Integer> coils;
+	private boolean copyMode;
 }

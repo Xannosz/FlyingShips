@@ -329,7 +329,10 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider, Butt
 		}
 
 		if (clock % 5 == 0) {
-			new Thread(this::calculateJumpData).start();
+			if (!scanRunning) {
+				scanRunning = true;
+				new Thread(this::calculateJumpData).start();
+			}
 			if (vehicleScanResult == null || terrainScanResult == null) {
 				return;
 			}
@@ -496,10 +499,6 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider, Butt
 	}
 
 	private void calculateJumpData() {
-		if (scanRunning) {
-			return;
-		}
-		scanRunning = true;
 		terrainScanResult = Scanner.scan((ServerLevel) level, JumpUtil.createRectangles(getBlockPos(), blockPositions), waterLine);
 		vehicleScanResult = VehicleScanUtil.scanVehicle((ServerLevel) level, JumpUtil.createRectangles(getBlockPos(), blockPositions),
 				getBlockState().getValue(Rudder.FACING), terrainScanResult);
@@ -559,13 +558,15 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider, Butt
 					//consume energy
 					consumeEnergy();
 					setChanged();
-					JumpUtil.jump((ServerLevel) level, getBlockPos(), blockPositions, getAdditional(isHyperJump));
-					//restore energy if jump not success
-					enderEnergy = storedEnderEnergy;
-					heatEnergy = storedHeatEnergy;
-					steamEnergy = storedSteamEnergy;
-					if (isHyperJump) {
-						itemHandler.setStackInSlot(0, new ItemStack(Items.ENDER_EYE, 1));
+					if(!JumpUtil.jump((ServerLevel) level, getBlockPos(), blockPositions,
+							getAdditional(isHyperJump), vehicleScanResult.isCopyMode())){
+						//restore energy if jump not success
+						enderEnergy = storedEnderEnergy;
+						heatEnergy = storedHeatEnergy;
+						steamEnergy = storedSteamEnergy;
+						if (isHyperJump) {
+							itemHandler.setStackInSlot(0, new ItemStack(Items.ENDER_EYE, 1));
+						}
 					}
 					vehicleScanResult = null;
 					terrainScanResult = null;
