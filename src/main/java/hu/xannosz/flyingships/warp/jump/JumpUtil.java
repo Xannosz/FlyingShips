@@ -11,26 +11,20 @@ import lombok.extern.slf4j.Slf4j;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.Mirror;
-import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.levelgen.structure.templatesystem.BlockRotProcessor;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import net.minecraft.world.phys.Vec3;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -139,13 +133,29 @@ public class JumpUtil {
 	}
 
 	private static void saveStructure(List<AbsoluteRectangleData> rectangles, ServerLevel level) {
-		int i = 0;
-		final StructureTemplateManager structuretemplatemanager = level.getStructureManager();
-
 		for (AbsoluteRectangleData rectangleData : rectangles) {
-			final StructureTemplate structuretemplate = structuretemplatemanager.getOrCreate(new ResourceLocation(UUID.randomUUID().toString().toLowerCase(Locale.ROOT).replace(" ", "_") + (i++)));
-			structuretemplate.fillFromWorld(level, rectangleData.getNorthWestCorner(), rectangleData.getStructureSize(), false, Blocks.STRUCTURE_VOID);
-			rectangleData.setStructuretemplate(structuretemplate);
+			rectangleData.setStructureBlocks(new HashMap<>());
+			rectangleData.setPostStructureBlocks(new HashMap<>());
+			rectangleData.setStructureBlockEntities(new HashMap<>());
+			for (int x = rectangleData.getNorthWestCorner().getX(); x <= rectangleData.getSouthEastCorner().getX(); x++) {
+				for (int y = rectangleData.getNorthWestCorner().getY(); y <= rectangleData.getSouthEastCorner().getY(); y++) {
+					for (int z = rectangleData.getNorthWestCorner().getZ(); z <= rectangleData.getSouthEastCorner().getZ(); z++) {
+						final BlockPos position = new BlockPos(x, y, z);
+						final BlockEntity blockEntity = level.getBlockEntity(position);
+						final BlockState state =  level.getBlockState(position);
+
+						if(PRE_PROCESS.contains(state.getBlock())){
+							rectangleData.getPostStructureBlocks().put(position,state);
+						}else{
+							rectangleData.getStructureBlocks().put(position,state);
+						}
+
+						if (blockEntity != null) {
+							rectangleData.getStructureBlockEntities().put(position, blockEntity);
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -332,11 +342,36 @@ public class JumpUtil {
 
 	private static void createStructure(List<AbsoluteRectangleData> rectangles, Vec3 additional, ServerLevel level) {
 		for (AbsoluteRectangleData rectangleData : rectangles) {
-			final StructurePlaceSettings structureplacesettings = (new StructurePlaceSettings()).setMirror(Mirror.NONE).setRotation(Rotation.NONE).setIgnoreEntities(true);
-			structureplacesettings.clearProcessors().addProcessor(new BlockRotProcessor(Mth.clamp(1.0F, 0.0F, 1.0F))).setRandom(RandomSource.create());
+			for (Map.Entry<BlockPos, BlockState> blocks : rectangleData.getStructureBlocks().entrySet()) {
+				level.setBlock(blocks.getKey().offset(additional.x(), additional.y(), additional.z()),
+						blocks.getValue(), 2, 0);
+			}
+			for (Map.Entry<BlockPos, BlockState> blocks : rectangleData.getPostStructureBlocks().entrySet()) {
+				level.setBlock(blocks.getKey().offset(additional.x(), additional.y(), additional.z()),
+						blocks.getValue(), 2, 0);
+			}
+			for (Map.Entry<BlockPos, BlockEntity> blockEntity : rectangleData.getStructureBlockEntities().entrySet()) {
+				final BlockPos pos = blockEntity.getKey().offset(additional.x(), additional.y(), additional.z());
 
-			BlockPos blockPos1 = rectangleData.getNorthWestCorner().offset(new BlockPos(additional));
-			rectangleData.getStructuretemplate().placeInWorld(level, blockPos1, blockPos1, structureplacesettings, RandomSource.create(), 2);
+				try {
+					Field fx = Vec3i.class.getDeclaredField(BLOCK_POS_X_FIELD_NAME);
+					fx.setAccessible(true);
+					fx.set(blockEntity.getValue().getBlockPos(), pos.getX());
+
+					Field fy = Vec3i.class.getDeclaredField(BLOCK_POS_Y_FIELD_NAME);
+					fy.setAccessible(true);
+					fy.set(blockEntity.getValue().getBlockPos(), pos.getY());
+
+					Field fz = Vec3i.class.getDeclaredField(BLOCK_POS_Z_FIELD_NAME);
+					fz.setAccessible(true);
+					fz.set(blockEntity.getValue().getBlockPos(), pos.getZ());
+				} catch (Exception e) {
+					log.error("BlockEntity loading failed", e);
+					log.error("Bugging BlockEntity on {}", pos);
+				}
+
+				level.setBlockEntity(blockEntity.getValue());
+			}
 		}
 	}
 

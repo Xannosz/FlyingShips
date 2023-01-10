@@ -1,16 +1,20 @@
 package hu.xannosz.flyingships;
 
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
+import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Material;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @UtilityClass
 public class Util {
 
@@ -27,6 +31,10 @@ public class Util {
 	public static final int CLOUD_LEVEL = 196;
 	public static final int RUDDER_TYPES = 3; //started from zero
 	public static final int RUNE_TYPES = 3; //started from zero
+
+	public static final String BLOCK_POS_X_FIELD_NAME;
+	public static final String BLOCK_POS_Y_FIELD_NAME;
+	public static final String BLOCK_POS_Z_FIELD_NAME;
 
 	public static final List<String> INNER_ROUNDS = Arrays.asList("gui.innerRound.base", "gui.innerRound.triangle",
 			"gui.innerRound.submarine", "gui.innerRound.modern", "gui.innerRound.jumper", "gui.innerRound.pyramid");
@@ -88,6 +96,33 @@ public class Util {
 		DENSITY_MAP.put(Material.POWDER_SNOW, 3);
 		DENSITY_MAP.put(Material.FROGSPAWN, 0);
 		DENSITY_MAP.put(Material.FROGLIGHT, 0);
+
+		// auto-detect obfuscated filed names;
+		String xName = "x";
+		String yName = "y";
+		String zName = "z";
+
+		Vec3i vec = new Vec3i(2, 3, 5);
+		for (Field field : Vec3i.class.getDeclaredFields()) {
+			try {
+				field.setAccessible(true);
+				if (field.get(vec).equals(2)) {
+					xName = field.getName();
+				}
+				if (field.get(vec).equals(3)) {
+					yName = field.getName();
+				}
+				if (field.get(vec).equals(5)) {
+					zName = field.getName();
+				}
+			} catch (Exception e) {
+				log.error("Filed auto-detection failed", e);
+			}
+		}
+
+		BLOCK_POS_X_FIELD_NAME = xName;
+		BLOCK_POS_Y_FIELD_NAME = yName;
+		BLOCK_POS_Z_FIELD_NAME = zName;
 	}
 
 	public static int convertBitArrayToInt(boolean[] booleans) {

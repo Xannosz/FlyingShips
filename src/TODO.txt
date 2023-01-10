@@ -1,8 +1,12 @@
 // known bugs
 - item frames sometimes broken during jump (just on non-full blocks)
+- long tick jump kill week servers (disable watchdog)
 
 // bugs/optimization
-- long tick jump restarts week servers (call a function on tick without tile entity)
+
+// features
+- mini sci-fi rudder
+- admin engine
 
 // official programming
 - check future functions

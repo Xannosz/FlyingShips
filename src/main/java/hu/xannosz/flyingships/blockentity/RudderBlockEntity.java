@@ -187,6 +187,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider, Butt
 	@Setter
 	@Getter
 	private int waterContent = 0;
+	private boolean scanRunning = false;
 
 	public RudderBlockEntity(BlockPos blockPos, BlockState blockState) {
 		super(ModBlockEntities.RUDDER_BLOCK_ENTITY.get(), blockPos, blockState);
@@ -328,7 +329,10 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider, Butt
 		}
 
 		if (clock % 5 == 0) {
-			calculateJumpData();
+			new Thread(this::calculateJumpData).start();
+			if (vehicleScanResult == null || terrainScanResult == null) {
+				return;
+			}
 			normalizeEnergies();
 
 			updateHeaters();
@@ -492,9 +496,14 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider, Butt
 	}
 
 	private void calculateJumpData() {
+		if (scanRunning) {
+			return;
+		}
+		scanRunning = true;
 		terrainScanResult = Scanner.scan((ServerLevel) level, JumpUtil.createRectangles(getBlockPos(), blockPositions), waterLine);
 		vehicleScanResult = VehicleScanUtil.scanVehicle((ServerLevel) level, JumpUtil.createRectangles(getBlockPos(), blockPositions),
 				getBlockState().getValue(Rudder.FACING), terrainScanResult);
+		scanRunning = false;
 	}
 
 	public void executeButtonClick(ButtonId buttonId) {
@@ -558,6 +567,10 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider, Butt
 					if (isHyperJump) {
 						itemHandler.setStackInSlot(0, new ItemStack(Items.ENDER_EYE, 1));
 					}
+					vehicleScanResult = null;
+					terrainScanResult = null;
+					selectedWarpDirection = null;
+					coolDown = FlyingShipsConfiguration.COOL_DOWN_TIME.get();
 				}
 			}
 			case POWER -> {
@@ -983,7 +996,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider, Butt
 		data.set(POWER_BUTTON_STATE_KEY, powerButtonState.getKey());
 		data.set(POWER_BUTTON_NEXT_STATE_KEY, powerButtonState.nextState(enableSteamEngine).getKey());
 
-		if (terrainScanResult != null) {
+		if (terrainScanResult != null && vehicleScanResult != null) {
 			data.set(POSITION_MARKER_TOP_KEY, terrainScanResult.getCellingPosition().getKey());
 			data.set(POSITION_MARKER_MID_KEY, terrainScanResult.getFloatingPosition().getKey());
 			data.set(POSITION_MARKER_BOTTOM_KEY, terrainScanResult.getBottomPosition().getKey());
