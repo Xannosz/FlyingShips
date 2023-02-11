@@ -376,6 +376,7 @@ public class JumpUtil {
 				}
 
 				level.setBlockEntity(blockEntity.getValue());
+				blockEntity.getValue().setChanged();
 			}
 		}
 	}

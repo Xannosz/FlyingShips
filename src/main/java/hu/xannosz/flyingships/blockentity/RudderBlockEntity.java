@@ -187,7 +187,6 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider, Butt
 	@Setter
 	@Getter
 	private int waterContent = 0;
-	private boolean scanRunning = false;
 
 	public RudderBlockEntity(BlockPos blockPos, BlockState blockState) {
 		super(ModBlockEntities.RUDDER_BLOCK_ENTITY.get(), blockPos, blockState);
@@ -323,16 +322,14 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider, Butt
 		if (level == null || level.isClientSide()) {
 			return;
 		}
+
 		coolDown--;
 		if (coolDown < 0) {
 			coolDown = 0;
 		}
 
 		if (clock % 5 == 0) {
-			if (!scanRunning) {
-				scanRunning = true;
-				new Thread(this::calculateJumpData).start();
-			}
+			calculateJumpData();
 			if (vehicleScanResult == null || terrainScanResult == null) {
 				return;
 			}
@@ -502,7 +499,6 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider, Butt
 		terrainScanResult = Scanner.scan((ServerLevel) level, JumpUtil.createRectangles(getBlockPos(), blockPositions), waterLine);
 		vehicleScanResult = VehicleScanUtil.scanVehicle((ServerLevel) level, JumpUtil.createRectangles(getBlockPos(), blockPositions),
 				getBlockState().getValue(Rudder.FACING), terrainScanResult);
-		scanRunning = false;
 	}
 
 	public void executeButtonClick(ButtonId buttonId) {
@@ -510,7 +506,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider, Butt
 			case UP, DOWN, RIGHT, LEFT, FORWARD, BACKWARD ->
 					selectedWarpDirection = WarpDirection.fromBlockDirection(buttonId, getBlockState().getValue(Rudder.FACING));
 			case LAND -> {
-				if (vehicleScanResult == null) {
+				if (vehicleScanResult == null || terrainScanResult == null) {
 					break;
 				}
 				landButtonSettings = landButtonSettings.nextState(terrainScanResult,
@@ -558,8 +554,8 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider, Butt
 					//consume energy
 					consumeEnergy();
 					setChanged();
-					if(!JumpUtil.jump((ServerLevel) level, getBlockPos(), blockPositions,
-							getAdditional(isHyperJump), vehicleScanResult.isCopyMode())){
+					if (!JumpUtil.jump((ServerLevel) level, getBlockPos(), blockPositions,
+							getAdditional(isHyperJump), vehicleScanResult.isCopyMode())) {
 						//restore energy if jump not success
 						enderEnergy = storedEnderEnergy;
 						heatEnergy = storedHeatEnergy;
@@ -869,7 +865,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider, Butt
 		SavedCoordinate coordinate = coordinates.get(selectedCoordinate);
 		if (!coordinate.getMarker().isEmpty()) {
 			final BlockPos markerPosition = getMarkersInRange().get(coordinate.getMarker());
-			if (markerPosition == null) {
+			if (markerPosition == null && vehicleScanResult != null) {
 				vehicleScanResult.getPlayers().forEach(player ->
 						player.sendSystemMessage(Component.translatable("message.markerOutOfRange", coordinate.getMarker())));
 			}
@@ -1045,7 +1041,7 @@ public class RudderBlockEntity extends BlockEntity implements MenuProvider, Butt
 		}
 		data.set(BLOCK_POS_ON_THIS_PAGE_KEY, recNum);
 
-		if (vehicleScanResult != null) {
+		if (terrainScanResult != null && vehicleScanResult != null) {
 			data.set(WIND_MAX_KEY, getNecessaryMovementPower());
 			data.set(WIND_KEY, getMovementPower());
 			data.set(FLOATING_MAX_KEY, getNecessaryFloatingPower());

@@ -53,7 +53,7 @@ public class FlyingShipsConfiguration {
 		COIL_MULTIPLIER= BUILDER.comment("Multiple coil energy for each coil layer")
 				.defineInRange("coilMultiplier", 1.5d, 1.2d, 2.2d);
 		COOL_DOWN_TIME = BUILDER.comment("Cool down time in tick")
-				.define("coolDownTime", 500);
+				.defineInRange("coolDownTime", 500, 200,1200);
 		ENERGY_PER_OSCILLATOR = BUILDER.comment("Energy capacity per ender oscillator")
 				.define("energyPerOscillator", 12000);
 		ENERGY_PER_HEATER = BUILDER.comment("Energy capacity per heater")
