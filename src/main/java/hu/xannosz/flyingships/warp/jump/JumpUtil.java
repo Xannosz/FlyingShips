@@ -103,8 +103,18 @@ public class JumpUtil {
 			waterTagged.forEach(waterTag -> level.setBlock(waterTag, level.getBlockState(waterTag).setValue(BlockStateProperties.WATERLOGGED, false), 2, 0));
 
 			//start block updates
-			blockUpdates(level, sourceShell);
-			blockUpdates(level, targetShell);
+			try {
+				blockUpdates(level, sourceShell);
+			} catch (Exception ex) {
+				log.error(ex.getMessage(), ex);
+				//TODO not a good solution
+			}
+			try {
+				blockUpdates(level, targetShell);
+			} catch (Exception ex) {
+				log.error(ex.getMessage(), ex);
+				//TODO not a good solution
+			}
 
 			//reset chunks force load
 			resetChunkForceLoad(chunks, level);
@@ -419,8 +429,7 @@ public class JumpUtil {
 	}
 
 	private static void resetChunkForceLoad(Map<LevelChunk, Boolean> chunks, ServerLevel level) {
-		chunks.forEach((chunk, isForced) ->
-				level.setChunkForced(chunk.getPos().x, chunk.getPos().z, isForced));
+		chunks.forEach((chunk, isForced) -> level.setChunkForced(chunk.getPos().x, chunk.getPos().z, isForced));
 	}
 
 	private static void saveChunks(Map<LevelChunk, Boolean> chunks) {

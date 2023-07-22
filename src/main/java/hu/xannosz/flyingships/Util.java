@@ -18,7 +18,7 @@ import java.util.Map;
 @UtilityClass
 public class Util {
 
-	public static final List<Block> PRE_PROCESS = Arrays.asList(Blocks.REDSTONE_WIRE);
+	public static final List<Block> PRE_PROCESS = Arrays.asList(Blocks.REDSTONE_WIRE, Blocks.RAIL);
 	public static final List<Block> POST_PROCESS = Arrays.asList(Blocks.PISTON_HEAD);
 	private static final List<Block> HOLLOW_BLOCKS = Arrays.asList(Blocks.LADDER, Blocks.TORCH, Blocks.WALL_TORCH,
 			Blocks.REDSTONE_TORCH, Blocks.REDSTONE_WALL_TORCH, Blocks.SOUL_TORCH, Blocks.SOUL_WALL_TORCH,
